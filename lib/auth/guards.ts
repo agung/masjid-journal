@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { eq, and } from 'drizzle-orm'
@@ -6,11 +7,13 @@ import { db } from '@/lib/db'
 import { member, organization, session as authSession } from '@/drizzle/schema'
 import { hasMinRole, type Role } from '@/lib/auth/roles'
 
-export async function getSession() {
+// cache() memoizes per-request in React Server Components.
+// If layout and page both call getSession(), the HTTP call is made only once.
+export const getSession = cache(async () => {
   return auth.api.getSession({
     headers: await headers(),
   })
-}
+})
 
 export async function requireAuth() {
   const session = await getSession()
@@ -22,7 +25,9 @@ export async function requireAuth() {
   return session
 }
 
-export async function getActiveOrganizationContext() {
+// cache() memoizes per-request: layout + page calling this gets the same result
+// without any additional DB queries.
+export const getActiveOrganizationContext = cache(async function getActiveOrganizationContext() {
   const session = await requireAuth()
   const sessionData = session.session as unknown as {
     id?: string
@@ -61,22 +66,24 @@ export async function getActiveOrganizationContext() {
     }
   }
 
-  const [membership] = await db
-    .select({ role: member.role })
-    .from(member)
-    .where(
-      and(
-        eq(member.userId, session.user.id),
-        eq(member.organizationId, activeOrganizationId)
+  // Run membership + organization queries in parallel to save one round-trip.
+  const [[membership], [org]] = await Promise.all([
+    db
+      .select({ role: member.role })
+      .from(member)
+      .where(
+        and(
+          eq(member.userId, session.user.id),
+          eq(member.organizationId, activeOrganizationId)
+        )
       )
-    )
-    .limit(1)
-
-  const [org] = await db
-    .select()
-    .from(organization)
-    .where(eq(organization.id, activeOrganizationId))
-    .limit(1)
+      .limit(1),
+    db
+      .select()
+      .from(organization)
+      .where(eq(organization.id, activeOrganizationId))
+      .limit(1),
+  ])
 
   return {
     session,
@@ -84,7 +91,7 @@ export async function getActiveOrganizationContext() {
     role: (membership?.role as Role | undefined) ?? null,
     activeOrganizationId,
   }
-}
+})
 
 export async function requireOrganization() {
   const ctx = await getActiveOrganizationContext()
