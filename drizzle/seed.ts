@@ -5,10 +5,15 @@
  * These are global categories (organization_id = null) available to all masjids.
  */
 
+import * as dotenv from 'dotenv'
 import postgres from 'postgres'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import { category } from './schema'
 import crypto from 'crypto'
+
+// Load .env.local first (local dev), fallback to .env
+dotenv.config({ path: '.env.local' })
+dotenv.config({ path: '.env' })
 
 const DATABASE_URL = process.env.DATABASE_URL
 if (!DATABASE_URL) {

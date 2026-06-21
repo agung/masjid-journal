@@ -1,10 +1,10 @@
-import { requireAuth } from '@/lib/auth/guards'
+import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { listCategories } from '@/lib/server/categories'
 import Link from 'next/link'
 
 export default async function CategoriesPage() {
-  const session = await requireAuth()
-  const orgId = (session.session as unknown as { activeOrganizationId?: string }).activeOrganizationId
+  const ctx = await getActiveOrganizationContext()
+  const orgId = ctx.activeOrganizationId
 
   const categories = orgId ? await listCategories({ organizationId: orgId }) : []
 

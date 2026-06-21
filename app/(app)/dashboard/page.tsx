@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth/guards'
+import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { getAccountSummary, getMonthlyFlow, getRecentMovements } from '@/lib/server/reports'
 import { SummaryCards } from '@/components/dashboard/summary-cards'
 import { LedgerRow, type LedgerRowData } from '@/components/transactions/ledger-row'
@@ -6,25 +6,29 @@ import { formatMonthYear } from '@/lib/formatters'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { AppLogo } from '@/components/ui/app-logo'
+import { CreateOrganizationForm } from '@/components/organization/create-organization-form'
 
 export default async function DashboardPage() {
-  const session = await requireAuth()
-  const orgId = (session.session as unknown as { activeOrganizationId?: string }).activeOrganizationId
+  const ctx = await getActiveOrganizationContext()
 
-  if (!orgId) {
+  if (!ctx.organization || !ctx.activeOrganizationId) {
     return (
-      <div className="p-4 max-w-md mx-auto pt-12 text-center">
-        <div className="flex justify-center mb-4">
-          <AppLogo size={64} />
+      <div className="p-4 max-w-md mx-auto pt-8 pb-24">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <AppLogo size={64} />
+          </div>
+          <h1 className="text-xl font-bold mb-2">Selamat Datang!</h1>
+          <p className="text-gray-500 text-sm">
+            Buat organisasi masjid untuk mulai mencatat keuangan.
+          </p>
         </div>
-        <h1 className="text-xl font-bold mb-2">Selamat Datang!</h1>
-        <p className="text-gray-500 text-sm mb-6">
-          Anda belum tergabung dalam organisasi masjid. Hubungi admin untuk mendapatkan undangan.
-        </p>
+        <CreateOrganizationForm />
       </div>
     )
   }
 
+  const orgId = ctx.activeOrganizationId
   const now = new Date()
   const year = now.getFullYear()
   const month = now.getMonth() + 1
@@ -42,7 +46,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-xl font-bold">Dashboard</h1>
+          <h1 className="text-xl font-bold">{ctx.organization.name}</h1>
           <p className="text-sm text-gray-500">{monthLabel}</p>
         </div>
         <Link

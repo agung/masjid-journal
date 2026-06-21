@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth/guards'
+import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { listAccounts } from '@/lib/server/accounts'
 import { formatRupiah } from '@/lib/formatters'
 import Link from 'next/link'
@@ -8,8 +8,8 @@ import type { MasjidAccount } from '@/drizzle/schema'
 type AccountWithBalance = MasjidAccount & { currentBalance: number }
 
 export default async function AccountsPage() {
-  const session = await requireAuth()
-  const activeOrgId = (session.session as unknown as { activeOrganizationId?: string }).activeOrganizationId
+  const ctx = await getActiveOrganizationContext()
+  const activeOrgId = ctx.activeOrganizationId
 
   const accounts: AccountWithBalance[] = activeOrgId
     ? (await listAccounts(activeOrgId)) as AccountWithBalance[]

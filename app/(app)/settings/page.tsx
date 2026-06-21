@@ -1,9 +1,11 @@
-import { requireAuth } from '@/lib/auth/guards'
+import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import Link from 'next/link'
-import { ChevronRight, Users, Building2, Tag } from 'lucide-react'
+import { ChevronRight, Users, Building2, Tag, Wallet } from 'lucide-react'
+import { LogoutButton } from '@/components/auth/logout-button'
 
 export default async function SettingsPage() {
-  const session = await requireAuth()
+  const ctx = await getActiveOrganizationContext()
+  const session = ctx.session
 
   return (
     <div className="p-4 max-w-md mx-auto pb-24">
@@ -11,26 +13,44 @@ export default async function SettingsPage() {
 
       {/* User info */}
       <div className="bg-white border rounded-2xl p-4 mb-6 flex items-center gap-3">
-        <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-lg">
+        <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-lg shrink-0">
           {session.user.name?.charAt(0).toUpperCase() ?? '?'}
         </div>
-        <div>
-          <p className="font-semibold text-gray-900">{session.user.name}</p>
-          <p className="text-sm text-gray-500">{session.user.email}</p>
+        <div className="min-w-0">
+          <p className="font-semibold text-gray-900 truncate">{session.user.name}</p>
+          <p className="text-sm text-gray-500 truncate">{session.user.email}</p>
+          {ctx.role && (
+            <p className="text-xs text-green-600 font-medium mt-0.5 capitalize">{ctx.role}</p>
+          )}
         </div>
       </div>
 
+      {/* Organization info */}
+      {ctx.organization && (
+        <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-6">
+          <p className="text-xs text-green-600 font-medium mb-0.5">Organisasi Aktif</p>
+          <p className="text-sm font-semibold text-green-800">{ctx.organization.name}</p>
+        </div>
+      )}
+
       {/* Settings menu */}
-      <div className="space-y-2">
-        <SettingsSection title="Organisasi">
-          <SettingsItem href="/settings/organization" icon={Building2} label="Profil Masjid" />
-          <SettingsItem href="/settings/members" icon={Users} label="Kelola Anggota" />
-        </SettingsSection>
+      <div className="space-y-4">
+        {ctx.organization && (
+          <SettingsSection title="Organisasi">
+            <SettingsItem href="/settings/organization" icon={Building2} label="Profil Masjid" />
+            <SettingsItem href="/settings/members" icon={Users} label="Kelola Anggota" />
+          </SettingsSection>
+        )}
 
         <SettingsSection title="Master Data">
-          <SettingsItem href="/accounts" icon={Tag} label="Akun Keuangan" />
+          <SettingsItem href="/accounts" icon={Wallet} label="Akun Keuangan" />
           <SettingsItem href="/categories" icon={Tag} label="Kategori" />
         </SettingsSection>
+
+        {/* Logout */}
+        <div className="pt-2">
+          <LogoutButton />
+        </div>
       </div>
     </div>
   )

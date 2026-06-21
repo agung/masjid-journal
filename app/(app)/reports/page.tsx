@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth/guards'
+import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { getMonthlyReport } from '@/lib/server/reports'
 import { formatRupiah, formatDate } from '@/lib/formatters'
 import { PrintButton } from '@/components/reports/print-button'
@@ -9,11 +9,11 @@ export default async function ReportsPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const session = await requireAuth()
-  const orgId = (session.session as unknown as { activeOrganizationId?: string }).activeOrganizationId
+  const ctx = await getActiveOrganizationContext()
+  const orgId = ctx.activeOrganizationId
 
   if (!orgId) {
-    return <div className="p-4">Belum ada organisasi aktif.</div>
+    return <div className="p-4 text-sm text-gray-500">Belum ada organisasi aktif. Buat di <a href="/dashboard" className="text-green-600">Dashboard</a>.</div>
   }
 
   const { month, year } = await searchParams

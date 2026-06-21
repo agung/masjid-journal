@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth/guards'
+import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { listAccounts } from '@/lib/server/accounts'
 import { formatRupiah, formatDate } from '@/lib/formatters'
 import { notFound } from 'next/navigation'
@@ -14,8 +14,8 @@ interface Props {
 
 export default async function AccountDetailPage({ params }: Props) {
   const { id } = await params
-  const session = await requireAuth()
-  const activeOrgId = (session.session as unknown as { activeOrganizationId?: string }).activeOrganizationId
+  const ctx = await getActiveOrganizationContext()
+  const activeOrgId = ctx.activeOrganizationId
 
   const accounts: AccountWithBalance[] = activeOrgId
     ? (await listAccounts(activeOrgId)) as AccountWithBalance[]

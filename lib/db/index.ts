@@ -17,6 +17,7 @@ const client = globalForDb.pgClient ?? postgres(dbUrl, {
   max: 10,
   idle_timeout: 20,
   connect_timeout: 10,
+  ssl: dbUrl.includes('supabase.com') ? 'require' : false,
 })
 
 if (process.env.NODE_ENV !== 'production') {

@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth/guards'
+import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { getTransactionById } from '@/lib/server/transactions'
 import { formatRupiah, formatDate } from '@/lib/formatters'
 import { TRANSACTION_TYPE_CONFIG } from '@/lib/transaction-icons'
@@ -13,8 +13,8 @@ interface Props {
 
 export default async function TransactionDetailPage({ params }: Props) {
   const { id } = await params
-  const session = await requireAuth()
-  const orgId = (session.session as unknown as { activeOrganizationId?: string }).activeOrganizationId
+  const ctx = await getActiveOrganizationContext()
+  const orgId = ctx.activeOrganizationId
 
   if (!orgId) notFound()
 
