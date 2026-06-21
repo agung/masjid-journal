@@ -66,11 +66,11 @@ export async function listAccounts(organizationId: string) {
           (
             SELECT tm.balance_after
             FROM transaction_movement tm
-            WHERE tm.account_id = ${masjidAccount.id}
+            WHERE tm.account_id = "masjid_account"."id"
             ORDER BY tm.created_at DESC
             LIMIT 1
           ),
-          ${masjidAccount.initialBalance}
+          "masjid_account"."initial_balance"
         )
       `.as('current_balance'),
     })
