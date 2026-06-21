@@ -1,5 +1,6 @@
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
+import * as schema from '@/drizzle/schema'
 
 const dbUrl = process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/masjid_journal'
 
@@ -22,4 +23,4 @@ if (process.env.NODE_ENV !== 'production') {
   globalForDb.pgClient = client
 }
 
-export const db = drizzle(client)
+export const db = drizzle(client, { schema })
