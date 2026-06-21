@@ -1,7 +1,6 @@
 import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { listMembers } from '@/lib/server/organizations'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 
 const ROLE_LABEL: Record<string, string> = {
   owner: 'Owner',
@@ -21,12 +20,6 @@ export default async function MembersPage() {
 
   return (
     <div className="p-4 max-w-md mx-auto pb-24">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center">
-          <Link href="/settings" className="text-gray-500 hover:text-gray-700 mr-3">←</Link>
-          <h1 className="text-xl font-bold">Anggota</h1>
-        </div>
-      </div>
 
       <div className="bg-white border rounded-xl overflow-hidden">
         {members.map((m) => (

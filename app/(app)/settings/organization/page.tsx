@@ -1,6 +1,5 @@
 import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { updateOrganizationNameAction } from '@/lib/server/organizations'
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 export default async function OrganizationSettingsPage({
@@ -18,10 +17,6 @@ export default async function OrganizationSettingsPage({
 
   return (
     <div className="p-4 max-w-md mx-auto pb-24">
-      <div className="flex items-center mb-6">
-        <Link href="/settings" className="text-gray-500 hover:text-gray-700 mr-3">←</Link>
-        <h1 className="text-xl font-bold">Profil Masjid</h1>
-      </div>
 
       {saved && (
         <div className="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-xl">

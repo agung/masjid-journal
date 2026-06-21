@@ -1,6 +1,5 @@
 import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { listCategories } from '@/lib/server/categories'
-import Link from 'next/link'
 
 export default async function CategoriesPage() {
   const ctx = await getActiveOrganizationContext()
@@ -13,10 +12,6 @@ export default async function CategoriesPage() {
 
   return (
     <div className="p-4 max-w-md mx-auto pb-24">
-      <div className="flex items-center mb-6">
-        <Link href="/settings" className="text-gray-500 hover:text-gray-700 mr-3">←</Link>
-        <h1 className="text-xl font-bold">Kategori</h1>
-      </div>
 
       <section className="mb-6">
         <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Pemasukan</h2>

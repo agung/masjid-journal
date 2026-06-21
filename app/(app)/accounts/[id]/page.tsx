@@ -2,7 +2,6 @@ import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { listAccounts } from '@/lib/server/accounts'
 import { formatRupiah, formatDate } from '@/lib/formatters'
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
 import { Wallet, Landmark } from 'lucide-react'
 import type { MasjidAccount } from '@/drizzle/schema'
 
@@ -27,10 +26,7 @@ export default async function AccountDetailPage({ params }: Props) {
   return (
     <div className="p-4 max-w-md mx-auto">
       {/* Header */}
-      <div className="mb-6 flex items-center">
-        <Link href="/accounts" className="text-gray-500 hover:text-gray-700 mr-3">
-          ←
-        </Link>
+      <div className="mb-6">
         <h1 className="text-xl font-bold">Detail Akun</h1>
       </div>
 
@@ -74,12 +70,6 @@ export default async function AccountDetailPage({ params }: Props) {
         </div>
       </div>
 
-      <Link
-        href="/accounts"
-        className="block text-center text-sm text-gray-500 hover:text-gray-700"
-      >
-        ← Kembali ke daftar akun
-      </Link>
     </div>
   )
 }
