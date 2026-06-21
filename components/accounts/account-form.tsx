@@ -31,7 +31,7 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
         result = await createCashHolder({
           name: get('name'),
           holderName: get('holderName'),
-          initialBalance: get('initialBalance'),
+          balance: get('balance'),
         })
       } else {
         result = await createBankAccount({
@@ -39,7 +39,7 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
           bankName: get('bankName'),
           accountNumber: get('accountNumber'),
           accountHolderName: get('accountHolderName'),
-          initialBalance: get('initialBalance'),
+          balance: get('balance'),
         })
       }
 
@@ -173,14 +173,14 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
 
       {/* Initial balance */}
       <div className="space-y-1.5">
-        <label htmlFor="initialBalance" className="text-sm font-medium text-gray-700">
+        <label htmlFor="balance" className="text-sm font-medium text-gray-700">
           Saldo Awal
         </label>
         <div className="relative">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
           <input
-            id="initialBalance"
-            name="initialBalance"
+            id="balance"
+            name="balance"
             type="text"
             inputMode="numeric"
             defaultValue="0"

@@ -122,7 +122,7 @@ export const masjidAccount = pgTable(
     accountNumber: text('account_number'),
     accountHolderName: text('account_holder_name'),
 
-    initialBalance: bigint('initial_balance', { mode: 'number' }).notNull().default(0),
+    balance: bigint('balance', { mode: 'number' }).notNull().default(0),
     isActive: boolean('is_active').notNull().default(true),
 
     createdBy: text('created_by').notNull().references(() => user.id),

@@ -64,9 +64,8 @@ export default async function AccountDetailPage({ params }: Props) {
               <Row label="Atas Nama" value={account.accountHolderName ?? '-'} />
             </>
           )}
-          <Row label="Saldo Awal" value={formatRupiah(account.initialBalance)} />
           <div className="border-t pt-3">
-            <p className="text-xs text-gray-500 mb-0.5">Saldo Saat Ini</p>
+            <p className="text-xs text-gray-500 mb-0.5">Saldo</p>
             <p className="text-2xl font-bold text-green-600">
               {formatRupiah(account.currentBalance)}
             </p>

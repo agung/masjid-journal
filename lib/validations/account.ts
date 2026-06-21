@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const createCashHolderSchema = z.object({
   name: z.string().min(1, 'Nama akun wajib diisi').max(100, 'Nama terlalu panjang'),
   holderName: z.string().min(1, 'Nama pemegang wajib diisi').max(100),
-  initialBalance: z
+  balance: z
     .union([z.string(), z.number()])
     .transform((v) => (typeof v === 'number' ? v : parseInt(String(v).replace(/[^0-9]/g, ''), 10) || 0))
     .pipe(z.number().min(0, 'Saldo awal tidak boleh negatif')),
@@ -14,7 +14,7 @@ export const createBankAccountSchema = z.object({
   bankName: z.string().min(1, 'Nama bank wajib diisi').max(100),
   accountNumber: z.string().min(1, 'Nomor rekening wajib diisi').max(30),
   accountHolderName: z.string().min(1, 'Nama pemilik rekening wajib diisi').max(100),
-  initialBalance: z
+  balance: z
     .union([z.string(), z.number()])
     .transform((v) => (typeof v === 'number' ? v : parseInt(String(v).replace(/[^0-9]/g, ''), 10) || 0))
     .pipe(z.number().min(0, 'Saldo awal tidak boleh negatif')),

@@ -57,26 +57,17 @@ async function generateTransactionNo(
 }
 
 /**
- * Get the latest balance for an account to use as balance_before.
- * Falls back to initial_balance.
+ * Get the current balance for an account directly from masjid_account.balance.
+ * balance is kept in sync on every transaction write.
  */
 async function getLatestBalance(accountId: string): Promise<number> {
-  const [latest] = await db
-    .select({ balanceAfter: transactionMovement.balanceAfter })
-    .from(transactionMovement)
-    .where(eq(transactionMovement.accountId, accountId))
-    .orderBy(desc(transactionMovement.createdAt))
-    .limit(1)
-
-  if (latest) return Number(latest.balanceAfter ?? 0)
-
   const [acc] = await db
-    .select({ initialBalance: masjidAccount.initialBalance })
+    .select({ balance: masjidAccount.balance })
     .from(masjidAccount)
     .where(eq(masjidAccount.id, accountId))
     .limit(1)
 
-  return Number(acc?.initialBalance ?? 0)
+  return Number(acc?.balance ?? 0)
 }
 
 /**
@@ -215,6 +206,14 @@ export async function createTransaction(
     })
 
     await db.insert(transactionMovement).values(resolvedMovements)
+
+    // Update balance on each affected account
+    for (const m of resolvedMovements) {
+      await db
+        .update(masjidAccount)
+        .set({ balance: m.balanceAfter })
+        .where(eq(masjidAccount.id, m.accountId))
+    }
 
     // Audit log
     await db.insert(auditLog).values({

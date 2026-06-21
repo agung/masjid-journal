@@ -1,10 +1,10 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { eq, and, desc, sql } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 import crypto from 'crypto'
 import { db } from '@/lib/db'
-import { masjidAccount, transactionMovement } from '@/drizzle/schema'
+import { masjidAccount } from '@/drizzle/schema'
 import { requireRole } from '@/lib/auth/guards'
 import {
   createCashHolderSchema,
@@ -20,26 +20,16 @@ import {
 // ============================================================
 
 /**
- * Get the latest balance for a single account.
- * Falls back to initialBalance if no movements exist.
+ * Get the current balance for a single account directly from masjid_account.balance.
  */
 export async function getAccountBalance(accountId: string): Promise<number> {
-  const [latest] = await db
-    .select({ balanceAfter: transactionMovement.balanceAfter })
-    .from(transactionMovement)
-    .where(eq(transactionMovement.accountId, accountId))
-    .orderBy(desc(transactionMovement.createdAt))
-    .limit(1)
-
-  if (latest) return Number(latest.balanceAfter ?? 0)
-
   const [acc] = await db
-    .select({ initialBalance: masjidAccount.initialBalance })
+    .select({ balance: masjidAccount.balance })
     .from(masjidAccount)
     .where(eq(masjidAccount.id, accountId))
     .limit(1)
 
-  return Number(acc?.initialBalance ?? 0)
+  return Number(acc?.balance ?? 0)
 }
 
 /**
@@ -57,22 +47,9 @@ export async function listAccounts(organizationId: string) {
       bankName: masjidAccount.bankName,
       accountNumber: masjidAccount.accountNumber,
       accountHolderName: masjidAccount.accountHolderName,
-      initialBalance: masjidAccount.initialBalance,
+      balance: masjidAccount.balance,
       isActive: masjidAccount.isActive,
       createdAt: masjidAccount.createdAt,
-      // Latest balance: subquery
-      currentBalance: sql<number>`
-        COALESCE(
-          (
-            SELECT tm.balance_after
-            FROM transaction_movement tm
-            WHERE tm.account_id = "masjid_account"."id"
-            ORDER BY tm.created_at DESC
-            LIMIT 1
-          ),
-          "masjid_account"."initial_balance"
-        )
-      `.as('current_balance'),
     })
     .from(masjidAccount)
     .where(eq(masjidAccount.organizationId, organizationId))
@@ -80,7 +57,7 @@ export async function listAccounts(organizationId: string) {
 
   return accounts.map((account) => ({
     ...account,
-    currentBalance: Number(account.currentBalance ?? 0),
+    currentBalance: Number(account.balance ?? 0),
   }))
 }
 
@@ -98,7 +75,7 @@ export async function createCashHolder(
     if (!validated.success) {
       return { success: false, error: validated.error.errors[0]?.message ?? 'Validasi gagal' }
     }
-    const { name, holderName, initialBalance } = validated.data
+    const { name, holderName, balance } = validated.data
     const id = crypto.randomUUID()
 
     await db.insert(masjidAccount).values({
@@ -107,7 +84,7 @@ export async function createCashHolder(
       kind: 'cash_holder',
       name,
       holderName,
-      initialBalance,
+      balance,
       isActive: true,
       createdBy: session.user.id,
       createdAt: new Date(),
@@ -132,7 +109,7 @@ export async function createBankAccount(
     if (!validated.success) {
       return { success: false, error: validated.error.errors[0]?.message ?? 'Validasi gagal' }
     }
-    const { name, bankName, accountNumber, accountHolderName, initialBalance } = validated.data
+    const { name, bankName, accountNumber, accountHolderName, balance } = validated.data
     const id = crypto.randomUUID()
 
     await db.insert(masjidAccount).values({
@@ -143,7 +120,7 @@ export async function createBankAccount(
       bankName,
       accountNumber,
       accountHolderName,
-      initialBalance,
+      balance,
       isActive: true,
       createdBy: session.user.id,
       createdAt: new Date(),

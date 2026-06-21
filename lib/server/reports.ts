@@ -14,17 +14,7 @@ export async function getAccountSummary(organizationId: string) {
       kind: masjidAccount.kind,
       name: masjidAccount.name,
       isActive: masjidAccount.isActive,
-      initialBalance: masjidAccount.initialBalance,
-      currentBalance: sql<number>`
-        COALESCE(
-          (SELECT tm.balance_after
-           FROM transaction_movement tm
-           WHERE tm.account_id = "masjid_account"."id"
-           ORDER BY tm.created_at DESC
-           LIMIT 1),
-          "masjid_account"."initial_balance"
-        )
-      `.as('current_balance'),
+      currentBalance: masjidAccount.balance,
     })
     .from(masjidAccount)
     .where(
