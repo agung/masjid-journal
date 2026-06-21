@@ -160,7 +160,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
             inputMode="numeric"
             required
             onChange={(e) => { e.target.value = formatAmount(e.target.value) }}
-            className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl text-lg font-bold focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pl-10 pr-3 py-3 bg-gray-100 border-0 rounded-xl text-lg font-bold focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="0"
           />
         </div>
@@ -174,7 +174,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
             id="categoryId"
             name="categoryId"
             required
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             <option value="">Pilih kategori...</option>
             {(type === 'income' ? incomeCategories : expenseCategories).map((c) => (
@@ -192,7 +192,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
             id="sourceAccountId"
             name="sourceAccountId"
             required
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             <option value="">Pilih pemegang kas...</option>
             {cashHolders.map((a) => (
@@ -206,7 +206,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         <div className="space-y-1.5">
           <label htmlFor="sourceAccountId" className="text-sm font-medium text-gray-700">Dari Pemegang Kas</label>
           <select id="sourceAccountId" name="sourceAccountId" required
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
             <option value="">Pilih pemegang kas...</option>
             {cashHolders.map((a) => (
               <option key={a.id} value={a.id}>{a.name} ({a.holderName})</option>
@@ -219,7 +219,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         <div className="space-y-1.5">
           <label htmlFor="sourceAccountId" className="text-sm font-medium text-gray-700">Dari Rekening Bank</label>
           <select id="sourceAccountId" name="sourceAccountId" required
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
             <option value="">Pilih rekening bank...</option>
             {bankAccounts.map((a) => (
               <option key={a.id} value={a.id}>{a.name} — {a.bankName}</option>
@@ -233,7 +233,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         <div className="space-y-1.5">
           <label htmlFor="targetAccountId" className="text-sm font-medium text-gray-700">Ke Akun</label>
           <select id="targetAccountId" name="targetAccountId" required
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
             <option value="">Pilih akun penerima...</option>
             {accounts.filter((a) => a.isActive).map((a) => (
               <option key={a.id} value={a.id}>
@@ -248,7 +248,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         <div className="space-y-1.5">
           <label htmlFor="targetAccountId" className="text-sm font-medium text-gray-700">Ke Pemegang Kas</label>
           <select id="targetAccountId" name="targetAccountId" required
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
             <option value="">Pilih pemegang kas...</option>
             {cashHolders.map((a) => (
               <option key={a.id} value={a.id}>{a.name} ({a.holderName})</option>
@@ -261,7 +261,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         <div className="space-y-1.5">
           <label htmlFor="targetAccountId" className="text-sm font-medium text-gray-700">Ke Rekening Bank</label>
           <select id="targetAccountId" name="targetAccountId" required
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
             <option value="">Pilih rekening bank...</option>
             {bankAccounts.map((a) => (
               <option key={a.id} value={a.id}>{a.name} — {a.bankName}</option>
@@ -274,7 +274,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         <div className="space-y-1.5">
           <label htmlFor="targetAccountId" className="text-sm font-medium text-gray-700">Ke Pemegang Kas</label>
           <select id="targetAccountId" name="targetAccountId" required
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
             <option value="">Pilih pemegang kas...</option>
             {cashHolders.map((a) => (
               <option key={a.id} value={a.id}>{a.name} ({a.holderName})</option>
@@ -291,7 +291,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
           name="description"
           type="text"
           required
-          className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
           placeholder="Contoh: Infak Jumat 21 Juni"
         />
       </div>
@@ -305,7 +305,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
           type="date"
           required
           defaultValue={new Date().toISOString().split('T')[0]}
-          className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
         />
       </div>
 
@@ -318,7 +318,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
           id="notes"
           name="notes"
           rows={2}
-          className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+          className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
           placeholder="Catatan tambahan..."
         />
       </div>

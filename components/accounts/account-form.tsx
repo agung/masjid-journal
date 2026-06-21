@@ -103,7 +103,7 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
           name="name"
           type="text"
           required
-          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
           placeholder={kind === 'cash_holder' ? 'Contoh: Kas Bendahara A' : 'Contoh: Rek BSI Masjid'}
         />
       </div>
@@ -119,7 +119,7 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
             name="holderName"
             type="text"
             required
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="Contoh: Ahmad Fauzi"
           />
         </div>
@@ -137,7 +137,7 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
               name="bankName"
               type="text"
               required
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Contoh: BSI, BRI, Mandiri"
             />
           </div>
@@ -151,7 +151,7 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
               type="text"
               inputMode="numeric"
               required
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Contoh: 7123456789"
             />
           </div>
@@ -164,7 +164,7 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
               name="accountHolderName"
               type="text"
               required
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Sesuai buku tabungan"
             />
           </div>
@@ -184,7 +184,7 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
             type="text"
             inputMode="numeric"
             defaultValue="0"
-            className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pl-9 pr-3 py-2.5 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="0"
           />
         </div>
