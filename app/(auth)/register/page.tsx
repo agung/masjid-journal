@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signIn } from '@/lib/auth-client'
+import { signUp } from '@/lib/auth-client'
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter()
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -18,14 +19,15 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const result = await signIn.email({
+      const result = await signUp.email({
+        name,
         email,
         password,
         callbackURL: '/dashboard',
       })
 
       if (result?.error) {
-        setError(result.error.message ?? 'Email atau password salah')
+        setError(result.error.message ?? 'Pendaftaran gagal. Silakan coba lagi.')
         return
       }
 
@@ -45,7 +47,7 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">🕌</div>
           <h1 className="text-2xl font-bold text-gray-900">Keuangan Masjid</h1>
-          <p className="text-sm text-gray-500 mt-1">Masuk ke akun Anda</p>
+          <p className="text-sm text-gray-500 mt-1">Buat akun baru</p>
         </div>
 
         {/* Form */}
@@ -55,6 +57,22 @@ export default function LoginPage() {
               {error}
             </div>
           )}
+
+          <div className="space-y-1.5">
+            <label htmlFor="name" className="text-sm font-medium text-gray-700">
+              Nama Lengkap
+            </label>
+            <input
+              id="name"
+              type="text"
+              autoComplete="name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Nama Anda"
+            />
+          </div>
 
           <div className="space-y-1.5">
             <label htmlFor="email" className="text-sm font-medium text-gray-700">
@@ -79,12 +97,13 @@ export default function LoginPage() {
             <input
               id="password"
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               required
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="••••••••"
+              placeholder="Minimal 8 karakter"
             />
           </div>
 
@@ -93,14 +112,14 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg text-sm transition-colors"
           >
-            {loading ? 'Masuk...' : 'Masuk'}
+            {loading ? 'Mendaftar...' : 'Daftar'}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          Belum punya akun?{' '}
-          <Link href="/register" className="text-green-600 hover:text-green-700 font-medium">
-            Daftar
+          Sudah punya akun?{' '}
+          <Link href="/login" className="text-green-600 hover:text-green-700 font-medium">
+            Masuk
           </Link>
         </p>
       </div>
