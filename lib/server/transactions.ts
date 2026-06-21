@@ -207,6 +207,8 @@ export async function createTransaction(
       categoryId: 'categoryId' in data ? data.categoryId : null,
       description: data.description,
       notes: data.notes ?? null,
+      proofStoragePath: data.proofStoragePath ?? null,
+      proofPublicUrl: data.proofPublicUrl ?? null,
       createdBy: session.user.id,
       createdAt: now,
       updatedAt: now,

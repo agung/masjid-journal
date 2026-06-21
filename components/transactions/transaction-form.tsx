@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createTransaction } from '@/lib/server/transactions'
+import { ProofUpload, type ProofUploadResult } from '@/components/transactions/proof-upload'
 import type { MasjidAccount, Category } from '@/drizzle/schema'
 import type { CreateTransactionInput } from '@/lib/validations/transaction'
 
@@ -27,6 +28,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
   const [type, setType] = useState<TransactionType | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [proof, setProof] = useState<ProofUploadResult | null>(null)
 
   const cashHolders = accounts.filter((a) => a.kind === 'cash_holder' && a.isActive)
   const bankAccounts = accounts.filter((a) => a.kind === 'bank' && a.isActive)
@@ -57,6 +59,8 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         description: get('description'),
         transactionDate: get('transactionDate'),
         notes: get('notes') || undefined,
+        proofStoragePath: proof?.fileId,
+        proofPublicUrl: proof?.webViewLink,
       } as const
 
       switch (type) {
@@ -318,6 +322,12 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
           placeholder="Catatan tambahan..."
         />
       </div>
+
+      {/* Proof upload */}
+      <ProofUpload
+        onUploaded={(result) => setProof(result)}
+        onClear={() => setProof(null)}
+      />
 
       <button
         type="submit"

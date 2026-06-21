@@ -9,6 +9,9 @@ const baseTransactionFields = {
     .union([z.string(), z.number()])
     .transform((v) => (typeof v === 'number' ? v : parseInt(String(v).replace(/[^0-9]/g, ''), 10) || 0))
     .pipe(z.number().min(1, 'Nominal harus lebih dari 0')),
+  // Proof upload fields (optional, populated after Google Drive upload)
+  proofStoragePath: z.string().optional(), // Drive file ID
+  proofPublicUrl: z.string().url().optional(),  // Drive web view link
 }
 
 // Income: uang masuk ke holder atau bank
