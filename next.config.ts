@@ -17,9 +17,14 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
+        // Google Drive shared file previews
         protocol: 'https',
-        hostname: '*.supabase.co',
-        pathname: '/storage/v1/object/public/**',
+        hostname: 'drive.google.com',
+      },
+      {
+        // Google Drive direct content links
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
       },
     ],
   },

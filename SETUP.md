@@ -37,15 +37,7 @@ Panduan lengkap untuk mengkonfigurasi semua layanan eksternal sebelum deploy.
 5. Ganti `[YOUR-PASSWORD]` dengan password yang dicatat tadi
 6. Simpan sebagai nilai `DATABASE_URL`
 
-### 1.3 Ambil API Keys
-
-1. **Project Settings** → **API**
-2. Copy:
-   - **URL** → nilai `NEXT_PUBLIC_SUPABASE_URL`
-   - **anon public** → nilai `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - **service_role secret** → nilai `SUPABASE_SERVICE_ROLE_KEY`
-
-### 1.4 Push Schema
+### 1.3 Push Schema
 
 Setelah `.env.local` terisi, jalankan:
 
@@ -188,11 +180,6 @@ BETTER_AUTH_URL=http://localhost:3000
 # Database (Supabase PostgreSQL)
 DATABASE_URL=postgresql://postgres.xxxx:password@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
 
-# Supabase API
-NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJh...
-SUPABASE_SERVICE_ROLE_KEY=eyJh...
-
 # Google Drive
 GOOGLE_SERVICE_ACCOUNT_EMAIL=masjid-journal-uploader@project.iam.gserviceaccount.com
 GOOGLE_SERVICE_ACCOUNT_KEY=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -208,9 +195,6 @@ NEXT_PUBLIC_APP_NAME="Keuangan Masjid"
 | `BETTER_AUTH_SECRET` | Ya | Random string 32 bytes |
 | `BETTER_AUTH_URL` | Ya | URL app (localhost atau Vercel URL) |
 | `DATABASE_URL` | Ya | Supabase PostgreSQL connection string |
-| `NEXT_PUBLIC_SUPABASE_URL` | Ya | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Ya | Supabase anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Ya | Supabase service role key |
 | `GOOGLE_SERVICE_ACCOUNT_EMAIL` | Ya | Service account email |
 | `GOOGLE_SERVICE_ACCOUNT_KEY` | Ya | Base64 encoded JSON key |
 | `GOOGLE_DRIVE_FOLDER_ID` | Ya | Folder ID tujuan upload |
