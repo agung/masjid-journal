@@ -89,9 +89,22 @@ export const auth = betterAuth({
     }),
   ],
 
-  trustedOrigins: [
-    process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
-  ],
+  // In development, accept any origin so the app works when opened from
+  // a phone on the same Wi-Fi (e.g. http://192.168.x.x:3000).
+  // In production, lock to NEXT_PUBLIC_APP_URL only.
+  trustedOrigins:
+    process.env.NODE_ENV === 'development'
+      ? async (request?: Request) => {
+          const origin = request?.headers.get('origin') ?? ''
+          return [
+            'http://localhost:3000',
+            ...(process.env.NEXT_PUBLIC_APP_URL ? [process.env.NEXT_PUBLIC_APP_URL] : []),
+            origin, // accept whatever origin sent the request
+          ].filter(Boolean)
+        }
+      : [
+          process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
+        ],
 })
 
 export type Session = typeof auth.$Infer.Session
