@@ -1,6 +1,8 @@
 import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { listTransactionMovements } from '@/lib/server/transactions'
+import { listAccounts } from '@/lib/server/accounts'
 import { LedgerRow, type LedgerRowData } from '@/components/transactions/ledger-row'
+import { LedgerFilters } from '@/components/transactions/ledger-filters'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 
@@ -22,13 +24,16 @@ export default async function TransactionsPage({
   const pYear = year ? parseInt(year as string, 10) : now.getFullYear()
   const pMonth = month ? parseInt(month as string, 10) : now.getMonth() + 1
 
-  const rows = await listTransactionMovements({
-    organizationId: orgId,
-    year: pYear,
-    month: pMonth,
-    accountId: accountId as string,
-    type: type as string,
-  })
+  const [rows, accounts] = await Promise.all([
+    listTransactionMovements({
+      organizationId: orgId,
+      year: pYear,
+      month: pMonth,
+      accountId: accountId as string,
+      type: type as string,
+    }),
+    listAccounts(orgId),
+  ])
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
@@ -49,21 +54,13 @@ export default async function TransactionsPage({
         </Link>
       </div>
 
-      {/* Filters stub (mobile friendly) */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-4 hide-scrollbar">
-        <select className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2.5 outline-none min-h-[44px]">
-          <option>Bulan Ini</option>
-          <option>Bulan Lalu</option>
-        </select>
-        <select className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2.5 outline-none min-h-[44px]">
-          <option>Semua Akun</option>
-        </select>
-        <select className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2.5 outline-none min-h-[44px]">
-          <option>Semua Tipe</option>
-          <option value="income">Pemasukan</option>
-          <option value="expense">Pengeluaran</option>
-        </select>
-      </div>
+      <LedgerFilters
+        accounts={accounts}
+        currentYear={pYear}
+        currentMonth={pMonth}
+        currentAccountId={accountId as string | undefined}
+        currentType={type as string | undefined}
+      />
 
       {/* Ledger list */}
       {rows.length === 0 ? (

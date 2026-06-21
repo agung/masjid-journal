@@ -46,7 +46,8 @@ export default async function ReportsPage({
           const y = d.getFullYear()
           const m = d.getMonth() + 1
           const label = d.toLocaleString('id-ID', { month: 'short', year: 'numeric' })
-          const active = offset === 0
+          // Active when this tab's year+month matches the currently viewed period
+          const active = y === pYear && m === pMonth
           return (
             <Link
               key={offset}
