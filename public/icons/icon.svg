@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <!-- Background -->
+  <rect width="192" height="192" rx="40" fill="#16a34a"/>
+  <!-- Masjid dome -->
+  <ellipse cx="96" cy="72" rx="44" ry="36" fill="white"/>
+  <!-- Minaret left -->
+  <rect x="38" y="72" width="16" height="72" rx="4" fill="white"/>
+  <ellipse cx="46" cy="72" rx="10" ry="12" fill="white"/>
+  <!-- Minaret right -->
+  <rect x="138" y="72" width="16" height="72" rx="4" fill="white"/>
+  <ellipse cx="146" cy="72" rx="10" ry="12" fill="white"/>
+  <!-- Main building -->
+  <rect x="54" y="104" width="84" height="40" rx="0" fill="white"/>
+  <!-- Door -->
+  <rect x="85" y="118" width="22" height="26" rx="11" fill="#16a34a"/>
+  <!-- Star crescent -->
+  <text x="80" y="60" font-size="20" fill="#16a34a" font-family="serif">★</text>
+  <!-- Ground line -->
+  <rect x="24" y="144" width="144" height="8" rx="4" fill="white"/>
+</svg>

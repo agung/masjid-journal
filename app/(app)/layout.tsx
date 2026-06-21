@@ -1,3 +1,5 @@
+import { BottomNav } from '@/components/layout/bottom-nav'
+
 export default function AppLayout({
   children,
 }: {
@@ -8,6 +10,7 @@ export default function AppLayout({
       <main className="pb-safe">
         {children}
       </main>
+      <BottomNav />
     </div>
   )
 }

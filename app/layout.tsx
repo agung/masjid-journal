@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     template: '%s | Keuangan Masjid',
   },
   description: 'Sistem pencatatan keuangan masjid',
-  manifest: '/manifest.json',
+  // manifest is now served dynamically via app/manifest.ts
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     telephone: false,
   },
   icons: {
+    icon: '/icons/icon.svg',
     apple: '/icons/apple-touch-icon.png',
   },
 }
