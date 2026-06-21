@@ -3,8 +3,14 @@ import { updateOrganizationNameAction } from '@/lib/server/organizations'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-export default async function OrganizationSettingsPage() {
+export default async function OrganizationSettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ saved?: string }>
+}) {
   const ctx = await getActiveOrganizationContext()
+  const params = await searchParams
+  const saved = params.saved === '1'
 
   if (!ctx.organization) {
     redirect('/dashboard')
@@ -17,7 +23,13 @@ export default async function OrganizationSettingsPage() {
         <h1 className="text-xl font-bold">Profil Masjid</h1>
       </div>
 
-      <form action={async (fd) => { await updateOrganizationNameAction(fd) }} className="space-y-4">
+      {saved && (
+        <div className="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-xl">
+          ✓ Perubahan berhasil disimpan
+        </div>
+      )}
+
+      <form action={updateOrganizationNameAction} className="space-y-4">
         <div className="space-y-1.5">
           <label htmlFor="name" className="text-sm font-medium text-gray-700">Nama Masjid</label>
           <input

@@ -231,6 +231,7 @@ export async function createTransaction(
 
     revalidatePath('/transactions')
     revalidatePath('/dashboard')
+    revalidatePath('/accounts')
 
     return { success: true, id: txId }
   } catch (err) {

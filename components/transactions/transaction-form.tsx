@@ -84,7 +84,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         return
       }
 
-      router.push('/transactions')
+      router.push('/dashboard')
       router.refresh()
     } catch {
       setError('Terjadi kesalahan. Silakan coba lagi.')

@@ -57,18 +57,19 @@ export async function createOrganizationAction(formData: FormData) {
   redirect('/dashboard')
 }
 
-export async function updateOrganizationNameAction(formData: FormData) {
+export async function updateOrganizationNameAction(formData: FormData): Promise<void> {
   const session = await requireAuth()
   const sessionData = session.session as unknown as { activeOrganizationId?: string | null }
   const orgId = sessionData.activeOrganizationId
   const name = String(formData.get('name') ?? '').trim()
 
-  if (!orgId || !name) return { success: false, error: 'Data tidak lengkap' }
+  if (!orgId || !name) return
 
   await db.update(organization).set({ name }).where(eq(organization.id, orgId))
   revalidatePath('/settings/organization')
+  revalidatePath('/settings')
   revalidatePath('/dashboard')
-  return { success: true }
+  redirect('/settings/organization?saved=1')
 }
 
 export async function listMembers(organizationId: string) {
