@@ -1,0 +1,58 @@
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { AppLogo } from '@/components/ui/app-logo'
+
+const PAGE_TITLES: Record<string, string> = {
+  '/dashboard': 'Dashboard',
+  '/transactions': 'Ledger',
+  '/transactions/new': 'Transaksi Baru',
+  '/accounts': 'Akun Keuangan',
+  '/accounts/new': 'Tambah Akun',
+  '/categories': 'Kategori',
+  '/reports': 'Laporan',
+  '/settings': 'Pengaturan',
+  '/settings/organization': 'Profil Masjid',
+  '/settings/members': 'Kelola Anggota',
+}
+
+export function TopBar({ orgName }: { orgName?: string }) {
+  const pathname = usePathname()
+
+  const isBack = pathname !== '/dashboard' && ![
+    '/transactions', '/accounts', '/reports', '/settings',
+  ].includes(pathname)
+
+  const title = PAGE_TITLES[pathname] ?? 'Keuangan Masjid'
+
+  return (
+    <header className="sticky top-0 z-40 bg-white border-b border-gray-100 no-print">
+      <div className="flex items-center h-14 px-4 max-w-2xl mx-auto gap-3">
+        {isBack ? (
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-600 -ml-1 shrink-0"
+            aria-label="Kembali"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m15 18-6-6 6-6"/>
+            </svg>
+          </button>
+        ) : (
+          <Link href="/dashboard" className="shrink-0">
+            <AppLogo size={28} />
+          </Link>
+        )}
+
+        <div className="flex-1 min-w-0">
+          <p className="text-base font-semibold text-gray-900 truncate">{title}</p>
+          {pathname === '/dashboard' && orgName && (
+            <p className="text-xs text-gray-500 truncate -mt-0.5">{orgName}</p>
+          )}
+        </div>
+      </div>
+    </header>
+  )
+}
