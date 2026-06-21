@@ -31,7 +31,7 @@ export async function getAccountBalance(accountId: string): Promise<number> {
     .orderBy(desc(transactionMovement.createdAt))
     .limit(1)
 
-  if (latest) return latest.balanceAfter
+  if (latest) return Number(latest.balanceAfter ?? 0)
 
   const [acc] = await db
     .select({ initialBalance: masjidAccount.initialBalance })
@@ -39,7 +39,7 @@ export async function getAccountBalance(accountId: string): Promise<number> {
     .where(eq(masjidAccount.id, accountId))
     .limit(1)
 
-  return acc?.initialBalance ?? 0
+  return Number(acc?.initialBalance ?? 0)
 }
 
 /**
@@ -78,7 +78,10 @@ export async function listAccounts(organizationId: string) {
     .where(eq(masjidAccount.organizationId, organizationId))
     .orderBy(masjidAccount.kind, masjidAccount.name)
 
-  return accounts
+  return accounts.map((account) => ({
+    ...account,
+    currentBalance: Number(account.currentBalance ?? 0),
+  }))
 }
 
 // ============================================================

@@ -52,7 +52,7 @@ async function generateTransactionNo(
       )
     )
 
-  const seq = ((result?.count ?? 0) as number) + 1
+  const seq = Number(result?.count ?? 0) + 1
   return `${prefix}-${yyyymm}-${String(seq).padStart(4, '0')}`
 }
 
@@ -68,7 +68,7 @@ async function getLatestBalance(accountId: string): Promise<number> {
     .orderBy(desc(transactionMovement.createdAt))
     .limit(1)
 
-  if (latest) return latest.balanceAfter
+  if (latest) return Number(latest.balanceAfter ?? 0)
 
   const [acc] = await db
     .select({ initialBalance: masjidAccount.initialBalance })
@@ -76,7 +76,7 @@ async function getLatestBalance(accountId: string): Promise<number> {
     .where(eq(masjidAccount.id, accountId))
     .limit(1)
 
-  return acc?.initialBalance ?? 0
+  return Number(acc?.initialBalance ?? 0)
 }
 
 /**

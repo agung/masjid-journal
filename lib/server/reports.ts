@@ -37,8 +37,9 @@ export async function getAccountSummary(organizationId: string) {
   const cashHolders = accounts.filter((a) => a.kind === 'cash_holder')
   const banks = accounts.filter((a) => a.kind === 'bank')
 
-  const totalCash = cashHolders.reduce((sum, a) => sum + (a.currentBalance ?? 0), 0)
-  const totalBank = banks.reduce((sum, a) => sum + (a.currentBalance ?? 0), 0)
+  // PostgreSQL bigint/numeric comes back as strings — cast to Number before summing.
+  const totalCash = cashHolders.reduce((sum, a) => sum + Number(a.currentBalance ?? 0), 0)
+  const totalBank = banks.reduce((sum, a) => sum + Number(a.currentBalance ?? 0), 0)
 
   return {
     cashHolders,
@@ -81,10 +82,10 @@ export async function getMonthlyFlow(
     )
 
   return {
-    totalIncome: result?.totalIncome ?? 0,
-    totalExpense: result?.totalExpense ?? 0,
-    transactionCount: result?.transactionCount ?? 0,
-    netFlow: (result?.totalIncome ?? 0) - (result?.totalExpense ?? 0),
+    totalIncome: Number(result?.totalIncome ?? 0),
+    totalExpense: Number(result?.totalExpense ?? 0),
+    transactionCount: Number(result?.transactionCount ?? 0),
+    netFlow: Number(result?.totalIncome ?? 0) - Number(result?.totalExpense ?? 0),
   }
 }
 
@@ -131,12 +132,13 @@ export async function getMonthlyReport(
     if (tx.type !== 'income' && tx.type !== 'expense') continue
     const key = tx.categoryId ?? '__uncategorized__'
     const name = tx.categoryName ?? 'Tanpa Kategori'
+    const amount = Number(tx.amount ?? 0)
     const existing = categoryMap.get(key)
     if (existing) {
-      existing.total += tx.amount
+      existing.total += amount
       existing.count += 1
     } else {
-      categoryMap.set(key, { name, type: tx.categoryType ?? tx.type, total: tx.amount, count: 1 })
+      categoryMap.set(key, { name, type: tx.categoryType ?? tx.type, total: amount, count: 1 })
     }
   }
 
@@ -145,11 +147,11 @@ export async function getMonthlyReport(
 
   const totalIncome = transactions
     .filter((t) => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0)
+    .reduce((sum, t) => sum + Number(t.amount ?? 0), 0)
 
   const totalExpense = transactions
     .filter((t) => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0)
+    .reduce((sum, t) => sum + Number(t.amount ?? 0), 0)
 
   // Opening balance: total of all account balances at start of month
   // Approximate: currentBalance - netFlow

@@ -18,13 +18,14 @@ export default async function AccountsPage() {
   const cashHolders = accounts.filter((a) => a.kind === 'cash_holder')
   const bankAccounts = accounts.filter((a) => a.kind === 'bank')
 
+  // currentBalance comes from a raw SQL subquery — cast to Number to prevent string concatenation.
   const totalCash = cashHolders
     .filter((a) => a.isActive)
-    .reduce((sum, a) => sum + a.currentBalance, 0)
+    .reduce((sum, a) => sum + Number(a.currentBalance ?? 0), 0)
 
   const totalBank = bankAccounts
     .filter((a) => a.isActive)
-    .reduce((sum, a) => sum + a.currentBalance, 0)
+    .reduce((sum, a) => sum + Number(a.currentBalance ?? 0), 0)
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
