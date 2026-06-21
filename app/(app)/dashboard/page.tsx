@@ -35,7 +35,7 @@ export default async function DashboardPage() {
   const monthLabel = formatMonthYear(now)
 
   return (
-    <div className="p-4 max-w-2xl mx-auto pb-24">
+    <div className="p-4 max-w-2xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
@@ -44,7 +44,7 @@ export default async function DashboardPage() {
         </div>
         <Link
           href="/transactions/new"
-          className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+          className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
         >
           <Plus size={16} />
           Input
@@ -66,7 +66,7 @@ export default async function DashboardPage() {
         <div className="mt-5">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Akun</h2>
-            <Link href="/accounts" className="text-xs text-green-600">Lihat semua</Link>
+            <Link href="/accounts" className="text-xs text-green-600 p-2 -m-2">Lihat semua</Link>
           </div>
           <div className="space-y-2">
             {[...accountSummary.cashHolders, ...accountSummary.banks].slice(0, 4).map((acc) => (
@@ -88,7 +88,7 @@ export default async function DashboardPage() {
       <div className="mt-5">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Transaksi Terakhir</h2>
-          <Link href="/transactions" className="text-xs text-green-600">Lihat semua</Link>
+          <Link href="/transactions" className="text-xs text-green-600 p-2 -m-2">Lihat semua</Link>
         </div>
         {recentMovements.length === 0 ? (
           <div className="text-center py-8 bg-gray-50 rounded-2xl border border-dashed">

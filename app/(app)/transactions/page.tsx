@@ -31,7 +31,7 @@ export default async function TransactionsPage({
   })
 
   return (
-    <div className="p-4 max-w-2xl mx-auto pb-24">
+    <div className="p-4 max-w-2xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -42,7 +42,7 @@ export default async function TransactionsPage({
         </div>
         <Link
           href="/transactions/new"
-          className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+          className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
         >
           <Plus size={16} />
           Input
@@ -51,14 +51,14 @@ export default async function TransactionsPage({
 
       {/* Filters stub (mobile friendly) */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4 hide-scrollbar">
-        <select className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-1.5 outline-none">
+        <select className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2.5 outline-none min-h-[44px]">
           <option>Bulan Ini</option>
           <option>Bulan Lalu</option>
         </select>
-        <select className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-1.5 outline-none">
+        <select className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2.5 outline-none min-h-[44px]">
           <option>Semua Akun</option>
         </select>
-        <select className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-1.5 outline-none">
+        <select className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2.5 outline-none min-h-[44px]">
           <option>Semua Tipe</option>
           <option value="income">Pemasukan</option>
           <option value="expense">Pengeluaran</option>

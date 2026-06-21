@@ -130,7 +130,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         <button
           type="button"
           onClick={() => { setStep(1); setError(null) }}
-          className="text-gray-400 hover:text-gray-600 text-xl leading-none"
+          className="text-gray-400 hover:text-gray-600 text-xl leading-none p-2 -ml-2 min-h-[44px] min-w-[44px]"
           aria-label="Kembali"
         >
           ←
