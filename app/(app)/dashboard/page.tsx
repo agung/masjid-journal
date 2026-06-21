@@ -5,6 +5,7 @@ import { LedgerRow, type LedgerRowData } from '@/components/transactions/ledger-
 import { formatMonthYear } from '@/lib/formatters'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
+import { AppLogo } from '@/components/ui/app-logo'
 
 export default async function DashboardPage() {
   const session = await requireAuth()
@@ -13,7 +14,9 @@ export default async function DashboardPage() {
   if (!orgId) {
     return (
       <div className="p-4 max-w-md mx-auto pt-12 text-center">
-        <div className="text-5xl mb-4">🕌</div>
+        <div className="flex justify-center mb-4">
+          <AppLogo size={64} />
+        </div>
         <h1 className="text-xl font-bold mb-2">Selamat Datang!</h1>
         <p className="text-gray-500 text-sm mb-6">
           Anda belum tergabung dalam organisasi masjid. Hubungi admin untuk mendapatkan undangan.

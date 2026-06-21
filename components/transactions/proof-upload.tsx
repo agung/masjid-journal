@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Image from 'next/image'
+import { Camera, Loader2 } from 'lucide-react'
 
 export interface ProofUploadResult {
   fileId: string
@@ -76,7 +77,7 @@ export function ProofUpload({ onUploaded, onClear }: ProofUploadProps) {
           htmlFor="proof-file"
           className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-green-400 hover:bg-green-50 transition-colors"
         >
-          <span className="text-3xl mb-1">📸</span>
+          <Camera size={28} className="text-gray-400 mb-1" />
           <span className="text-sm text-gray-500">Foto / pilih dari galeri</span>
           <span className="text-xs text-gray-400 mt-0.5">JPG, PNG, WebP — maks 5MB</span>
           <input
@@ -103,7 +104,7 @@ export function ProofUpload({ onUploaded, onClear }: ProofUploadProps) {
           {/* Overlay while uploading */}
           {uploading && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-              <div className="text-white text-sm font-medium">🔄 Mengupload...</div>
+              <div className="text-white text-sm font-medium flex items-center gap-2"><Loader2 size={16} className="animate-spin" /> Mengupload...</div>
             </div>
           )}
 

@@ -1,18 +1,11 @@
 import { requireAuth } from '@/lib/auth/guards'
 import { getTransactionById } from '@/lib/server/transactions'
 import { formatRupiah, formatDate } from '@/lib/formatters'
+import { TRANSACTION_TYPE_CONFIG } from '@/lib/transaction-icons'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-
-const TYPE_INFO: Record<string, { label: string; emoji: string }> = {
-  income:     { label: 'Pemasukan',   emoji: '📥' },
-  expense:    { label: 'Pengeluaran', emoji: '📤' },
-  transfer:   { label: 'Transfer',    emoji: '🔄' },
-  deposit:    { label: 'Setor Bank',  emoji: '🏦' },
-  withdrawal: { label: 'Tarik Tunai', emoji: '💳' },
-  adjustment: { label: 'Koreksi',     emoji: '⚙️'  },
-}
+import { Wallet, Landmark } from 'lucide-react'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -28,7 +21,8 @@ export default async function TransactionDetailPage({ params }: Props) {
   const tx = await getTransactionById(id, orgId)
   if (!tx) notFound()
 
-  const typeInfo = TYPE_INFO[tx.type] ?? { label: tx.type, emoji: '•' }
+  const typeConfig = TRANSACTION_TYPE_CONFIG[tx.type as keyof typeof TRANSACTION_TYPE_CONFIG]
+  const TypeIcon = typeConfig?.icon
 
   return (
     <div className="p-4 max-w-md mx-auto pb-24">
@@ -44,7 +38,9 @@ export default async function TransactionDetailPage({ params }: Props) {
       <div className="bg-white border rounded-2xl p-5 mb-4 space-y-4">
         {/* Type + number */}
         <div className="flex items-center justify-between">
-          <span className="text-2xl">{typeInfo.emoji}</span>
+          <span className={`h-10 w-10 rounded-xl flex items-center justify-center ${typeConfig?.color ?? 'bg-gray-100 text-gray-700'}`}>
+            {TypeIcon && <TypeIcon size={20} />}
+          </span>
           <div className="text-right">
             <p className="text-xs text-gray-400 font-mono">{tx.transactionNo}</p>
             <p className="text-xs text-gray-500">{formatDate(tx.transactionDate)}</p>
@@ -69,7 +65,9 @@ export default async function TransactionDetailPage({ params }: Props) {
             <div key={m.id} className="bg-white border rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">{m.accountKind === 'cash_holder' ? '💰' : '🏦'}</span>
+                  <span className="h-7 w-7 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center">
+                    {m.accountKind === 'cash_holder' ? <Wallet size={14} /> : <Landmark size={14} />}
+                  </span>
                   <span className="font-medium text-sm">{m.accountName}</span>
                 </div>
                 <span className={`font-bold text-base ${ m.direction === 'in' ? 'text-green-600' : 'text-red-600' }`}>

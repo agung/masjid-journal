@@ -4,18 +4,15 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createTransaction } from '@/lib/server/transactions'
 import { ProofUpload, type ProofUploadResult } from '@/components/transactions/proof-upload'
+import { TRANSACTION_TYPE_CONFIG } from '@/lib/transaction-icons'
 import type { MasjidAccount, Category } from '@/drizzle/schema'
 import type { CreateTransactionInput } from '@/lib/validations/transaction'
 
 type TransactionType = 'income' | 'expense' | 'transfer' | 'deposit' | 'withdrawal'
 
-const TRANSACTION_TYPES: { type: TransactionType; label: string; emoji: string; color: string }[] = [
-  { type: 'income', label: 'Pemasukan', emoji: '📥', color: 'border-green-500 bg-green-50 text-green-700' },
-  { type: 'expense', label: 'Pengeluaran', emoji: '📤', color: 'border-red-500 bg-red-50 text-red-700' },
-  { type: 'transfer', label: 'Transfer', emoji: '🔄', color: 'border-blue-500 bg-blue-50 text-blue-700' },
-  { type: 'deposit', label: 'Setor Bank', emoji: '🏦', color: 'border-purple-500 bg-purple-50 text-purple-700' },
-  { type: 'withdrawal', label: 'Tarik Tunai', emoji: '💳', color: 'border-orange-500 bg-orange-50 text-orange-700' },
-]
+const TRANSACTION_TYPES = (
+  ['income', 'expense', 'transfer', 'deposit', 'withdrawal'] as TransactionType[]
+).map((type) => ({ type, ...TRANSACTION_TYPE_CONFIG[type] }))
 
 interface TransactionFormProps {
   accounts: MasjidAccount[]
@@ -102,26 +99,32 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
       <div className="space-y-4">
         <p className="text-sm text-gray-500 text-center">Pilih jenis transaksi</p>
         <div className="grid grid-cols-1 gap-2">
-          {TRANSACTION_TYPES.map((t) => (
-            <button
-              key={t.type}
-              type="button"
-              onClick={() => { setType(t.type); setStep(2) }}
-              className={`flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-colors hover:shadow-sm ${
-                type === t.type ? t.color : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <span className="text-3xl">{t.emoji}</span>
-              <span className="font-semibold text-base">{t.label}</span>
-            </button>
-          ))}
+          {TRANSACTION_TYPES.map((t) => {
+            const Icon = t.icon
+            return (
+              <button
+                key={t.type}
+                type="button"
+                onClick={() => { setType(t.type); setStep(2) }}
+                className={`flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-colors hover:shadow-sm ${
+                  type === t.type ? t.borderColor : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <span className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${t.borderColor}`}>
+                  <Icon size={22} />
+                </span>
+                <span className="font-semibold text-base">{t.label}</span>
+              </button>
+            )
+          })}
         </div>
       </div>
     )
   }
 
   // ── Step 2: Transaction details ──
-  const selectedType = TRANSACTION_TYPES.find((t) => t.type === type)!
+  const selectedType = TRANSACTION_TYPE_CONFIG[type!]
+  const SelectedIcon = selectedType.icon
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -135,10 +138,11 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         >
           ←
         </button>
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
-          selectedType.color
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${
+          selectedType.borderColor
         }`}>
-          {selectedType.emoji} {selectedType.label}
+          <SelectedIcon size={12} />
+          {selectedType.label}
         </span>
       </div>
 
@@ -237,7 +241,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
             <option value="">Pilih akun penerima...</option>
             {accounts.filter((a) => a.isActive).map((a) => (
               <option key={a.id} value={a.id}>
-                {a.kind === 'cash_holder' ? '💰' : '🏦'} {a.name}
+                {a.kind === 'cash_holder' ? 'Kas' : 'Bank'} — {a.name}
               </option>
             ))}
           </select>

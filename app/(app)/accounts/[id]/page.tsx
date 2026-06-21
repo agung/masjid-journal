@@ -3,6 +3,7 @@ import { listAccounts } from '@/lib/server/accounts'
 import { formatRupiah, formatDate } from '@/lib/formatters'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { Wallet, Landmark } from 'lucide-react'
 import type { MasjidAccount } from '@/drizzle/schema'
 
 type AccountWithBalance = MasjidAccount & { currentBalance: number }
@@ -36,8 +37,8 @@ export default async function AccountDetailPage({ params }: Props) {
       {/* Card */}
       <div className="bg-white rounded-2xl border p-5 mb-6">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-3xl">
-            {account.kind === 'cash_holder' ? '💰' : '🏦'}
+          <span className="h-12 w-12 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center shrink-0">
+            {account.kind === 'cash_holder' ? <Wallet size={24} /> : <Landmark size={24} />}
           </span>
           <div>
             <h2 className="font-bold text-lg">{account.name}</h2>
