@@ -72,21 +72,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: 'Helvetica-Bold',
     color: COLORS.primary,
-    marginBottom: 4,
-  },
-  accountLine: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 2,
-  },
-  accountLineName: {
-    fontSize: 7.5,
-    color: COLORS.subtext,
-    flex: 1,
-  },
-  accountLineBalance: {
-    fontSize: 7.5,
-    color: COLORS.heading,
   },
   // ── movement table ────────────────────────────────────────────
   tableSection: {
@@ -136,10 +121,9 @@ const styles = StyleSheet.create({
   colNo: { width: 22 },
   colDate: { width: 52 },
   colDesc: { flex: 1 },
-  colAccount: { width: 70 },
-  colIn: { width: 72, textAlign: 'right' },
-  colOut: { width: 72, textAlign: 'right' },
-  colBalance: { width: 76, textAlign: 'right' },
+  colIn: { width: 80, textAlign: 'right' },
+  colOut: { width: 80, textAlign: 'right' },
+  colBalance: { width: 84, textAlign: 'right' },
   // ── empty state ───────────────────────────────────────────────
   emptyBox: {
     borderWidth: 1,
@@ -241,17 +225,6 @@ export function TransactionReportPdf({
               <Text style={styles.summaryCardTotal}>
                 {formatRupiah(accountSummary.totalBank)}
               </Text>
-              {accountSummary.banks.map((acc) => (
-                <View key={acc.id} style={styles.accountLine}>
-                  <Text style={styles.accountLineName}>{acc.name}</Text>
-                  <Text style={styles.accountLineBalance}>
-                    {formatRupiah(Number(acc.currentBalance))}
-                  </Text>
-                </View>
-              ))}
-              {accountSummary.banks.length === 0 && (
-                <Text style={styles.tableCellSub}>—</Text>
-              )}
             </View>
 
             {/* Cash card */}
@@ -260,17 +233,6 @@ export function TransactionReportPdf({
               <Text style={styles.summaryCardTotal}>
                 {formatRupiah(accountSummary.totalCash)}
               </Text>
-              {accountSummary.cashHolders.map((acc) => (
-                <View key={acc.id} style={styles.accountLine}>
-                  <Text style={styles.accountLineName}>{acc.name}</Text>
-                  <Text style={styles.accountLineBalance}>
-                    {formatRupiah(Number(acc.currentBalance))}
-                  </Text>
-                </View>
-              ))}
-              {accountSummary.cashHolders.length === 0 && (
-                <Text style={styles.tableCellSub}>—</Text>
-              )}
             </View>
           </View>
         </View>
@@ -294,7 +256,6 @@ export function TransactionReportPdf({
                 <Text style={[styles.tableHeaderCell, styles.colNo]}>No</Text>
                 <Text style={[styles.tableHeaderCell, styles.colDate]}>Tanggal</Text>
                 <Text style={[styles.tableHeaderCell, styles.colDesc]}>Keterangan</Text>
-                <Text style={[styles.tableHeaderCell, styles.colAccount]}>Akun</Text>
                 <Text style={[styles.tableHeaderCell, styles.colIn]}>Masuk</Text>
                 <Text style={[styles.tableHeaderCell, styles.colOut]}>Keluar</Text>
                 <Text style={[styles.tableHeaderCell, styles.colBalance]}>Saldo Akhir</Text>
@@ -320,9 +281,6 @@ export function TransactionReportPdf({
                     </Text>
                     <Text style={styles.tableCellSub}>{m.transactionNo}</Text>
                   </View>
-                  <Text style={[styles.tableCell, styles.colAccount]}>
-                    {m.accountName}
-                  </Text>
                   <Text style={[styles.cellIn, styles.colIn]}>
                     {m.direction === 'in'
                       ? formatRupiah(Number(m.amount ?? 0))
