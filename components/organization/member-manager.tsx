@@ -182,7 +182,7 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
             className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors shadow-sm"
           >
             <Plus size={16} />
-            Tambah Anggota
+            Tambah
           </button>
         )}
       </div>

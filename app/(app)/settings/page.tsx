@@ -1,6 +1,6 @@
 import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import Link from 'next/link'
-import { ChevronRight, Users, Building2, Tag, Wallet } from 'lucide-react'
+import { ChevronRight, Users, Building2, Tag, Wallet, UserCircle } from 'lucide-react'
 import { LogoutButton } from '@/components/auth/logout-button'
 
 export default async function SettingsPage() {
@@ -11,19 +11,23 @@ export default async function SettingsPage() {
     <div className="p-4 max-w-md mx-auto pb-24">
       <h1 className="text-xl font-bold mb-6">Pengaturan</h1>
 
-      {/* User info */}
-      <div className="bg-white border rounded-2xl p-4 mb-6 flex items-center gap-3">
+      {/* User info — tappable, navigates to profile edit */}
+      <Link
+        href="/settings/profile"
+        className="bg-white border rounded-2xl p-4 mb-6 flex items-center gap-3 hover:bg-gray-50 transition-colors"
+      >
         <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-lg shrink-0">
           {session.user.name?.charAt(0).toUpperCase() ?? '?'}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="font-semibold text-gray-900 truncate">{session.user.name}</p>
           <p className="text-sm text-gray-500 truncate">{session.user.email}</p>
           {ctx.role && (
             <p className="text-xs text-green-600 font-medium mt-0.5 capitalize">{ctx.role}</p>
           )}
         </div>
-      </div>
+        <ChevronRight size={16} className="text-gray-400 shrink-0" />
+      </Link>
 
       {/* Organization info */}
       {ctx.organization && (
@@ -41,6 +45,10 @@ export default async function SettingsPage() {
             <SettingsItem href="/settings/members" icon={Users} label="Kelola Anggota" />
           </SettingsSection>
         )}
+
+        <SettingsSection title="Akun">
+          <SettingsItem href="/settings/profile" icon={UserCircle} label="Profil & Password" />
+        </SettingsSection>
 
         <SettingsSection title="Master Data">
           <SettingsItem href="/accounts" icon={Wallet} label="Akun Keuangan" />
