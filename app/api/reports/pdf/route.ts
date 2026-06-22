@@ -152,12 +152,17 @@ export async function GET(req: NextRequest) {
   const blob = new Blob([arrayBuffer], { type: 'application/pdf' })
 
   const filename = `laporan-transaksi-${year}-${String(month).padStart(2, '0')}.pdf`
+  // ?download=1 → force browser save dialog; omit → inline for iframe preview
+  const isDownload = searchParams.get('download') === '1'
+  const disposition = isDownload
+    ? `attachment; filename="${filename}"`
+    : `inline; filename="${filename}"`
 
   return new Response(blob, {
     status: 200,
     headers: {
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Disposition': disposition,
       'Content-Length': String(pdfBuffer.byteLength),
     },
   })

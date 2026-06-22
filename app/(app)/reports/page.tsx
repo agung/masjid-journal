@@ -1,9 +1,8 @@
 import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { getMonthlyReport } from '@/lib/server/reports'
 import { formatRupiah, formatDate } from '@/lib/formatters'
-import { PrintButton } from '@/components/reports/print-button'
-import { PdfDownloadButton } from '@/components/reports/pdf-download-button'
 import Link from 'next/link'
+import { FileDown } from 'lucide-react'
 
 export default async function ReportsPage({
   searchParams,
@@ -37,10 +36,13 @@ export default async function ReportsPage({
           <h1 className="text-xl font-bold">Laporan Keuangan</h1>
           <p className="text-sm text-gray-500">{monthLabel}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <PdfDownloadButton year={pYear} month={pMonth} />
-          <PrintButton />
-        </div>
+        <Link
+          href={`/reports/preview?year=${pYear}&month=${pMonth}`}
+          className="flex items-center gap-1.5 text-sm bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-xl transition-colors"
+        >
+          <FileDown size={15} />
+          PDF
+        </Link>
       </div>
 
       {/* Month navigation */}
