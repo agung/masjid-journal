@@ -29,16 +29,17 @@ const BUCKET_NAME = 'bukti-transaksi'
 
 let supabaseClient: ReturnType<typeof createClient> | null = null
 
-function getSupabaseClient() {
+function getSupabaseClient(): ReturnType<typeof createClient> | null {
   if (supabaseClient) return supabaseClient
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!url || !serviceKey) {
-    throw new Error(
+    console.warn(
       'Supabase Storage env vars not set: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY'
     )
+    return null
   }
 
   supabaseClient = createClient(url, serviceKey, {
@@ -54,6 +55,11 @@ function getSupabaseClient() {
 const supabaseProvider: StorageProvider = {
   async upload(buffer, mimeType, fileName) {
     const supabase = getSupabaseClient()
+    if (!supabase) {
+      throw new Error(
+        'Supabase Storage not configured — set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY'
+      )
+    }
 
     const { error: uploadError } = await supabase.storage
       .from(BUCKET_NAME)
@@ -67,6 +73,12 @@ const supabaseProvider: StorageProvider = {
       throw new Error(`Upload failed: ${uploadError.message}`)
     }
 
+    // Permanent public URL (bucket must be public — set once in Supabase dashboard)
+    const { data: publicUrlData } = supabase.storage
+      .from(BUCKET_NAME)
+      .getPublicUrl(fileName)
+
+    // Short-lived signed URL (60s) for immediate display
     const { data: signedData, error: signedError } = await supabase.storage
       .from(BUCKET_NAME)
       .createSignedUrl(fileName, 60)
@@ -84,13 +96,14 @@ const supabaseProvider: StorageProvider = {
     return {
       fileId: fileName,
       fileName,
-      webViewLink: signedData.signedUrl,
-      webContentLink: signedData.signedUrl,
+      webViewLink: publicUrlData.publicUrl, // permanent URL — stored as proofPublicUrl
+      webContentLink: signedData.signedUrl,  // short-lived signed URL
     }
   },
 
   async delete(fileId) {
     const supabase = getSupabaseClient()
+    if (!supabase) throw new Error('Supabase Storage not configured')
     const { error } = await supabase.storage.from(BUCKET_NAME).remove([fileId])
     if (error) {
       throw new Error(`Delete failed: ${error.message}`)
@@ -102,6 +115,8 @@ const supabaseProvider: StorageProvider = {
 
     try {
       const supabase = getSupabaseClient()
+      if (!supabase) return null
+
       const { data, error } = await supabase.storage
         .from(BUCKET_NAME)
         .createSignedUrl(storagePath, 60)
@@ -188,7 +203,7 @@ const googleDriveProvider: StorageProvider = {
     return {
       fileId: file.id,
       fileName: file.name ?? fileName,
-      webViewLink: file.webViewLink ?? `https://drive.google.com/file/d/${file.id}/view`,
+      webViewLink: `https://drive.google.com/uc?export=view&id=${file.id}`,
       webContentLink: file.webContentLink ?? `https://drive.google.com/uc?id=${file.id}`,
     }
   },
@@ -201,7 +216,8 @@ const googleDriveProvider: StorageProvider = {
   async getSignedUrl(storagePath) {
     // Google Drive URLs are permanent (file is public via "anyone" permission)
     if (!storagePath) return null
-    return `https://drive.google.com/file/d/${storagePath}/view`
+    // Use direct download URL so the image can be embedded in <img> tags
+    return `https://drive.google.com/uc?export=view&id=${storagePath}`
   },
 }
 

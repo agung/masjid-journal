@@ -124,6 +124,34 @@ const styles = StyleSheet.create({
   colIn: { width: 80, textAlign: 'right' },
   colOut: { width: 80, textAlign: 'right' },
   colBalance: { width: 84, textAlign: 'right' },
+  // ── total row ─────────────────────────────────────────────────
+  totalRow: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.primaryLight,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.primary,
+    paddingVertical: 5,
+    paddingHorizontal: 4,
+    marginTop: 2,
+  },
+  totalRowLabel: {
+    fontSize: 8,
+    fontFamily: 'Helvetica-Bold',
+    color: COLORS.primary,
+    textAlign: 'right' as const,
+  },
+  totalRowIn: {
+    fontSize: 8,
+    fontFamily: 'Helvetica-Bold',
+    color: COLORS.green,
+    textAlign: 'right' as const,
+  },
+  totalRowOut: {
+    fontSize: 8,
+    fontFamily: 'Helvetica-Bold',
+    color: COLORS.red,
+    textAlign: 'right' as const,
+  },
   // ── empty state ───────────────────────────────────────────────
   emptyBox: {
     borderWidth: 1,
@@ -203,6 +231,35 @@ export function TransactionReportPdf({
 }: TransactionReportPdfProps) {
   const periodLabel = formatMonthYear(new Date(year, month - 1))
 
+  // Calculate combined running total across ALL accounts (cash + bank).
+  // Opening total = current total across all accounts minus net change from
+  // this period's movements. Each movement then adds/subtracts its signed
+  // amount so the last row's value = current totalAll (matches Ringkasan Saldo).
+  const totalAll = accountSummary.totalCash + accountSummary.totalBank
+
+  const netChange = movements.reduce((sum, m) => {
+    const amt = Number(m.amount ?? 0)
+    return sum + (m.direction === 'in' ? amt : -amt)
+  }, 0)
+
+  const openingTotal = totalAll - netChange
+
+  // Build enriched movements with cumulative combined total
+  let runningTotal = openingTotal
+  const enrichedMovements = movements.map((m) => {
+    const signedAmount = m.direction === 'in' ? Number(m.amount ?? 0) : -Number(m.amount ?? 0)
+    runningTotal += signedAmount
+    return { ...m, cumulativeBalance: runningTotal }
+  })
+
+  // Calculate totals from movements
+  const totalIn = movements
+    .filter((m) => m.direction === 'in')
+    .reduce((sum, m) => sum + Number(m.amount ?? 0), 0)
+  const totalOut = movements
+    .filter((m) => m.direction === 'out')
+    .reduce((sum, m) => sum + Number(m.amount ?? 0), 0)
+
   return (
     <Document
       title={`Laporan Transaksi ${periodLabel} — ${orgName}`}
@@ -235,6 +292,16 @@ export function TransactionReportPdf({
               </Text>
             </View>
           </View>
+
+          {/* Opening balance line */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6, paddingTop: 6, borderTopWidth: 1, borderTopColor: COLORS.border }}>
+            <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: COLORS.subtext }}>
+              Saldo Awal Periode
+            </Text>
+            <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: COLORS.heading }}>
+              {formatRupiah(openingTotal)}
+            </Text>
+          </View>
         </View>
 
         {/* ── Movement Table ── */}
@@ -258,11 +325,11 @@ export function TransactionReportPdf({
                 <Text style={[styles.tableHeaderCell, styles.colDesc]}>Keterangan</Text>
                 <Text style={[styles.tableHeaderCell, styles.colIn]}>Masuk</Text>
                 <Text style={[styles.tableHeaderCell, styles.colOut]}>Keluar</Text>
-                <Text style={[styles.tableHeaderCell, styles.colBalance]}>Saldo Akhir</Text>
+                <Text style={[styles.tableHeaderCell, styles.colBalance]}>Total Saldo</Text>
               </View>
 
               {/* Data rows */}
-              {movements.map((m, i) => (
+              {enrichedMovements.map((m, i) => (
                 <View
                   key={m.movementId}
                   style={[
@@ -292,10 +359,26 @@ export function TransactionReportPdf({
                       : ''}
                   </Text>
                   <Text style={[styles.tableCell, styles.colBalance]}>
-                    {formatRupiah(Number(m.balanceAfter ?? 0))}
+                    {formatRupiah(m.cumulativeBalance)}
                   </Text>
                 </View>
               ))}
+
+              {/* Total row */}
+              <View style={styles.totalRow} wrap={false}>
+                <Text style={[styles.totalRowLabel, styles.colNo]}>{' '}</Text>
+                <Text style={[styles.totalRowLabel, styles.colDate]}>{' '}</Text>
+                <Text style={[styles.totalRowLabel, styles.colDesc]}>TOTAL</Text>
+                <Text style={[styles.totalRowIn, styles.colIn]}>
+                  {totalIn > 0 ? formatRupiah(totalIn) : ''}
+                </Text>
+                <Text style={[styles.totalRowOut, styles.colOut]}>
+                  {totalOut > 0 ? formatRupiah(totalOut) : ''}
+                </Text>
+                <Text style={[styles.totalRowLabel, styles.colBalance]}>
+                  {' '}
+                </Text>
+              </View>
             </View>
           )}
         </View>

@@ -4,8 +4,21 @@ import { getProofSignedUrl } from '@/lib/server/storage'
 import { formatRupiah, formatDate } from '@/lib/formatters'
 import { TRANSACTION_TYPE_CONFIG } from '@/lib/transaction-icons'
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
 import { Wallet, Landmark } from 'lucide-react'
+
+/**
+ * Convert a stored proof URL into an embeddable image URL.
+ * Google Drive viewer URLs (drive.google.com/file/d/...) can't be embedded
+ * in <img> tags — rewrite them to the direct download format.
+ */
+function embeddableProofUrl(url: string | null): string | null {
+  if (!url) return null
+  const match = url.match(/drive\.google\.com\/file\/d\/([^/?#]+)/)
+  if (match) {
+    return `https://drive.google.com/uc?export=view&id=${match[1]}`
+  }
+  return url
+}
 
 interface Props {
   params: Promise<{ id: string }>
@@ -24,8 +37,13 @@ export default async function TransactionDetailPage({ params }: Props) {
   const typeConfig = TRANSACTION_TYPE_CONFIG[tx.type as keyof typeof TRANSACTION_TYPE_CONFIG]
   const TypeIcon = typeConfig?.icon
 
-  // Generate fresh signed URL for proof image (expires in 60s)
-  const freshProofUrl = await getProofSignedUrl(tx.proofStoragePath)
+  // Generate fresh signed URL for proof image (expires in 60s).
+  // Fall back to the stored proofPublicUrl when the current provider can't
+  // resolve the storage path (e.g. the proof was uploaded via Google Drive
+  // but the provider is now Supabase, or vice versa).
+  const freshProofUrl =
+    (await getProofSignedUrl(tx.proofStoragePath)) ??
+    embeddableProofUrl(tx.proofPublicUrl)
 
   return (
     <div className="p-4 max-w-md mx-auto pb-24">
@@ -97,12 +115,11 @@ export default async function TransactionDetailPage({ params }: Props) {
       {freshProofUrl && (
         <div className="mb-4">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Bukti Transaksi</h2>
-          <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border">
-            <Image
+          <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border bg-gray-50">
+            <img
               src={freshProofUrl}
               alt="Bukti transaksi"
-              fill
-              className="object-cover"
+              className="absolute inset-0 w-full h-full object-contain"
             />
           </div>
           <a
