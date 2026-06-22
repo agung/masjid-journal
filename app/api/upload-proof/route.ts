@@ -3,7 +3,7 @@ import { getSessionCookie } from 'better-auth/cookies'
 import { uploadProofToDrive } from '@/lib/server/storage'
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024 // 5MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic']
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
 
 /**
  * POST /api/upload-proof
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error('[upload-proof]', err)
     return NextResponse.json(
-      { error: 'Upload gagal. Pastikan konfigurasi Google Drive sudah benar.' },
+      { error: 'Upload gagal. Silakan coba lagi.' },
       { status: 500 }
     )
   }

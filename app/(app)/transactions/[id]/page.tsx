@@ -1,5 +1,6 @@
 import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { getTransactionById } from '@/lib/server/transactions'
+import { getProofSignedUrl } from '@/lib/server/storage'
 import { formatRupiah, formatDate } from '@/lib/formatters'
 import { TRANSACTION_TYPE_CONFIG } from '@/lib/transaction-icons'
 import { notFound } from 'next/navigation'
@@ -22,6 +23,9 @@ export default async function TransactionDetailPage({ params }: Props) {
 
   const typeConfig = TRANSACTION_TYPE_CONFIG[tx.type as keyof typeof TRANSACTION_TYPE_CONFIG]
   const TypeIcon = typeConfig?.icon
+
+  // Generate fresh signed URL for proof image (expires in 60s)
+  const freshProofUrl = await getProofSignedUrl(tx.proofStoragePath)
 
   return (
     <div className="p-4 max-w-md mx-auto pb-24">
@@ -90,19 +94,19 @@ export default async function TransactionDetailPage({ params }: Props) {
       </div>
 
       {/* Proof image */}
-      {tx.proofPublicUrl && (
+      {freshProofUrl && (
         <div className="mb-4">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Bukti Transaksi</h2>
           <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border">
             <Image
-              src={tx.proofPublicUrl}
+              src={freshProofUrl}
               alt="Bukti transaksi"
               fill
               className="object-cover"
             />
           </div>
           <a
-            href={tx.proofPublicUrl}
+            href={freshProofUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-2 text-xs text-green-600 hover:underline"

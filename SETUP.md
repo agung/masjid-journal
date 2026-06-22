@@ -122,72 +122,87 @@ GOOGLE_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxx
 
 ---
 
-## 4. Google Drive (Bukti Transaksi)
+## 4. Supabase Storage (Bukti Transaksi)
 
-> ⚠️ Jika hanya ingin login dengan Google (SSO), tidak perlu setup Google Drive.
-> Drive hanya dibutuhkan untuk upload bukti foto transaksi ke folder terpusat.
+> ⚠️ Jika hanya ingin login dengan Google (SSO), tidak perlu setup Storage.
+> Storage hanya dibutuhkan untuk upload bukti foto transaksi.
 
-### 3.1 Buat Google Cloud Project
+Kamu bisa pilih provider storage dengan mengatur env `STORAGE_PROVIDER`:
 
-1. Buka [console.cloud.google.com](https://console.cloud.google.com)
-2. Klik dropdown project di atas → **New Project**
-3. Isi nama: `masjid-journal`
-4. Klik **Create**
+- `STORAGE_PROVIDER=supabase` → **Supabase Storage** (default, gratis 1 GB)
+- `STORAGE_PROVIDER=google_drive` → **Google Drive OAuth** (pakai quota Drive 15 GB)
 
-### 3.2 Aktifkan Google Drive API
+---
 
-1. Masuk ke project yang baru dibuat
-2. Menu → **APIs & Services** → **Library**
-3. Cari **Google Drive API**
-4. Klik **Enable**
+### Opsi A: Pakai Supabase Storage (default)
 
-### 3.3 Buat Service Account
+### 4.1 Buat Bucket Storage
 
-1. Menu → **APIs & Services** → **Credentials**
-2. **Create Credentials** → **Service Account**
-3. Isi nama: `masjid-journal-uploader`
-4. Klik **Create and Continue** → **Done** (skip role assignment)
+1. Buka [Supabase Dashboard](https://supabase.com/dashboard) → pilih project
+2. Menu → **Storage**
+3. Klik **New Bucket**
+4. Nama: `bukti-transaksi`
+5. **Public bucket**: **disable** (file diakses via signed URL dengan expired 60 detik)
+6. Klik **Create bucket**
 
-### 3.4 Download JSON Key
+### 4.2 Ambil Environment Variables
 
-1. Di halaman **Credentials**, klik email service account yang baru dibuat
-2. Tab **Keys** → **Add Key** → **Create new key**
-3. Pilih **JSON** → **Create**
-4. File JSON akan terdownload otomatis
+1. Menu → **Project Settings** → **API**
+2. Salin **Project URL** sebagai `NEXT_PUBLIC_SUPABASE_URL`
+3. Salin **service_role key** sebagai `SUPABASE_SERVICE_ROLE_KEY`
 
-### 3.5 Encode JSON Key ke Base64
+### 4.3 Set di `.env.local`
 
-```bash
-# macOS/Linux
-base64 -i service-account.json
-
-# Windows (PowerShell)
-[Convert]::ToBase64String([IO.File]::ReadAllBytes('service-account.json'))
+```env
+STORAGE_PROVIDER=supabase
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
 ```
 
-Salin hasil encode sebagai nilai `GOOGLE_SERVICE_ACCOUNT_KEY`.
+---
 
-Ambil juga nilai `client_email` dari file JSON sebagai `GOOGLE_SERVICE_ACCOUNT_EMAIL`.
+### Opsi B: Pakai Google Drive OAuth
 
-### 3.6 Buat Folder di Google Drive
+### 4.4 Setup Google OAuth
 
-1. Buka [drive.google.com](https://drive.google.com)
-2. Klik **New** → **New folder**
-3. Nama: `Bukti Transaksi Masjid` (atau sesuai keinginan)
-4. Klik kanan folder → **Share**
-5. Masukkan email service account (dari file JSON, field `client_email`)
-   Contoh: `masjid-journal-uploader@masjid-journal.iam.gserviceaccount.com`
-6. Pilih role **Editor** → **Send**
+1. Buka [console.cloud.google.com](https://console.cloud.google.com)
+2. **APIs & Services** → **Credentials** → OAuth Client ID (bisa reuse dari SSO)
+3. Tambahkan **Authorized redirect URIs**:
+   - `http://localhost:3000/api/drive-setup/callback` (development)
+   - `https://domain-vercel-kamu.vercel.app/api/drive-setup/callback` (production)
+4. Pastikan **Google Drive API** sudah di-enabled di **APIs & Services → Library**
 
-### 3.7 Ambil Folder ID
+### 4.5 Dapatkan Refresh Token via App
 
-1. Buka folder yang sudah dibuat
-2. Lihat URL browser:
-   ```
-   https://drive.google.com/drive/folders/1AbCdEfGhIjKlMnOpQrStUvWxYz
-   ```
-3. Bagian terakhir URL (`1AbCdEfGhIjKlMnOpQrStUvWxYz`) adalah Folder ID
-4. Simpan sebagai nilai `GOOGLE_DRIVE_FOLDER_ID`
+Cara termudah — langsung dari app yang sudah berjalan:
+
+1. Buka **Settings → Sistem → Penyimpanan Bukti**
+2. Ikuti langkah-langkah di halaman tersebut
+3. Klik tombol **Hubungkan Google Drive**
+4. Login dengan akun pemilik folder Drive
+5. Setujui akses
+6. Salin refresh token yang muncul
+7. Tambahkan ke Vercel / `.env.local`
+
+> Atau alternatif: pakai [OAuth Playground](https://developers.google.com/oauthplayground) dengan redirect URI:
+> `https://developers.google.com/oauthplayground`
+
+### 4.6 Set di `.env.local`
+
+```env
+STORAGE_PROVIDER=google_drive
+GOOGLE_DRIVE_CLIENT_ID=xxxxx.apps.googleusercontent.com
+GOOGLE_DRIVE_CLIENT_SECRET=GOCSPX-xxxxx
+GOOGLE_DRIVE_REFRESH_TOKEN=1//0gabcdef...
+GOOGLE_DRIVE_FOLDER_ID=1AbCdEfGhIjKlMnOpQrStUvWxYz
+```
+
+---
+
+### Test Upload
+
+Setelah env terisi, jalankan dev server dan upload foto bukti transaksi.
+Foto akan otomatis dikompres ke WebP (kualitas tinggi) di browser sebelum diupload.
 
 ---
 
@@ -239,10 +254,10 @@ DATABASE_URL=postgresql://postgres.xxxx:password@aws-0-ap-southeast-1.pooler.sup
 GOOGLE_CLIENT_ID=123456789-xxxxx.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxx
 
-# Google Drive
-GOOGLE_SERVICE_ACCOUNT_EMAIL=masjid-journal-uploader@project.iam.gserviceaccount.com
-GOOGLE_SERVICE_ACCOUNT_KEY=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
-GOOGLE_DRIVE_FOLDER_ID=1AbCdEfGhIjKlMnOpQrStUvWxYz
+# General
+STORAGE_PROVIDER=supabase
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -256,9 +271,13 @@ NEXT_PUBLIC_APP_NAME="Keuangan Masjid"
 | `DATABASE_URL` | Ya | Supabase PostgreSQL connection string |
 | `GOOGLE_CLIENT_ID` | Ya* | Client ID dari Google OAuth (wajib jika pakai SSO) |
 | `GOOGLE_CLIENT_SECRET` | Ya* | Client Secret dari Google OAuth (wajib jika pakai SSO) |
-| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | Ya* | Service account email (wajib jika pakai upload Drive) |
-| `GOOGLE_SERVICE_ACCOUNT_KEY` | Ya* | Base64 encoded JSON key (wajib jika pakai upload Drive) |
-| `GOOGLE_DRIVE_FOLDER_ID` | Ya* | Folder ID tujuan upload (wajib jika pakai upload Drive) |
+| `STORAGE_PROVIDER` | Opsional | `supabase` (default) atau `google_drive` |
+| `NEXT_PUBLIC_SUPABASE_URL` | Ya* | Supabase project URL (wajib jika STORAGE_PROVIDER=supabase) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Ya* | Service role key (wajib jika STORAGE_PROVIDER=supabase) |
+| `GOOGLE_DRIVE_CLIENT_ID` | Ya* | OAuth Client ID (wajib jika STORAGE_PROVIDER=google_drive) |
+| `GOOGLE_DRIVE_CLIENT_SECRET` | Ya* | OAuth Client Secret (wajib jika STORAGE_PROVIDER=google_drive) |
+| `GOOGLE_DRIVE_REFRESH_TOKEN` | Ya* | Refresh token (wajib jika STORAGE_PROVIDER=google_drive) |
+| `GOOGLE_DRIVE_FOLDER_ID` | Ya* | Folder Drive tujuan (wajib jika STORAGE_PROVIDER=google_drive) |
 | `NEXT_PUBLIC_APP_URL` | Opsional | URL app untuk metadata |
 | `NEXT_PUBLIC_APP_NAME` | Opsional | Nama app yang ditampilkan |
 
@@ -341,10 +360,11 @@ Buka [http://localhost:3000](http://localhost:3000)
 - Pastikan **redirect URI** di Google Cloud Console sudah tepat: `http://localhost:3000/api/auth/callback/google`
 - Jika error "redirect_uri_mismatch", periksa daftar Authorized redirect URIs di Google Cloud
 
-### Upload ke Google Drive gagal
-- Pastikan folder sudah di-share ke email service account dengan role **Editor**
-- Pastikan `GOOGLE_SERVICE_ACCOUNT_KEY` adalah base64 dari **full JSON** (bukan hanya private key)
-- Cek log Vercel untuk error detail
+### Upload ke Supabase Storage gagal
+- Pastikan `NEXT_PUBLIC_SUPABASE_URL` dan `SUPABASE_SERVICE_ROLE_KEY` sudah di-set di `.env.local`
+- Pastikan bucket `bukti-transaksi` sudah dibuat di Supabase Dashboard → Storage
+- Pastikan bucket bersifat **private** (bukan public) — signed URL akan gagal untuk bucket public
+- Cek log Vercel atau terminal dev server untuk error detail
 
 ### Better Auth error: default secret
 - Generate `BETTER_AUTH_SECRET` dengan `openssl rand -base64 32`

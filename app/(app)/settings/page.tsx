@@ -1,6 +1,6 @@
 import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import Link from 'next/link'
-import { ChevronRight, Users, Building2, Tag, Wallet, UserCircle } from 'lucide-react'
+import { ChevronRight, Users, Building2, Tag, Wallet, UserCircle, HardDrive } from 'lucide-react'
 import { LogoutButton } from '@/components/auth/logout-button'
 
 export default async function SettingsPage() {
@@ -45,6 +45,10 @@ export default async function SettingsPage() {
             <SettingsItem href="/settings/members" icon={Users} label="Kelola Anggota" />
           </SettingsSection>
         )}
+
+        <SettingsSection title="Sistem">
+          <SettingsItem href="/settings/drive" icon={HardDrive} label="Penyimpanan Bukti" />
+        </SettingsSection>
 
         <SettingsSection title="Akun">
           <SettingsItem href="/settings/profile" icon={UserCircle} label="Profil & Password" />

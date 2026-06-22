@@ -30,6 +30,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
       },
+      {
+        // Supabase Storage signed URLs
+        protocol: 'https',
+        hostname: '*.supabase.co',
+      },
     ],
   },
 }

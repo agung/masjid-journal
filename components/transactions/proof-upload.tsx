@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import Image from 'next/image'
+import NextImage from 'next/image'
 import { Camera, Loader2 } from 'lucide-react'
 
 export interface ProofUploadResult {
@@ -13,6 +13,46 @@ export interface ProofUploadResult {
 interface ProofUploadProps {
   onUploaded: (result: ProofUploadResult) => void
   onClear: () => void
+}
+
+/**
+ * Compress an image file client-side using Canvas API.
+ * Preserves original resolution but re-encodes as WebP (quality 0.85)
+ * to significantly reduce file size.
+ */
+async function compressImage(file: File): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = document.createElement('img')
+    img.src = URL.createObjectURL(file)
+    img.onload = () => {
+      // Clean up the object URL
+      URL.revokeObjectURL(img.src)
+
+      const canvas = document.createElement('canvas')
+
+      // Preserve original resolution — don't resize
+      canvas.width = img.naturalWidth
+      canvas.height = img.naturalHeight
+
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(img, 0, 0)
+
+      // Convert to WebP at quality 0.85
+      // This reduces file size 50-70% with minimal visual loss
+      canvas.toBlob(
+        (blob) => {
+          if (blob) resolve(blob)
+          else reject(new Error('Compress failed'))
+        },
+        'image/webp',
+        0.85
+      )
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(img.src)
+      reject(new Error('Failed to load image'))
+    }
+  })
 }
 
 export function ProofUpload({ onUploaded, onClear }: ProofUploadProps) {
@@ -27,14 +67,18 @@ export function ProofUpload({ onUploaded, onClear }: ProofUploadProps) {
 
     setError(null)
 
-    // Show local preview immediately
+    // Show local preview immediately (original file for speed)
     const objectUrl = URL.createObjectURL(file)
     setPreview(objectUrl)
     setUploading(true)
 
     try {
+      // Compress image client-side before upload
+      const compressed = await compressImage(file)
+      const compressedFile = new File([compressed], 'bukti.webp', { type: 'image/webp' })
+
       const fd = new FormData()
-      fd.append('file', file)
+      fd.append('file', compressedFile)
 
       const res = await fetch('/api/upload-proof', {
         method: 'POST',
@@ -93,7 +137,7 @@ export function ProofUpload({ onUploaded, onClear }: ProofUploadProps) {
       ) : (
         <div className="relative rounded-xl overflow-hidden border">
           <div className="relative w-full aspect-[4/3]">
-            <Image
+            <NextImage
               src={preview}
               alt="Preview bukti transaksi"
               fill
