@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import { ChevronLeft, FileDown } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import { getActiveOrganizationContext } from '@/lib/auth/guards'
+import { DownloadPdfButton } from '@/components/reports/download-pdf-button'
 
 export default async function ReportPreviewPage({
   searchParams,
@@ -49,14 +50,7 @@ export default async function ReportPreviewPage({
             <p className="text-xs text-gray-500">{monthLabel}</p>
           </div>
         </div>
-        <a
-          href={downloadUrl}
-          download
-          className="flex items-center gap-1.5 text-sm bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-xl transition-colors"
-        >
-          <FileDown size={15} />
-          Download PDF
-        </a>
+        <DownloadPdfButton downloadUrl={downloadUrl} />
       </div>
 
       {/* PDF iframe */}
