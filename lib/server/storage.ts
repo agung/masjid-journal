@@ -203,7 +203,7 @@ const googleDriveProvider: StorageProvider = {
     return {
       fileId: file.id,
       fileName: file.name ?? fileName,
-      webViewLink: `https://drive.google.com/uc?export=view&id=${file.id}`,
+      webViewLink: `https://lh3.googleusercontent.com/d/${file.id}`,
       webContentLink: file.webContentLink ?? `https://drive.google.com/uc?id=${file.id}`,
     }
   },
@@ -216,8 +216,8 @@ const googleDriveProvider: StorageProvider = {
   async getSignedUrl(storagePath) {
     // Google Drive URLs are permanent (file is public via "anyone" permission)
     if (!storagePath) return null
-    // Use direct download URL so the image can be embedded in <img> tags
-    return `https://drive.google.com/uc?export=view&id=${storagePath}`
+    // Use lh3.googleusercontent.com CDN for direct image embedding
+    return `https://lh3.googleusercontent.com/d/${storagePath}`
   },
 }
 

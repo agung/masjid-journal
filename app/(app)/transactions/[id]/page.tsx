@@ -9,13 +9,13 @@ import { Wallet, Landmark } from 'lucide-react'
 /**
  * Convert a stored proof URL into an embeddable image URL.
  * Google Drive viewer URLs (drive.google.com/file/d/...) can't be embedded
- * in <img> tags — rewrite them to the direct download format.
+ * in <img> tags — rewrite them to a direct CDN URL via lh3.googleusercontent.com.
  */
 function embeddableProofUrl(url: string | null): string | null {
   if (!url) return null
   const match = url.match(/drive\.google\.com\/file\/d\/([^/?#]+)/)
   if (match) {
-    return `https://drive.google.com/uc?export=view&id=${match[1]}`
+    return `https://lh3.googleusercontent.com/d/${match[1]}`
   }
   return url
 }
