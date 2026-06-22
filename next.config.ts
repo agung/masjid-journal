@@ -8,6 +8,10 @@ const withSerwist = withSerwistInit({
 })
 
 const nextConfig: NextConfig = {
+  // Keep @react-pdf/renderer out of the webpack bundle — it's Node-only and
+  // causes OOM during bundling if webpack tries to trace its dependencies.
+  serverExternalPackages: ['@react-pdf/renderer'],
+
   // Enable experimental features for server actions
   experimental: {
     serverActions: {

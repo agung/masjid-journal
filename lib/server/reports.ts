@@ -188,3 +188,42 @@ export async function getRecentMovements(organizationId: string, limit = 5) {
     .orderBy(sql`${transaction.transactionDate} DESC, ${transactionMovement.createdAt} DESC`)
     .limit(limit)
 }
+
+/**
+ * Get all movements for a monthly PDF report, ordered chronologically.
+ */
+export async function getMovementsForReport(
+  organizationId: string,
+  year: number,
+  month: number
+) {
+  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+  const lastDay = new Date(year, month, 0).getDate()
+  const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+
+  return db
+    .select({
+      movementId: transactionMovement.id,
+      direction: transactionMovement.direction,
+      amount: transactionMovement.amount,
+      balanceAfter: transactionMovement.balanceAfter,
+      accountName: masjidAccount.name,
+      accountKind: masjidAccount.kind,
+      transactionId: transaction.id,
+      transactionNo: transaction.transactionNo,
+      transactionType: transaction.type,
+      transactionDate: transaction.transactionDate,
+      description: transaction.description,
+    })
+    .from(transactionMovement)
+    .innerJoin(transaction, eq(transactionMovement.transactionId, transaction.id))
+    .innerJoin(masjidAccount, eq(transactionMovement.accountId, masjidAccount.id))
+    .where(
+      and(
+        eq(transactionMovement.organizationId, organizationId),
+        gte(transaction.transactionDate, startDate),
+        lte(transaction.transactionDate, endDate)
+      )
+    )
+    .orderBy(sql`${transaction.transactionDate} ASC, ${transactionMovement.createdAt} ASC`)
+}

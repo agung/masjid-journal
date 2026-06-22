@@ -2,6 +2,7 @@ import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { getMonthlyReport } from '@/lib/server/reports'
 import { formatRupiah, formatDate } from '@/lib/formatters'
 import { PrintButton } from '@/components/reports/print-button'
+import { PdfDownloadButton } from '@/components/reports/pdf-download-button'
 import Link from 'next/link'
 
 export default async function ReportsPage({
@@ -36,7 +37,10 @@ export default async function ReportsPage({
           <h1 className="text-xl font-bold">Laporan Keuangan</h1>
           <p className="text-sm text-gray-500">{monthLabel}</p>
         </div>
-        <PrintButton />
+        <div className="flex items-center gap-2">
+          <PdfDownloadButton year={pYear} month={pMonth} />
+          <PrintButton />
+        </div>
       </div>
 
       {/* Month navigation */}
