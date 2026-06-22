@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import NextImage from 'next/image'
 import { Camera, Loader2 } from 'lucide-react'
 
 export interface ProofUploadResult {
@@ -136,10 +137,12 @@ export function ProofUpload({ onUploaded, onClear }: ProofUploadProps) {
       ) : (
         <div className="relative rounded-xl overflow-hidden border">
           <div className="relative w-full aspect-[4/3]">
-            <img
+            <NextImage
               src={preview}
               alt="Preview bukti transaksi"
-              className="absolute inset-0 w-full h-full object-cover"
+              fill
+              unoptimized
+              className="object-cover"
             />
           </div>
 
