@@ -123,21 +123,23 @@ const supabaseProvider: StorageProvider = {
 // Provider: Google Drive OAuth
 // ============================================================
 
-function getRequiredEnv(name: string) {
-  const value = process.env[name]
+function getEnvWithFallback(name: string, fallbackName?: string) {
+  const value = process.env[name] || (fallbackName ? process.env[fallbackName] : undefined)
 
   if (!value) {
-    throw new Error(`Google Drive env var not set: ${name}`)
+    throw new Error(
+      `Google Drive env var not set: ${name}${fallbackName ? ` or ${fallbackName}` : ''}`
+    )
   }
 
   return value
 }
 
 function getGoogleDriveClient() {
-  const clientId = getRequiredEnv('GOOGLE_DRIVE_CLIENT_ID')
-  const clientSecret = getRequiredEnv('GOOGLE_DRIVE_CLIENT_SECRET')
-  const refreshToken = getRequiredEnv('GOOGLE_DRIVE_REFRESH_TOKEN')
-  const folderId = getRequiredEnv('GOOGLE_DRIVE_FOLDER_ID')
+  const clientId = getEnvWithFallback('GOOGLE_DRIVE_CLIENT_ID', 'GOOGLE_CLIENT_ID')
+  const clientSecret = getEnvWithFallback('GOOGLE_DRIVE_CLIENT_SECRET', 'GOOGLE_CLIENT_SECRET')
+  const refreshToken = getEnvWithFallback('GOOGLE_DRIVE_REFRESH_TOKEN')
+  const folderId = getEnvWithFallback('GOOGLE_DRIVE_FOLDER_ID')
 
   const auth = new google.auth.OAuth2(clientId, clientSecret)
   auth.setCredentials({ refresh_token: refreshToken })
