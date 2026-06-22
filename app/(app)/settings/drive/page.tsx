@@ -47,7 +47,7 @@ export default async function DriveSetupPage() {
           {/* Step 1 */}
           <div className="flex gap-3">
             <span className="h-6 w-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-medium">Cek env di Vercel/ .env.local</p>
               <div className="mt-1 space-y-1">
                 <EnvCheck label="GOOGLE_CLIENT_ID" ok={hasDriveClientId} />
@@ -62,7 +62,7 @@ export default async function DriveSetupPage() {
           {/* Step 2 */}
           <div className="flex gap-3">
             <span className="h-6 w-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-medium">Buat folder di Google Drive</p>
               <ol className="text-xs text-gray-500 mt-1 list-decimal list-inside space-y-0.5">
                 <li>Buka <a href="https://drive.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">drive.google.com</a></li>
@@ -77,7 +77,7 @@ export default async function DriveSetupPage() {
           {/* Step 3 */}
           <div className="flex gap-3">
             <span className="h-6 w-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-medium">Tambahkan redirect URI di Google Cloud</p>
               <p className="text-xs text-gray-500 mt-1">Buka Google Cloud Console → <strong>APIs & Services → Credentials</strong> → klik OAuth Client kamu → <strong>Authorized redirect URIs</strong>, tambahkan:</p>
               <pre className="bg-gray-100 rounded-lg p-2 text-xs font-mono mt-1 text-gray-700 break-all">https://{process.env.VERCEL_URL ? process.env.VERCEL_URL + '/api/drive-setup/callback' : 'domain-anda.vercel.app/api/drive-setup/callback'}</pre>
@@ -88,7 +88,7 @@ export default async function DriveSetupPage() {
           {/* Step 4 */}
           <div className="flex gap-3">
             <span className="h-6 w-6 rounded-full bg-green-600 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-medium mb-2">Dapatkan Refresh Token</p>
               <a
                 href="/api/drive-setup"
@@ -106,7 +106,7 @@ export default async function DriveSetupPage() {
           {/* Step 5 */}
           <div className="flex gap-3">
             <span className="h-6 w-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">5</span>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-medium">Set STORAGE_PROVIDER & redeploy</p>
               <p className="text-xs text-gray-500 mt-1">Di Vercel, tambahkan semua env Drive, lalu set:</p>
               <pre className="bg-gray-100 rounded-lg p-2 text-xs font-mono mt-1 text-gray-700">STORAGE_PROVIDER=google_drive</pre>
