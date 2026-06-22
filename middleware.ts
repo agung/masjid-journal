@@ -9,8 +9,8 @@ const SKIP_PATHS = ['/api/', '/_next/', '/icons/', '/manifest.json', '/favicon.i
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Skip static files and API auth routes
-  if (SKIP_PATHS.some((path) => pathname.startsWith(path))) {
+  // Skip static files, internal Next.js routes, and API auth routes
+  if (pathname.startsWith('/_') || SKIP_PATHS.some((path) => pathname.startsWith(path))) {
     return NextResponse.next()
   }
 
