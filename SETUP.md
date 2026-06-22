@@ -8,11 +8,12 @@ Panduan lengkap untuk mengkonfigurasi semua layanan eksternal sebelum deploy.
 
 1. [Supabase (Database)](#1-supabase-database)
 2. [Better Auth (Secret)](#2-better-auth-secret)
-3. [Google Drive (Bukti Transaksi)](#3-google-drive-bukti-transaksi)
-4. [Vercel (Hosting)](#4-vercel-hosting)
-5. [Variabel Lingkungan Lengkap](#5-variabel-lingkungan-lengkap)
-6. [Jalankan Lokal](#6-jalankan-lokal)
-7. [Setelah Deploy](#7-setelah-deploy)
+3. [Google OAuth (Login dengan Google)](#3-google-oauth-login-dengan-google)
+4. [Google Drive (Bukti Transaksi)](#4-google-drive-bukti-transaksi)
+5. [Vercel (Hosting)](#5-vercel-hosting)
+6. [Variabel Lingkungan Lengkap](#6-variabel-lingkungan-lengkap)
+7. [Jalankan Lokal](#7-jalankan-lokal)
+8. [Setelah Deploy](#8-setelah-deploy)
 
 ---
 
@@ -70,7 +71,61 @@ Salin hasilnya sebagai nilai `BETTER_AUTH_SECRET`.
 
 ---
 
-## 3. Google Drive (Bukti Transaksi)
+## 3. Google OAuth (Login dengan Google)
+
+Konfigurasi OAuth agar pengguna bisa login/daftar menggunakan akun Google.
+
+### 3.1 Buat OAuth Consent Screen
+
+1. Buka [console.cloud.google.com](https://console.cloud.google.com)
+2. Pilih project (bisa project yang sudah dibuat untuk Google Drive, atau buat baru)
+3. Menu → **APIs & Services** → **OAuth consent screen**
+4. Pilih **External** → **Create**
+5. Isi **App name**: `Keuangan Masjid`
+6. Isi **User support email**: email kamu
+7. Scroll ke **Developer contact information** → isi email kamu
+8. Klik **Save and Continue**
+9. **Scopes**: langsung klik **Save and Continue** (skip, tidak perlu tambah scope)
+10. **Test users**: klik **Save and Continue** (skip)
+11. Kembali ke **Dashboard**
+
+### 3.2 Buat OAuth Client ID
+
+1. Menu → **APIs & Services** → **Credentials**
+2. Klik **Create Credentials** → **OAuth client ID**
+3. Application type: **Web application**
+4. Name: `Web Login`
+5. **Authorized JavaScript origins**:
+   - `http://localhost:3000` (development)
+   - `https://domain-vercel-kamu.vercel.app` (production, jika sudah deploy)
+6. **Authorized redirect URIs**:
+   - `http://localhost:3000/api/auth/callback/google` (development)
+   - `https://domain-vercel-kamu.vercel.app/api/auth/callback/google` (production)
+7. Klik **Create**
+8. Akan muncul popup dengan **Client ID** dan **Client Secret**
+9. Catat kedua nilai tersebut
+
+### 3.3 Set Environment Variables
+
+```env
+GOOGLE_CLIENT_ID=123456789-xxxxx.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxx
+```
+
+### 3.4 Test
+
+1. Jalankan dev server: `npm run dev`
+2. Buka `/login` — klik tombol **Masuk dengan Google**
+3. Pilih akun Google → redirect balik ke dashboard
+
+> **Catatan**: Karena status OAuth consent screen adalah **Testing**, hanya email yang kamu daftarkan sebagai test user yang bisa login. Untuk production, kamu harus mempublikasikan consent screen (submission ke Google — butuh logo, privacy policy, dll).
+
+---
+
+## 4. Google Drive (Bukti Transaksi)
+
+> ⚠️ Jika hanya ingin login dengan Google (SSO), tidak perlu setup Google Drive.
+> Drive hanya dibutuhkan untuk upload bukti foto transaksi ke folder terpusat.
 
 ### 3.1 Buat Google Cloud Project
 
@@ -136,23 +191,23 @@ Ambil juga nilai `client_email` dari file JSON sebagai `GOOGLE_SERVICE_ACCOUNT_E
 
 ---
 
-## 4. Vercel (Hosting)
+## 5. Vercel (Hosting)
 
-### 4.1 Push ke GitHub
+### 5.1 Push ke GitHub
 
 ```bash
 # Pastikan repo sudah dibuat di github.com/agung/masjid-journal
 git push -u origin main
 ```
 
-### 4.2 Import ke Vercel
+### 5.2 Import ke Vercel
 
 1. Buka [vercel.com](https://vercel.com) → **Add New Project**
 2. Import repo `agung/masjid-journal` dari GitHub
 3. Framework: Next.js (otomatis terdeteksi)
 4. Klik **Deploy** (akan gagal dulu karena belum ada env vars — itu normal)
 
-### 4.3 Set Environment Variables di Vercel
+### 5.3 Set Environment Variables di Vercel
 
 1. Project → **Settings** → **Environment Variables**
 2. Tambahkan semua variabel dari tabel di bawah
@@ -160,7 +215,7 @@ git push -u origin main
    Contoh: `https://masjid-journal.vercel.app`
 4. Klik **Redeploy**
 
-### 4.4 Custom Domain (Opsional)
+### 5.4 Custom Domain (Opsional)
 
 1. Project → **Settings** → **Domains**
 2. Tambah domain custom
@@ -168,7 +223,7 @@ git push -u origin main
 
 ---
 
-## 5. Variabel Lingkungan Lengkap
+## 6. Variabel Lingkungan Lengkap
 
 Buat file `.env.local` di root project:
 
@@ -179,6 +234,10 @@ BETTER_AUTH_URL=http://localhost:3000
 
 # Database (Supabase PostgreSQL)
 DATABASE_URL=postgresql://postgres.xxxx:password@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
+
+# Google OAuth (SSO Login)
+GOOGLE_CLIENT_ID=123456789-xxxxx.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxx
 
 # Google Drive
 GOOGLE_SERVICE_ACCOUNT_EMAIL=masjid-journal-uploader@project.iam.gserviceaccount.com
@@ -195,15 +254,19 @@ NEXT_PUBLIC_APP_NAME="Keuangan Masjid"
 | `BETTER_AUTH_SECRET` | Ya | Random string 32 bytes |
 | `BETTER_AUTH_URL` | Ya | URL app (localhost atau Vercel URL) |
 | `DATABASE_URL` | Ya | Supabase PostgreSQL connection string |
-| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | Ya | Service account email |
-| `GOOGLE_SERVICE_ACCOUNT_KEY` | Ya | Base64 encoded JSON key |
-| `GOOGLE_DRIVE_FOLDER_ID` | Ya | Folder ID tujuan upload |
+| `GOOGLE_CLIENT_ID` | Ya* | Client ID dari Google OAuth (wajib jika pakai SSO) |
+| `GOOGLE_CLIENT_SECRET` | Ya* | Client Secret dari Google OAuth (wajib jika pakai SSO) |
+| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | Ya* | Service account email (wajib jika pakai upload Drive) |
+| `GOOGLE_SERVICE_ACCOUNT_KEY` | Ya* | Base64 encoded JSON key (wajib jika pakai upload Drive) |
+| `GOOGLE_DRIVE_FOLDER_ID` | Ya* | Folder ID tujuan upload (wajib jika pakai upload Drive) |
 | `NEXT_PUBLIC_APP_URL` | Opsional | URL app untuk metadata |
 | `NEXT_PUBLIC_APP_NAME` | Opsional | Nama app yang ditampilkan |
 
+\* = Hanya wajib jika fitur terkait digunakan.
+
 ---
 
-## 6. Jalankan Lokal
+## 7. Jalankan Lokal
 
 ```bash
 # Install dependencies
@@ -227,7 +290,7 @@ Buka [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 7. Setelah Deploy
+## 8. Setelah Deploy
 
 ### Checklist
 
@@ -272,6 +335,11 @@ Buka [http://localhost:3000](http://localhost:3000)
 ### Database tidak terkoneksi
 - Pastikan `DATABASE_URL` menggunakan **Pooler** mode (port 6543), bukan Direct (port 5432)
 - Cek apakah IP Vercel sudah di-whitelist di Supabase (Settings → Database → Connection Pooling)
+
+### Google SSO gagal
+- Pastikan `GOOGLE_CLIENT_ID` dan `GOOGLE_CLIENT_SECRET` sudah di-set
+- Pastikan **redirect URI** di Google Cloud Console sudah tepat: `http://localhost:3000/api/auth/callback/google`
+- Jika error "redirect_uri_mismatch", periksa daftar Authorized redirect URIs di Google Cloud
 
 ### Upload ke Google Drive gagal
 - Pastikan folder sudah di-share ke email service account dengan role **Editor**
