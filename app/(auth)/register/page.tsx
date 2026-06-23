@@ -67,9 +67,8 @@ export default function RegisterPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-3">
-            <AppLogo size={56} />
+            <AppLogo size={140} />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Keuangan Masjid</h1>
           <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Buat akun baru</p>
         </div>
 

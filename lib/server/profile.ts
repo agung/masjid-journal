@@ -4,6 +4,9 @@ import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { auth } from '@/lib/auth'
+import { db } from '@/lib/db'
+import { account } from '@/drizzle/schema'
+import { eq, and } from 'drizzle-orm'
 
 const updateNameSchema = z.object({
   name: z.string().min(1, 'Nama wajib diisi').max(100, 'Nama terlalu panjang'),
@@ -11,7 +14,7 @@ const updateNameSchema = z.object({
 
 const changePasswordSchema = z
   .object({
-    currentPassword: z.string().min(1, 'Password saat ini wajib diisi'),
+    currentPassword: z.string().optional(),
     newPassword: z.string().min(8, 'Password baru minimal 8 karakter'),
     confirmPassword: z.string().min(1, 'Konfirmasi password wajib diisi'),
   })
@@ -47,7 +50,7 @@ export async function updateNameAction(
 }
 
 export async function changePasswordAction(
-  data: { currentPassword: string; newPassword: string; confirmPassword: string }
+  data: { currentPassword?: string; newPassword: string; confirmPassword: string }
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
     const validated = changePasswordSchema.safeParse(data)
@@ -57,20 +60,50 @@ export async function changePasswordAction(
 
     const { currentPassword, newPassword } = validated.data
 
-    await auth.api.changePassword({
+    const session = await auth.api.getSession({
       headers: await headers(),
-      body: {
-        currentPassword,
-        newPassword,
-        revokeOtherSessions: false,
-      },
     })
+    if (!session) {
+      return { success: false, error: 'Sesi tidak valid' }
+    }
 
+    // Check if the user already has a password set
+    const [credAccount] = await db
+      .select({ password: account.password })
+      .from(account)
+      .where(and(eq(account.userId, session.user.id), eq(account.providerId, 'credential')))
+      .limit(1)
+
+    const hasPassword = !!credAccount?.password
+
+    if (hasPassword) {
+      if (!currentPassword) {
+        return { success: false, error: 'Password saat ini wajib diisi' }
+      }
+
+      await auth.api.changePassword({
+        headers: await headers(),
+        body: {
+          currentPassword,
+          newPassword,
+          revokeOtherSessions: false,
+        },
+      })
+    } else {
+      // SSO user setting password for the first time
+      await auth.api.setPassword({
+        headers: await headers(),
+        body: {
+          newPassword,
+        },
+      })
+    }
+
+    revalidatePath('/settings/profile')
     return { success: true }
   } catch (err) {
     console.error('[changePasswordAction]', err)
     const msg = err instanceof Error ? err.message : 'Terjadi kesalahan'
-    // Better Auth returns a descriptive error for wrong current password
     if (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('incorrect')) {
       return { success: false, error: 'Password saat ini tidak benar' }
     }

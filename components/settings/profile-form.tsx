@@ -9,9 +9,10 @@ import { Input } from '@/components/ui/input'
 interface ProfileFormProps {
   name: string
   email: string
+  hasPassword: boolean
 }
 
-export function ProfileForm({ name, email }: ProfileFormProps) {
+export function ProfileForm({ name, email, hasPassword }: ProfileFormProps) {
   const router = useRouter()
 
   // ── name form
@@ -51,7 +52,11 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
     setPwError(null)
     setPwStatus('loading')
 
-    const res = await changePasswordAction({ currentPassword, newPassword, confirmPassword })
+    const res = await changePasswordAction({
+      currentPassword: hasPassword ? currentPassword : undefined,
+      newPassword,
+      confirmPassword,
+    })
     if (!res.success) {
       setPwError(res.error)
       setPwStatus('idle')
@@ -61,6 +66,7 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
     setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')
+    router.refresh()
     setTimeout(() => setPwStatus('idle'), 2500)
   }
 
@@ -128,9 +134,11 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
         </button>
       </form>
 
-      {/* ── Change password ── */}
+      {/* ── Change or set password ── */}
       <form onSubmit={handlePasswordSubmit} className="bg-white border rounded-2xl p-4 space-y-4 dark:bg-gray-900">
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Ubah Password</h2>
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+          {hasPassword ? 'Ubah Password' : 'Buat Password'}
+        </h2>
 
         {pwError && (
           <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl px-3 py-2 dark:bg-red-950/30 dark:border-red-900/50 dark:text-red-400">
@@ -140,35 +148,37 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
 
         {pwStatus === 'success' && (
           <div className="bg-green-50 border border-green-200 text-green-700 text-xs rounded-xl px-3 py-2 flex items-center gap-1.5 dark:bg-green-950/30 dark:border-green-900/50 dark:text-green-400">
-            <Check size={13} /> Password berhasil diubah.
+            <Check size={13} /> {hasPassword ? 'Password berhasil diubah.' : 'Password berhasil dibuat.'}
           </div>
         )}
 
-        {/* Current password */}
-        <div className="space-y-1.5">
-          <label htmlFor="current-pw" className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
-            Password Saat Ini
-          </label>
-          <div className="relative">
-            <Input
-              id="current-pw"
-              type={showCurrent ? 'text' : 'password'}
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              required
-              disabled={pwStatus === 'loading'}
-              className="pr-10"
-            />
-            <button
-              type="button"
-              onClick={() => setShowCurrent((v) => !v)}
-              tabIndex={-1}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center text-gray-400 hover:text-gray-600"
-            >
-              {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
+        {/* Current password (only if user has an existing password) */}
+        {hasPassword && (
+          <div className="space-y-1.5">
+            <label htmlFor="current-pw" className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
+              Password Saat Ini
+            </label>
+            <div className="relative">
+              <Input
+                id="current-pw"
+                type={showCurrent ? 'text' : 'password'}
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                required
+                disabled={pwStatus === 'loading'}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrent((v) => !v)}
+                tabIndex={-1}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center text-gray-400 hover:text-gray-600"
+              >
+                {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* New password */}
         <div className="space-y-1.5">
@@ -216,7 +226,7 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
 
         <button
           type="submit"
-          disabled={pwStatus !== 'idle' || !currentPassword || newPassword.length < 8 || !confirmPassword}
+          disabled={pwStatus !== 'idle' || (hasPassword && !currentPassword) || newPassword.length < 8 || !confirmPassword}
           className="w-full py-2.5 px-4 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-1.5"
         >
           {pwStatus === 'loading' ? (
@@ -224,7 +234,7 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
           ) : pwStatus === 'success' ? (
             <><Check size={15} /> Tersimpan</>
           ) : (
-            'Ubah Password'
+            hasPassword ? 'Ubah Password' : 'Buat Password'
           )}
         </button>
       </form>

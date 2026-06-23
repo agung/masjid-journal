@@ -4,7 +4,7 @@ import { getSessionCookie } from 'better-auth/cookies'
 // Routes that don't require authentication
 const PUBLIC_PATHS = ['/', '/login', '/register']
 // API routes to skip middleware
-const SKIP_PATHS = ['/api/', '/_next/', '/icons/', '/manifest.json', '/favicon.ico']
+const SKIP_PATHS = ['/api/', '/_next/', '/icons/', '/manifest.json', '/favicon.ico', '/logo.svg', '/sw.js']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl

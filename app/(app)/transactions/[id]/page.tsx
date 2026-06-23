@@ -5,6 +5,7 @@ import { formatRupiah, formatDate } from '@/lib/formatters'
 import { TRANSACTION_TYPE_CONFIG } from '@/lib/transaction-icons'
 import { notFound } from 'next/navigation'
 import { Wallet, Landmark } from 'lucide-react'
+import Image from 'next/image'
 
 /**
  * Convert a stored proof URL into an embeddable image URL.
@@ -116,10 +117,11 @@ export default async function TransactionDetailPage({ params }: Props) {
         <div className="mb-4">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 dark:text-gray-400">Bukti Transaksi</h2>
           <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border bg-gray-50 dark:bg-gray-900">
-            <img
+            <Image
               src={freshProofUrl}
               alt="Bukti transaksi"
-              className="absolute inset-0 w-full h-full object-contain"
+              fill
+              className="object-contain"
             />
           </div>
           <a
