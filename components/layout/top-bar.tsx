@@ -42,7 +42,7 @@ export function TopBar({ orgName }: { orgName?: string }) {
           </button>
         ) : (
           <Link href="/dashboard" className="shrink-0">
-            <AppLogo size={28} />
+            <AppLogo size={36} />
           </Link>
         )}
 
