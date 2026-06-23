@@ -10,7 +10,7 @@ export default async function AppLayout({
   const ctx = await getActiveOrganizationContext()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <TopBar orgName={ctx.organization?.name} />
       <main className="pb-safe">
         {children}

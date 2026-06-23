@@ -27,13 +27,13 @@ export function TopBar({ orgName }: { orgName?: string }) {
   const title = PAGE_TITLES[pathname] ?? 'Keuangan Masjid'
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-gray-100 no-print">
+    <header className="sticky top-0 z-40 bg-white border-b no-print dark:bg-gray-900">
       <div className="flex items-center h-14 px-4 max-w-2xl mx-auto gap-3">
         {isBack ? (
           <button
             type="button"
             onClick={() => window.history.back()}
-            className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-600 -ml-1 shrink-0"
+            className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-600 -ml-1 shrink-0 dark:hover:bg-gray-800 dark:text-gray-400"
             aria-label="Kembali"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -47,9 +47,9 @@ export function TopBar({ orgName }: { orgName?: string }) {
         )}
 
         <div className="flex-1 min-w-0">
-          <p className="text-base font-semibold text-gray-900 truncate">{title}</p>
+          <p className="text-base font-semibold text-gray-900 truncate dark:text-gray-100">{title}</p>
           {pathname === '/dashboard' && orgName && (
-            <p className="text-xs text-gray-500 truncate -mt-0.5">{orgName}</p>
+            <p className="text-xs text-gray-500 truncate -mt-0.5 dark:text-gray-400">{orgName}</p>
           )}
         </div>
       </div>

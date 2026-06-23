@@ -1,7 +1,14 @@
 'use client'
 
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface Account {
   id: string
@@ -25,7 +32,6 @@ export function LedgerFilters({
   currentType,
 }: LedgerFiltersProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   const buildUrl = useCallback(
     (overrides: Record<string, string | undefined>) => {
@@ -87,7 +93,7 @@ export function LedgerFilters({
               className={`text-xs px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors shrink-0 ${
                 isActive
                   ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
               }`}
             >
               {label}
@@ -97,35 +103,47 @@ export function LedgerFilters({
       </div>
 
       {/* Account + type filters */}
-      <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
-        <select
-          value={currentAccountId ?? ''}
-          onChange={(e) =>
-            router.push(buildUrl({ accountId: e.target.value || undefined }))
-          }
-          className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2.5 outline-none min-h-[44px] shrink-0"
-        >
-          <option value="">Semua Akun</option>
-          {accounts.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.kind === 'cash_holder' ? '💰' : '🏦'} {a.name}
-            </option>
-          ))}
-        </select>
+      <div className="flex gap-2">
+        <div className="flex-1">
+          <Select
+            value={currentAccountId ?? ''}
+            onValueChange={(v) =>
+              router.push(buildUrl({ accountId: v || undefined }))
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Semua Akun" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Semua Akun</SelectItem>
+              {accounts.map((a) => (
+                <SelectItem key={a.id} value={a.id}>
+                  {a.kind === 'cash_holder' ? '💰' : '🏦'} {a.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-        <select
-          value={currentType ?? ''}
-          onChange={(e) =>
-            router.push(buildUrl({ type: e.target.value || undefined }))
-          }
-          className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2.5 outline-none min-h-[44px] shrink-0"
-        >
-          {TRANSACTION_TYPES.map((t) => (
-            <option key={t.value} value={t.value}>
-              {t.label}
-            </option>
-          ))}
-        </select>
+        <div className="flex-1">
+          <Select
+            value={currentType ?? ''}
+            onValueChange={(v) =>
+              router.push(buildUrl({ type: v || undefined }))
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Semua Tipe" />
+            </SelectTrigger>
+            <SelectContent>
+              {TRANSACTION_TYPES.map((t) => (
+                <SelectItem key={t.value} value={t.value}>
+                  {t.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   )

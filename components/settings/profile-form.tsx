@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, Loader2, Check } from 'lucide-react'
 import { updateNameAction, changePasswordAction } from '@/lib/server/profile'
+import { Input } from '@/components/ui/input'
 
 interface ProfileFormProps {
   name: string
@@ -66,52 +67,50 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
   return (
     <div className="space-y-6">
       {/* ── Account info (read-only) ── */}
-      <div className="bg-white border rounded-2xl p-4 flex items-center gap-3">
+      <div className="bg-white border rounded-2xl p-4 flex items-center gap-3 dark:bg-gray-900">
         <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-lg shrink-0">
           {formName?.charAt(0).toUpperCase() ?? '?'}
         </div>
         <div className="min-w-0">
-          <p className="font-semibold text-gray-900 truncate">{formName || name}</p>
-          <p className="text-sm text-gray-500 truncate">{email}</p>
+          <p className="font-semibold text-gray-900 truncate dark:text-gray-100">{formName || name}</p>
+          <p className="text-sm text-gray-500 truncate dark:text-gray-400">{email}</p>
         </div>
       </div>
 
       {/* ── Edit name ── */}
-      <form onSubmit={handleNameSubmit} className="bg-white border rounded-2xl p-4 space-y-4">
-        <h2 className="text-sm font-semibold text-gray-700">Ubah Nama</h2>
+      <form onSubmit={handleNameSubmit} className="bg-white border rounded-2xl p-4 space-y-4 dark:bg-gray-900">
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Ubah Nama</h2>
 
         {nameError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl px-3 py-2">
+          <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl px-3 py-2 dark:bg-red-950/30 dark:border-red-900/50 dark:text-red-400">
             {nameError}
           </div>
         )}
 
         <div className="space-y-1.5">
-          <label htmlFor="profile-name" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <label htmlFor="profile-name" className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
             Nama Lengkap
           </label>
-          <input
+          <Input
             id="profile-name"
             type="text"
             value={formName}
             onChange={(e) => setFormName(e.target.value)}
             required
             disabled={nameStatus === 'loading'}
-            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 transition-all"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
             Email
           </label>
-          <input
+          <Input
             type="email"
             value={email}
             disabled
-            className="w-full px-3 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-400 cursor-not-allowed"
           />
-          <p className="text-xs text-gray-400">Email tidak dapat diubah.</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">Email tidak dapat diubah.</p>
         </div>
 
         <button
@@ -130,35 +129,35 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
       </form>
 
       {/* ── Change password ── */}
-      <form onSubmit={handlePasswordSubmit} className="bg-white border rounded-2xl p-4 space-y-4">
-        <h2 className="text-sm font-semibold text-gray-700">Ubah Password</h2>
+      <form onSubmit={handlePasswordSubmit} className="bg-white border rounded-2xl p-4 space-y-4 dark:bg-gray-900">
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Ubah Password</h2>
 
         {pwError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl px-3 py-2">
+          <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl px-3 py-2 dark:bg-red-950/30 dark:border-red-900/50 dark:text-red-400">
             {pwError}
           </div>
         )}
 
         {pwStatus === 'success' && (
-          <div className="bg-green-50 border border-green-200 text-green-700 text-xs rounded-xl px-3 py-2 flex items-center gap-1.5">
+          <div className="bg-green-50 border border-green-200 text-green-700 text-xs rounded-xl px-3 py-2 flex items-center gap-1.5 dark:bg-green-950/30 dark:border-green-900/50 dark:text-green-400">
             <Check size={13} /> Password berhasil diubah.
           </div>
         )}
 
         {/* Current password */}
         <div className="space-y-1.5">
-          <label htmlFor="current-pw" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <label htmlFor="current-pw" className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
             Password Saat Ini
           </label>
           <div className="relative">
-            <input
+            <Input
               id="current-pw"
               type={showCurrent ? 'text' : 'password'}
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               required
               disabled={pwStatus === 'loading'}
-              className="w-full px-3 py-2.5 pr-10 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 transition-all"
+              className="pr-10"
             />
             <button
               type="button"
@@ -173,11 +172,11 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
 
         {/* New password */}
         <div className="space-y-1.5">
-          <label htmlFor="new-pw" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <label htmlFor="new-pw" className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
             Password Baru
           </label>
           <div className="relative">
-            <input
+            <Input
               id="new-pw"
               type={showNew ? 'text' : 'password'}
               value={newPassword}
@@ -185,7 +184,7 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
               required
               minLength={8}
               disabled={pwStatus === 'loading'}
-              className="w-full px-3 py-2.5 pr-10 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 transition-all"
+              className="pr-10"
               placeholder="Minimal 8 karakter"
             />
             <button
@@ -201,17 +200,16 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
 
         {/* Confirm password */}
         <div className="space-y-1.5">
-          <label htmlFor="confirm-pw" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <label htmlFor="confirm-pw" className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
             Konfirmasi Password Baru
           </label>
-          <input
+          <Input
             id="confirm-pw"
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
             disabled={pwStatus === 'loading'}
-            className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 transition-all"
             placeholder="Ulangi password baru"
           />
         </div>

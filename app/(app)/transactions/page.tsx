@@ -15,7 +15,7 @@ export default async function TransactionsPage({
   const orgId = ctx.activeOrganizationId
 
   if (!orgId) {
-    return <div className="p-4 text-sm text-gray-500">Belum ada organisasi aktif. Buat di <a href="/dashboard" className="text-green-600">Dashboard</a>.</div>
+    return <div className="p-4 text-sm text-gray-500 dark:text-gray-400">Belum ada organisasi aktif. Buat di <a href="/dashboard" className="text-green-600">Dashboard</a>.</div>
   }
 
   const { month, year, accountId, type } = await searchParams
@@ -40,8 +40,8 @@ export default async function TransactionsPage({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold">Ledger Transaksi</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-xl font-bold dark:text-gray-100">Ledger Transaksi</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {new Date(pYear, pMonth - 1).toLocaleString('id-ID', { month: 'long', year: 'numeric' })}
           </p>
         </div>
@@ -64,8 +64,8 @@ export default async function TransactionsPage({
 
       {/* Ledger list */}
       {rows.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed">
-          <p className="text-gray-500 mb-2">Belum ada transaksi bulan ini</p>
+        <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed dark:bg-gray-900">
+          <p className="text-gray-500 dark:text-gray-400 mb-2">Belum ada transaksi bulan ini</p>
           <Link href="/transactions/new" className="text-green-600 font-medium">Buat Transaksi Baru</Link>
         </div>
       ) : (

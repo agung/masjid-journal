@@ -31,7 +31,7 @@ export default async function AccountsPage() {
     <div className="p-4 max-w-2xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold">Akun Keuangan</h1>
+        <h1 className="text-xl font-bold dark:text-gray-100">Akun Keuangan</h1>
         <Link
           href="/accounts/new"
           className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
@@ -43,19 +43,19 @@ export default async function AccountsPage() {
 
       {/* Summary */}
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="bg-orange-50 rounded-xl p-4">
+        <div className="bg-orange-50 rounded-xl p-4 dark:bg-orange-950 dark:border-orange-900">
           <p className="text-xs text-orange-600 font-medium mb-1 flex items-center gap-1"><Wallet size={12} /> Total Kas Tunai</p>
-          <p className="text-lg font-bold text-orange-700">{formatRupiah(totalCash)}</p>
+          <p className="text-lg font-bold text-orange-700 dark:text-orange-400">{formatRupiah(totalCash)}</p>
         </div>
-        <div className="bg-blue-50 rounded-xl p-4">
+        <div className="bg-blue-50 rounded-xl p-4 dark:bg-blue-950 dark:border-blue-900">
           <p className="text-xs text-blue-600 font-medium mb-1 flex items-center gap-1"><Landmark size={12} /> Total Bank</p>
-          <p className="text-lg font-bold text-blue-700">{formatRupiah(totalBank)}</p>
+          <p className="text-lg font-bold text-blue-700 dark:text-blue-400">{formatRupiah(totalBank)}</p>
         </div>
       </div>
 
       {/* Cash Holders */}
       <section className="mb-6">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 dark:text-gray-400">
           Pemegang Kas Tunai
         </h2>
         {cashHolders.length === 0 ? (
@@ -71,7 +71,7 @@ export default async function AccountsPage() {
 
       {/* Bank Accounts */}
       <section>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 dark:text-gray-400">
           Rekening Bank
         </h2>
         {bankAccounts.length === 0 ? (
@@ -92,17 +92,17 @@ function AccountCard({ account }: { account: AccountWithBalance }) {
   return (
     <Link
       href={`/accounts/${account.id}`}
-      className={`flex items-center justify-between bg-white border rounded-xl px-4 py-3.5 transition-colors hover:border-green-300 ${
+      className={`flex items-center justify-between bg-white border rounded-xl px-4 py-3.5 transition-colors hover:border-green-300 dark:bg-gray-900 ${
         !account.isActive ? 'opacity-50 grayscale' : ''
       }`}
     >
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center shrink-0">
+        <div className="h-10 w-10 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center shrink-0 dark:bg-gray-800 dark:text-gray-400">
           {account.kind === 'cash_holder' ? <Wallet size={20} /> : <Landmark size={20} />}
         </div>
         <div>
-          <p className="font-medium text-gray-900 text-sm">{account.name}</p>
-          <p className="text-xs text-gray-500">
+          <p className="font-medium text-gray-900 text-sm dark:text-gray-100">{account.name}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             {account.kind === 'cash_holder'
               ? account.holderName
               : `${account.bankName} • ${account.accountNumber}`}
@@ -110,7 +110,7 @@ function AccountCard({ account }: { account: AccountWithBalance }) {
         </div>
       </div>
       <div className="text-right">
-        <p className="font-bold text-gray-900 text-sm">{formatRupiah(account.currentBalance)}</p>
+        <p className="font-bold text-gray-900 text-sm dark:text-gray-100">{formatRupiah(account.currentBalance)}</p>
         {!account.isActive && (
           <span className="text-xs text-gray-400">Nonaktif</span>
         )}
@@ -121,8 +121,8 @@ function AccountCard({ account }: { account: AccountWithBalance }) {
 
 function EmptyState({ message, href }: { message: string; href: string }) {
   return (
-    <div className="text-center py-8 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-      <p className="text-sm text-gray-500 mb-3">{message}</p>
+    <div className="text-center py-8 bg-gray-50 rounded-xl border border-dashed border dark:bg-gray-900">
+      <p className="text-sm text-gray-500 mb-3 dark:text-gray-400">{message}</p>
       <Link
         href={href}
         className="text-sm text-green-600 font-medium hover:text-green-700"

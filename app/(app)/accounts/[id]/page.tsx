@@ -27,23 +27,23 @@ export default async function AccountDetailPage({ params }: Props) {
     <div className="p-4 max-w-md mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-xl font-bold">Detail Akun</h1>
+        <h1 className="text-xl font-bold dark:text-gray-100">Detail Akun</h1>
       </div>
 
       {/* Card */}
-      <div className="bg-white rounded-2xl border p-5 mb-6">
+      <div className="bg-white rounded-2xl border p-5 mb-6 dark:bg-gray-900">
         <div className="flex items-center gap-3 mb-4">
-          <span className="h-12 w-12 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center shrink-0">
+          <span className="h-12 w-12 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center shrink-0 dark:bg-gray-800 dark:text-gray-400">
             {account.kind === 'cash_holder' ? <Wallet size={24} /> : <Landmark size={24} />}
           </span>
           <div>
-            <h2 className="font-bold text-lg">{account.name}</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="font-bold text-lg dark:text-gray-100">{account.name}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {account.kind === 'cash_holder' ? 'Pemegang Kas' : 'Rekening Bank'}
             </p>
           </div>
           {!account.isActive && (
-            <span className="ml-auto text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">
+            <span className="ml-auto text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full dark:bg-gray-800 dark:text-gray-400">
               Nonaktif
             </span>
           )}
@@ -61,7 +61,7 @@ export default async function AccountDetailPage({ params }: Props) {
             </>
           )}
           <div className="border-t pt-3">
-            <p className="text-xs text-gray-500 mb-0.5">Saldo</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Saldo</p>
             <p className="text-2xl font-bold text-green-600">
               {formatRupiah(account.currentBalance)}
             </p>
@@ -85,8 +85,8 @@ function Row({
 }) {
   return (
     <div>
-      <p className="text-xs text-gray-500 mb-0.5">{label}</p>
-      <p className={`text-sm font-medium text-gray-900 ${mono ? 'font-mono' : ''}`}>{value}</p>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{label}</p>
+      <p className={`text-sm font-medium text-gray-900 dark:text-gray-100 ${mono ? 'font-mono' : ''}`}>{value}</p>
     </div>
   )
 }

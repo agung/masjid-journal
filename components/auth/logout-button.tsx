@@ -26,7 +26,7 @@ export function LogoutButton() {
       type="button"
       onClick={handleLogout}
       disabled={loading}
-      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 hover:bg-red-100 disabled:opacity-60 disabled:cursor-not-allowed text-red-600 rounded-xl text-sm font-semibold transition-colors"
+      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 hover:bg-red-100 disabled:opacity-60 disabled:cursor-not-allowed text-red-600 rounded-xl text-sm font-semibold transition-colors dark:bg-red-950/40 dark:hover:bg-red-950/70 dark:text-red-400 dark:border dark:border-red-800/40"
     >
       {loading ? (
         <>

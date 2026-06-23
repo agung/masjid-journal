@@ -39,14 +39,14 @@ export function SummaryCards({
 
       {/* Monthly flow */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white border rounded-xl p-4">
-          <p className="text-xs text-gray-500 mb-1 flex items-center gap-1"><ArrowDownToLine size={12} className="text-green-500" /> Pemasukan</p>
-          <p className="text-xs text-gray-400 mb-1">{monthLabel}</p>
+        <div className="bg-white border rounded-xl p-4 dark:bg-gray-900">
+          <p className="text-xs text-gray-500 mb-1 flex items-center gap-1 dark:text-gray-400"><ArrowDownToLine size={12} className="text-green-500" /> Pemasukan</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">{monthLabel}</p>
           <p className="font-bold text-green-600 text-base">{formatRupiah(totalIncome)}</p>
         </div>
-        <div className="bg-white border rounded-xl p-4">
-          <p className="text-xs text-gray-500 mb-1 flex items-center gap-1"><ArrowUpFromLine size={12} className="text-red-500" /> Pengeluaran</p>
-          <p className="text-xs text-gray-400 mb-1">{monthLabel}</p>
+        <div className="bg-white border rounded-xl p-4 dark:bg-gray-900">
+          <p className="text-xs text-gray-500 mb-1 flex items-center gap-1 dark:text-gray-400"><ArrowUpFromLine size={12} className="text-red-500" /> Pengeluaran</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">{monthLabel}</p>
           <p className="font-bold text-red-500 text-base">{formatRupiah(totalExpense)}</p>
         </div>
       </div>

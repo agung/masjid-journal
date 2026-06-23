@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createOrganizationAction } from '@/lib/server/organizations'
+import { Input } from '@/components/ui/input'
 
 export function CreateOrganizationForm() {
   const [error, setError] = useState<string | null>(null)
@@ -32,22 +33,21 @@ export function CreateOrganizationForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 dark:bg-red-950/30 dark:border-red-900/50 dark:text-red-400">
           {error}
         </div>
       )}
 
       <div className="space-y-1.5">
-        <label htmlFor="name" className="text-sm font-medium text-gray-700">
+        <label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Nama Masjid / Organisasi
         </label>
-        <input
+        <Input
           id="name"
           name="name"
           type="text"
           required
           autoFocus
-          className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
           placeholder="Contoh: Masjid Al-Ikhlas"
         />
       </div>

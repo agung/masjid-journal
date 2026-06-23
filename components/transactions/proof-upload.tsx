@@ -111,19 +111,19 @@ export function ProofUpload({ onUploaded, onClear }: ProofUploadProps) {
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-gray-700">
+      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
         Bukti Transaksi{' '}
-        <span className="text-gray-400 font-normal">(opsional)</span>
+        <span className="text-gray-400 font-normal dark:text-gray-500">(opsional)</span>
       </label>
 
       {!preview ? (
         <label
           htmlFor="proof-file"
-          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-green-400 hover:bg-green-50 transition-colors"
+          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer hover:border-green-400 hover:bg-green-50 dark:hover:border-green-500 dark:hover:bg-green-950/30 transition-colors"
         >
-          <Camera size={28} className="text-gray-400 mb-1" />
-          <span className="text-sm text-gray-500">Foto / pilih dari galeri</span>
-          <span className="text-xs text-gray-400 mt-0.5">JPG, PNG, WebP — maks 5MB</span>
+          <Camera size={28} className="text-gray-400 mb-1 dark:text-gray-500" />
+          <span className="text-sm text-gray-500 dark:text-gray-400">Foto / pilih dari galeri</span>
+          <span className="text-xs text-gray-400 mt-0.5 dark:text-gray-500">JPG, PNG, WebP — maks 5MB</span>
           <input
             ref={inputRef}
             id="proof-file"
@@ -158,7 +158,7 @@ export function ProofUpload({ onUploaded, onClear }: ProofUploadProps) {
             <button
               type="button"
               onClick={handleClear}
-              className="absolute top-2 right-2 bg-white/90 hover:bg-white text-gray-700 text-xs font-medium px-2 py-1 rounded-lg shadow"
+              className="absolute top-2 right-2 bg-white/90 hover:bg-white text-gray-700 text-xs font-medium px-2 py-1 rounded-lg shadow dark:bg-gray-800/90 dark:hover:bg-gray-800 dark:text-gray-300"
             >
               Ganti
             </button>

@@ -18,17 +18,17 @@ export default async function DriveSetupPage() {
 
   return (
     <div className="p-4 max-w-md mx-auto pb-24">
-      <Link href="/settings" className="text-sm text-gray-500 hover:text-gray-700 mb-4 inline-block">
+      <Link href="/settings" className="text-sm text-gray-500 hover:text-gray-700 mb-4 inline-block dark:text-gray-400 dark:hover:text-gray-200">
         ← Kembali
       </Link>
 
-      <h1 className="text-xl font-bold mb-1">Penyimpanan Bukti</h1>
-      <p className="text-sm text-gray-500 mb-6">
+      <h1 className="text-xl font-bold mb-1 dark:text-gray-100">Penyimpanan Bukti</h1>
+      <p className="text-sm text-gray-500 mb-6 dark:text-gray-400">
         Pilih tempat penyimpanan foto bukti transaksi
       </p>
 
       {/* Current provider */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-6">
+      <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-6 dark:bg-blue-950 dark:border-blue-900">
         <p className="text-xs text-blue-600 font-medium mb-1">Provider Aktif</p>
         <p className="text-sm font-semibold text-blue-800">
           {currentProvider === 'google_drive' ? '☁️ Google Drive' : '🗄️ Supabase Storage'}
@@ -39,14 +39,14 @@ export default async function DriveSetupPage() {
       </div>
 
       {/* Google Drive Setup */}
-      <div className="bg-white border rounded-2xl p-5 mb-4">
+      <div className="bg-white border rounded-2xl p-5 mb-4 dark:bg-gray-900">
         <h2 className="font-bold text-base mb-1">☁️ Google Drive</h2>
-        <p className="text-sm text-gray-500 mb-4">15 GB — pakai akun Google pribadi</p>
+        <p className="text-sm text-gray-500 mb-4 dark:text-gray-400">15 GB — pakai akun Google pribadi</p>
 
         <div className="space-y-4">
           {/* Step 1 */}
           <div className="flex gap-3">
-            <span className="h-6 w-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+            <span className="h-6 w-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 dark:bg-gray-700 dark:text-gray-300">1</span>
             <div className="min-w-0">
               <p className="text-sm font-medium">Cek env di Vercel/ .env.local</p>
               <div className="mt-1 space-y-1">
@@ -61,14 +61,14 @@ export default async function DriveSetupPage() {
 
           {/* Step 2 */}
           <div className="flex gap-3">
-            <span className="h-6 w-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+            <span className="h-6 w-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 dark:bg-gray-700 dark:text-gray-300">2</span>
             <div className="min-w-0">
               <p className="text-sm font-medium">Buat folder di Google Drive</p>
-              <ol className="text-xs text-gray-500 mt-1 list-decimal list-inside space-y-0.5">
+              <ol className="text-xs text-gray-500 mt-1 list-decimal list-inside space-y-0.5 dark:text-gray-400">
                 <li>Buka <a href="https://drive.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">drive.google.com</a></li>
-                <li>Buat folder baru, beri nama <code className="bg-gray-100 px-1 rounded">Bukti Transaksi Masjid</code></li>
-                <li>Buka folder, lihat URL — salin ID dari <code className="bg-gray-100 px-1 rounded">/folders/INI_ADALAH_ID</code></li>
-                <li>Simpan sebagai <code className="bg-gray-100 px-1 rounded">GOOGLE_DRIVE_FOLDER_ID</code></li>
+                <li>Buat folder baru, beri nama <code className="bg-gray-100 px-1 rounded dark:bg-gray-800 dark:text-gray-300">Bukti Transaksi Masjid</code></li>
+                <li>Buka folder, lihat URL — salin ID dari <code className="bg-gray-100 px-1 rounded dark:bg-gray-800 dark:text-gray-300">/folders/INI_ADALAH_ID</code></li>
+                <li>Simpan sebagai <code className="bg-gray-100 px-1 rounded dark:bg-gray-800 dark:text-gray-300">GOOGLE_DRIVE_FOLDER_ID</code></li>
               </ol>
               <EnvCheck label="GOOGLE_DRIVE_FOLDER_ID" ok={hasDriveFolderId} />
             </div>
@@ -76,12 +76,12 @@ export default async function DriveSetupPage() {
 
           {/* Step 3 */}
           <div className="flex gap-3">
-            <span className="h-6 w-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+            <span className="h-6 w-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 dark:bg-gray-700 dark:text-gray-300">3</span>
             <div className="min-w-0">
               <p className="text-sm font-medium">Tambahkan redirect URI di Google Cloud</p>
-              <p className="text-xs text-gray-500 mt-1">Buka Google Cloud Console → <strong>APIs & Services → Credentials</strong> → klik OAuth Client kamu → <strong>Authorized redirect URIs</strong>, tambahkan:</p>
-              <pre className="bg-gray-100 rounded-lg p-2 text-xs font-mono mt-1 text-gray-700 break-all">https://{process.env.VERCEL_URL ? process.env.VERCEL_URL + '/api/drive-setup/callback' : 'domain-anda.vercel.app/api/drive-setup/callback'}</pre>
-              <p className="text-xs text-gray-400 mt-1">Untuk development lokal, tambahkan juga: <code className="bg-gray-100 px-1 rounded">http://localhost:3000/api/drive-setup/callback</code></p>
+              <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">Buka Google Cloud Console → <strong>APIs & Services → Credentials</strong> → klik OAuth Client kamu → <strong>Authorized redirect URIs</strong>, tambahkan:</p>
+              <pre className="bg-gray-100 rounded-lg p-2 text-xs font-mono mt-1 text-gray-700 break-all dark:bg-gray-800 dark:text-gray-300">https://{process.env.VERCEL_URL ? process.env.VERCEL_URL + '/api/drive-setup/callback' : 'domain-anda.vercel.app/api/drive-setup/callback'}</pre>
+              <p className="text-xs text-gray-400 mt-1">Untuk development lokal, tambahkan juga: <code className="bg-gray-100 px-1 rounded dark:bg-gray-800 dark:text-gray-300">http://localhost:3000/api/drive-setup/callback</code></p>
             </div>
           </div>
 
@@ -96,7 +96,7 @@ export default async function DriveSetupPage() {
               >
                 🔗 Hubungkan Google Drive
               </a>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 mt-2 dark:text-gray-400">
                 Klik tombol di atas → login dengan akun pemilik folder Drive → setujui akses → salin refresh token yang muncul.
               </p>
               <EnvCheck label="GOOGLE_DRIVE_REFRESH_TOKEN" ok={hasDriveRefreshToken} />
@@ -105,29 +105,29 @@ export default async function DriveSetupPage() {
 
           {/* Step 5 */}
           <div className="flex gap-3">
-            <span className="h-6 w-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">5</span>
+            <span className="h-6 w-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 dark:bg-gray-700 dark:text-gray-300">5</span>
             <div className="min-w-0">
               <p className="text-sm font-medium">Set STORAGE_PROVIDER & redeploy</p>
-              <p className="text-xs text-gray-500 mt-1">Di Vercel, tambahkan semua env Drive, lalu set:</p>
-              <pre className="bg-gray-100 rounded-lg p-2 text-xs font-mono mt-1 text-gray-700">STORAGE_PROVIDER=google_drive</pre>
-              <p className="text-xs text-gray-500 mt-1">Redeploy Vercel setelah semua env terisi.</p>
+              <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">Di Vercel, tambahkan semua env Drive, lalu set:</p>
+              <pre className="bg-gray-100 rounded-lg p-2 text-xs font-mono mt-1 text-gray-700 dark:bg-gray-800 dark:text-gray-300">STORAGE_PROVIDER=google_drive</pre>
+              <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">Redeploy Vercel setelah semua env terisi.</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Supabase Storage info */}
-      <div className="bg-white border rounded-2xl p-5 mb-6">
+      <div className="bg-white border rounded-2xl p-5 mb-6 dark:bg-gray-900">
         <h2 className="font-bold text-base mb-1">🗄️ Supabase Storage (Default)</h2>
-        <p className="text-sm text-gray-500 mb-3">1 GB — gratis, setup cepat</p>
+        <p className="text-sm text-gray-500 mb-3 dark:text-gray-400">1 GB — gratis, setup cepat</p>
 
         <div className="space-y-1 mb-3">
           <EnvCheck label="NEXT_PUBLIC_SUPABASE_URL" ok={hasSupabaseUrl} />
           <EnvCheck label="SUPABASE_SERVICE_ROLE_KEY" ok={hasSupabaseKey} />
         </div>
 
-        <p className="text-xs text-gray-500">
-          Setup bucket <code className="bg-gray-100 px-1 rounded">bukti-transaksi</code> di Supabase Dashboard → Storage.
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Setup bucket <code className="bg-gray-100 px-1 rounded dark:bg-gray-800 dark:text-gray-300">bukti-transaksi</code> di Supabase Dashboard → Storage.
           <br />
           <Link href="/settings" className="text-blue-600 underline">Kembali ke settings utama →</Link>
         </p>

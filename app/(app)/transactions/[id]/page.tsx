@@ -49,21 +49,21 @@ export default async function TransactionDetailPage({ params }: Props) {
     <div className="p-4 max-w-md mx-auto pb-24">
 
       {/* Transaction card */}
-      <div className="bg-white border rounded-2xl p-5 mb-4 space-y-4">
+      <div className="bg-white border rounded-2xl p-5 mb-4 space-y-4 dark:bg-gray-900">
         {/* Type + number */}
         <div className="flex items-center justify-between">
-          <span className={`h-10 w-10 rounded-xl flex items-center justify-center ${typeConfig?.color ?? 'bg-gray-100 text-gray-700'}`}>
+          <span className={`h-10 w-10 rounded-xl flex items-center justify-center ${typeConfig?.color ?? 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}>
             {TypeIcon && <TypeIcon size={20} />}
           </span>
           <div className="text-right">
-            <p className="text-xs text-gray-400 font-mono">{tx.transactionNo}</p>
-            <p className="text-xs text-gray-500">{formatDate(tx.transactionDate)}</p>
+            <p className="text-xs text-gray-400 font-mono dark:text-gray-500">{tx.transactionNo}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(tx.transactionDate)}</p>
           </div>
         </div>
 
         <div>
-          <p className="font-bold text-lg text-gray-900">{tx.description}</p>
-          {tx.notes && <p className="text-sm text-gray-500 mt-1">{tx.notes}</p>}
+          <p className="font-bold text-lg text-gray-900 dark:text-gray-100">{tx.description}</p>
+          {tx.notes && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{tx.notes}</p>}
         </div>
 
         <div className="text-3xl font-bold text-green-600">
@@ -73,13 +73,13 @@ export default async function TransactionDetailPage({ params }: Props) {
 
       {/* Movements section */}
       <div className="mb-4">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Pergerakan Saldo</h2>
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 dark:text-gray-400">Pergerakan Saldo</h2>
         <div className="space-y-2">
           {tx.movements.map((m) => (
-            <div key={m.id} className="bg-white border rounded-xl p-4">
+            <div key={m.id} className="bg-white border rounded-xl p-4 dark:bg-gray-900">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="h-7 w-7 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center">
+                  <span className="h-7 w-7 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center dark:bg-gray-800 dark:text-gray-400">
                     {m.accountKind === 'cash_holder' ? <Wallet size={14} /> : <Landmark size={14} />}
                   </span>
                   <span className="font-medium text-sm">{m.accountName}</span>
@@ -90,18 +90,18 @@ export default async function TransactionDetailPage({ params }: Props) {
               </div>
               {/* Before / After */}
               <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="bg-gray-50 rounded-lg p-2">
-                  <p className="text-xs text-gray-400 mb-0.5">Sebelum</p>
-                  <p className="text-xs font-mono font-medium text-gray-700">{formatRupiah(m.balanceBefore)}</p>
+                <div className="bg-gray-50 rounded-lg p-2 dark:bg-gray-800">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">Sebelum</p>
+                  <p className="text-xs font-mono font-medium text-gray-700 dark:text-gray-300">{formatRupiah(m.balanceBefore)}</p>
                 </div>
                 <div className="flex items-center justify-center">
                   <span className={`text-lg font-bold ${ m.direction === 'in' ? 'text-green-500' : 'text-red-500' }`}>
                     {m.direction === 'in' ? '→' : '←'}
                   </span>
                 </div>
-                <div className={`rounded-lg p-2 ${ m.direction === 'in' ? 'bg-green-50' : 'bg-red-50' }`}>
-                  <p className="text-xs text-gray-400 mb-0.5">Sesudah</p>
-                  <p className={`text-xs font-mono font-medium ${ m.direction === 'in' ? 'text-green-700' : 'text-red-700' }`}>
+                <div className={`rounded-lg p-2 ${ m.direction === 'in' ? 'bg-green-50 dark:bg-green-950' : 'bg-red-50 dark:bg-red-950' }`}>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">Sesudah</p>
+                  <p className={`text-xs font-mono font-medium ${ m.direction === 'in' ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400' }`}>
                     {formatRupiah(m.balanceAfter)}
                   </p>
                 </div>
@@ -114,8 +114,8 @@ export default async function TransactionDetailPage({ params }: Props) {
       {/* Proof image */}
       {freshProofUrl && (
         <div className="mb-4">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Bukti Transaksi</h2>
-          <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border bg-gray-50">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 dark:text-gray-400">Bukti Transaksi</h2>
+          <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border bg-gray-50 dark:bg-gray-900">
             <img
               src={freshProofUrl}
               alt="Bukti transaksi"

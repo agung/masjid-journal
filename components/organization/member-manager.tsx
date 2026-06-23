@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Plus, X, Eye, EyeOff, Trash2, Edit2 } from 'lucide-react'
 import { addMemberAction, updateMemberRoleAction, removeMemberAction } from '@/lib/server/organizations'
 import type { Role } from '@/lib/auth/roles'
+import { Input } from '@/components/ui/input'
 
 interface MemberWithUser {
   id: string
@@ -173,8 +174,8 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Anggota</h1>
-          <p className="text-xs text-gray-500">Kelola pengurus dan peran akses login</p>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Anggota</h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Kelola pengurus dan peran akses login</p>
         </div>
         {isOwner && (
           <button
@@ -188,7 +189,7 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
       </div>
 
       {/* Members List */}
-      <div className="bg-white border rounded-xl overflow-hidden shadow-xs divide-y divide-gray-100">
+      <div className="bg-white border rounded-xl overflow-hidden shadow-xs divide-y divide-gray-100 dark:bg-gray-900 dark:divide-gray-800">
         {members.map((m) => {
           const isEditable = isOwner && m.userId !== currentUserId
           const Component = isEditable ? 'button' : 'div'
@@ -198,34 +199,34 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
               key={m.id}
               onClick={isEditable ? () => openEditSheet(m) : undefined}
               className={`w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors ${
-                isEditable ? 'hover:bg-gray-50 cursor-pointer active:bg-gray-100' : ''
+                isEditable ? 'hover:bg-gray-50 cursor-pointer active:bg-gray-100 dark:hover:bg-gray-800 dark:active:bg-gray-700' : ''
               }`}
             >
               <div>
-                <p className="font-medium text-sm text-gray-900 flex items-center gap-1.5">
+                <p className="font-medium text-sm text-gray-900 dark:text-gray-100 flex items-center gap-1.5">
                   {m.userName}
                   {m.userId === currentUserId && (
-                    <span className="text-[10px] font-semibold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md">
+                    <span className="text-[10px] font-semibold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md dark:bg-gray-800 dark:text-gray-500">
                       Anda
                     </span>
                   )}
                 </p>
-                <p className="text-xs text-gray-500">{m.userEmail}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{m.userEmail}</p>
               </div>
               <div className="flex items-center gap-2">
                 <span className={`text-xs px-2 py-1 rounded-full font-medium border ${
                   m.role === 'owner' 
-                    ? 'bg-purple-50 text-purple-700 border-purple-100'
+                    ? 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-900/50'
                     : m.role === 'admin'
-                    ? 'bg-blue-50 text-blue-700 border-blue-100'
+                    ? 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/50'
                     : m.role === 'treasurer'
-                    ? 'bg-green-50 text-green-700 border-green-100'
-                    : 'bg-gray-100 text-gray-600 border-gray-100'
+                    ? 'bg-green-50 text-green-700 border-green-100 dark:bg-green-950 dark:text-green-400 dark:border-green-900'
+                    : 'bg-gray-100 text-gray-600 border dark:bg-gray-800 dark:text-gray-400'
                 }`}>
                   {ROLE_LABEL[m.role] ?? m.role}
                 </span>
                 {isEditable && (
-                  <Edit2 size={12} className="text-gray-300 hover:text-gray-500" />
+                  <Edit2 size={12} className="text-gray-300 hover:text-gray-500 dark:hover:text-gray-400" />
                 )}
               </div>
             </Component>
@@ -243,7 +244,7 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
 
       {/* Bottom Sheet */}
       <div
-        className={`fixed inset-x-0 bottom-0 bg-white rounded-t-2xl shadow-2xl max-w-md mx-auto z-[70] transform transition-transform duration-300 ease-out pb-[calc(2rem+env(safe-area-inset-bottom))] border-t border-gray-200 overflow-y-auto ${
+        className={`fixed inset-x-0 bottom-0 bg-white rounded-t-2xl shadow-2xl max-w-md mx-auto z-[70] transform transition-transform duration-300 ease-out pb-[calc(2rem+env(safe-area-inset-bottom))] border-t overflow-y-auto dark:bg-gray-900 ${
           isSheetOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
         style={{ maxHeight: '92vh' }}
@@ -256,10 +257,10 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
             {/* Header */}
             <div className="flex items-center justify-between border-b pb-3 mb-2">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
                   {editingMember ? 'Ubah Akses Anggota' : 'Tambah Anggota'}
                 </h2>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {editingMember 
                     ? 'Perbarui tingkat hak akses peran anggota' 
                     : 'Daftarkan akun anggota baru untuk login'
@@ -269,14 +270,14 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
               <button
                 type="button"
                 onClick={closeSheet}
-                className="h-8 w-8 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 flex items-center justify-center transition-colors"
+                className="h-8 w-8 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700 flex items-center justify-center transition-colors"
               >
                 <X size={16} />
               </button>
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl px-4 py-2.5">
+              <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl px-4 py-2.5 dark:bg-red-950/30 dark:border-red-900/50 dark:text-red-400">
                 {error}
               </div>
             )}
@@ -286,10 +287,10 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
               <>
                 {/* Name Input */}
                 <div className="space-y-1.5">
-                  <label htmlFor="fullName" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <label htmlFor="fullName" className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Nama Lengkap
                   </label>
-                  <input
+                  <Input
                     id="fullName"
                     type="text"
                     value={formName}
@@ -297,16 +298,15 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
                     placeholder="Contoh: Ahmad Hidayat"
                     required
                     disabled={isSubmitting}
-                    className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 transition-all"
                   />
                 </div>
 
                 {/* Email Input */}
                 <div className="space-y-1.5">
-                  <label htmlFor="emailAddress" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <label htmlFor="emailAddress" className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Alamat Email
                   </label>
-                  <input
+                  <Input
                     id="emailAddress"
                     type="email"
                     value={formEmail}
@@ -314,17 +314,16 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
                     placeholder="email@masjid.com"
                     required
                     disabled={isSubmitting}
-                    className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 transition-all"
                   />
                 </div>
 
                 {/* Password Input */}
                 <div className="space-y-1.5">
-                  <label htmlFor="memberPass" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <label htmlFor="memberPass" className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Password Login
                   </label>
                   <div className="relative">
-                    <input
+                    <Input
                       id="memberPass"
                       type={showPassword ? 'text' : 'password'}
                       value={formPassword}
@@ -333,12 +332,12 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
                       required
                       minLength={8}
                       disabled={isSubmitting}
-                      className="w-full px-3 py-2.5 pr-10 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 transition-all"
+                      className="pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                       tabIndex={-1}
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -348,21 +347,21 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
               </>
             ) : (
               /* Edit Mode Read-Only displays */
-              <div className="space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-100">
+              <div className="space-y-3 bg-gray-50 p-4 rounded-xl border dark:bg-gray-800">
                 <div>
                   <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Nama Anggota</span>
-                  <span className="text-sm font-semibold text-gray-800">{formName}</span>
+                  <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{formName}</span>
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Email</span>
-                  <span className="text-sm font-mono text-gray-800">{formEmail}</span>
+                  <span className="text-sm font-mono text-gray-800 dark:text-gray-200">{formEmail}</span>
                 </div>
               </div>
             )}
 
             {/* Role selector */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block">
+              <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">
                 Pilih Peran (Role)
               </label>
               <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
@@ -374,17 +373,17 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
                     disabled={isSubmitting}
                     className={`w-full p-3 text-left border rounded-xl transition-all block ${
                       formRole === opt.value
-                        ? 'border-green-600 bg-green-50/50 shadow-2xs'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
+                        ? 'border-green-600 bg-green-50/50 shadow-2xs dark:border-green-500 dark:bg-green-950/70'
+                        : 'border bg-white dark:bg-gray-900 dark:hover:border-gray-600'
                     }`}
                   >
                     <div className="flex justify-between items-center mb-0.5">
-                      <span className="text-sm font-bold text-gray-900">{opt.label}</span>
+                      <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{opt.label}</span>
                       {formRole === opt.value && (
-                        <span className="h-2 w-2 rounded-full bg-green-600" />
+                        <span className="h-2 w-2 rounded-full bg-green-600 dark:bg-green-400" />
                       )}
                     </div>
-                    <p className="text-[11px] text-gray-500 leading-normal">{opt.desc}</p>
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-normal">{opt.desc}</p>
                   </button>
                 ))}
               </div>
@@ -405,7 +404,7 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
                   type="button"
                   onClick={() => setIsConfirmingDelete(true)}
                   disabled={isSubmitting}
-                  className="w-full py-2.5 px-4 text-red-600 hover:bg-red-50 disabled:opacity-50 font-semibold rounded-xl text-sm transition-colors border border-transparent"
+                  className="w-full py-2.5 px-4 text-red-600 hover:bg-red-50 disabled:opacity-50 font-semibold rounded-xl text-sm transition-colors border border-transparent dark:text-red-400 dark:hover:bg-red-950/50"
                 >
                   Keluarkan Anggota
                 </button>
@@ -416,19 +415,19 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
           /* Delete Confirmation mode inside sheet */
           <div className="px-6 py-4 space-y-5">
             <div className="flex items-center justify-between border-b pb-3 mb-2">
-              <h2 className="text-lg font-bold text-gray-900">Keluarkan Anggota</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Keluarkan Anggota</h2>
               <button
                 type="button"
                 onClick={() => setIsConfirmingDelete(false)}
-                className="h-8 w-8 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 flex items-center justify-center transition-colors"
+                className="h-8 w-8 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700 flex items-center justify-center transition-colors"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <div className="bg-red-50 border border-red-200 text-red-800 text-sm rounded-xl p-4 space-y-2">
-              <p className="font-semibold">Konfirmasi Pengeluaran</p>
-              <p className="text-xs leading-relaxed text-red-700">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-2 dark:bg-red-950/30 dark:border-red-600/60">
+              <p className="font-semibold text-red-800 dark:text-red-300">Konfirmasi Pengeluaran</p>
+              <p className="text-xs leading-relaxed text-red-700 dark:text-red-400">
                 Apakah Anda yakin ingin mengeluarkan <strong>{editingMember?.userName}</strong> ({editingMember?.userEmail}) dari organisasi? 
                 Pengguna ini tidak akan memiliki hak akses lagi untuk mencatat atau melihat pembukuan masjid ini.
               </p>
@@ -439,7 +438,7 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
                 type="button"
                 onClick={handleDelete}
                 disabled={isSubmitting}
-                className="w-full py-3 px-4 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold rounded-xl text-sm transition-colors shadow-sm flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold rounded-xl text-sm transition-colors shadow-sm flex items-center justify-center gap-2 dark:bg-red-800 dark:hover:bg-red-700"
               >
                 <Trash2 size={16} />
                 {isSubmitting ? 'Mengeluarkan...' : 'Ya, Keluarkan Anggota'}
@@ -449,7 +448,7 @@ export function MemberManager({ initialMembers, isOwner, currentUserId }: Member
                 type="button"
                 onClick={() => setIsConfirmingDelete(false)}
                 disabled={isSubmitting}
-                className="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-gray-700 font-semibold rounded-xl text-sm transition-colors"
+                className="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-gray-700 font-semibold rounded-xl text-sm transition-colors dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300"
               >
                 Batal
               </button>

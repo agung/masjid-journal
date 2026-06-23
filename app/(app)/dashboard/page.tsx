@@ -19,7 +19,7 @@ export default async function DashboardPage() {
             <AppLogo size={64} />
           </div>
           <h1 className="text-xl font-bold mb-2">Selamat Datang!</h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             Buat organisasi masjid untuk mulai mencatat keuangan.
           </p>
         </div>
@@ -46,8 +46,8 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-xl font-bold">{ctx.organization.name}</h1>
-          <p className="text-sm text-gray-500">{monthLabel}</p>
+          <h1 className="text-xl font-bold dark:text-gray-100">{ctx.organization.name}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{monthLabel}</p>
         </div>
         <Link
           href="/transactions/new"
@@ -72,17 +72,17 @@ export default async function DashboardPage() {
       {(accountSummary.cashHolders.length > 0 || accountSummary.banks.length > 0) && (
         <div className="mt-5">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Akun</h2>
+            <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Akun</h2>
             <Link href="/accounts" className="text-xs text-green-600 p-2 -m-2">Lihat semua</Link>
           </div>
           <div className="space-y-2">
             {[...accountSummary.cashHolders, ...accountSummary.banks].slice(0, 4).map((acc) => (
-              <div key={acc.id} className="flex items-center justify-between bg-white border rounded-xl px-4 py-3">
+              <div key={acc.id} className="flex items-center justify-between bg-white border rounded-xl px-4 py-3 dark:bg-gray-900">
                 <div className="flex items-center gap-2">
                   <span>{acc.kind === 'cash_holder' ? '💰' : '🏦'}</span>
                   <span className="text-sm font-medium">{acc.name}</span>
                 </div>
-                <span className="text-sm font-bold text-gray-800">
+                <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
                   {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(acc.currentBalance ?? 0)}
                 </span>
               </div>
@@ -94,12 +94,12 @@ export default async function DashboardPage() {
       {/* Recent movements */}
       <div className="mt-5">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Transaksi Terakhir</h2>
+          <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Transaksi Terakhir</h2>
           <Link href="/transactions" className="text-xs text-green-600 p-2 -m-2">Lihat semua</Link>
         </div>
         {recentMovements.length === 0 ? (
-          <div className="text-center py-8 bg-gray-50 rounded-2xl border border-dashed">
-            <p className="text-sm text-gray-500 mb-2">Belum ada transaksi</p>
+          <div className="text-center py-8 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-dashed">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Belum ada transaksi</p>
             <Link href="/transactions/new" className="text-sm text-green-600 font-medium">
               Buat Transaksi Pertama
             </Link>

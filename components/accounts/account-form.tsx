@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createCashHolder, createBankAccount } from '@/lib/server/accounts'
+import { Input } from '@/components/ui/input'
 
 type AccountKind = 'cash_holder' | 'bank'
 
@@ -66,8 +67,8 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
           onClick={() => setKind('cash_holder')}
           className={`py-3 px-4 rounded-xl border-2 text-sm font-medium transition-colors ${
             kind === 'cash_holder'
-              ? 'border-green-600 bg-green-50 text-green-700'
-              : 'border-gray-200 text-gray-600 hover:border-gray-300'
+              ? 'border-green-600 bg-green-50 text-green-700 dark:border-green-500 dark:bg-green-950/30 dark:text-green-400'
+              : 'border text-gray-600 dark:text-gray-400'
           }`}
         >
           <div className="text-xl mb-1">💰</div>
@@ -78,8 +79,8 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
           onClick={() => setKind('bank')}
           className={`py-3 px-4 rounded-xl border-2 text-sm font-medium transition-colors ${
             kind === 'bank'
-              ? 'border-blue-600 bg-blue-50 text-blue-700'
-              : 'border-gray-200 text-gray-600 hover:border-gray-300'
+              ? 'border-blue-600 bg-blue-50 text-blue-700 dark:border-blue-500 dark:bg-blue-950/30 dark:text-blue-400'
+              : 'border text-gray-600 dark:text-gray-400'
           }`}
         >
           <div className="text-xl mb-1">🏦</div>
@@ -88,22 +89,21 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 dark:bg-red-950/30 dark:border-red-900/50 dark:text-red-400">
           {error}
         </div>
       )}
 
       {/* Common fields */}
       <div className="space-y-1.5">
-        <label htmlFor="name" className="text-sm font-medium text-gray-700">
+        <label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Nama Akun
         </label>
-        <input
+        <Input
           id="name"
           name="name"
           type="text"
           required
-          className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
           placeholder={kind === 'cash_holder' ? 'Contoh: Kas Bendahara A' : 'Contoh: Rek BSI Masjid'}
         />
       </div>
@@ -111,15 +111,14 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
       {/* Cash holder fields */}
       {kind === 'cash_holder' && (
         <div className="space-y-1.5">
-          <label htmlFor="holderName" className="text-sm font-medium text-gray-700">
+          <label htmlFor="holderName" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Nama Pemegang
           </label>
-          <input
+          <Input
             id="holderName"
             name="holderName"
             type="text"
             required
-            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="Contoh: Ahmad Fauzi"
           />
         </div>
@@ -129,42 +128,39 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
       {kind === 'bank' && (
         <>
           <div className="space-y-1.5">
-            <label htmlFor="bankName" className="text-sm font-medium text-gray-700">
+            <label htmlFor="bankName" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Nama Bank
             </label>
-            <input
+            <Input
               id="bankName"
               name="bankName"
               type="text"
               required
-              className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Contoh: BSI, BRI, Mandiri"
             />
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="accountNumber" className="text-sm font-medium text-gray-700">
+            <label htmlFor="accountNumber" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Nomor Rekening
             </label>
-            <input
+            <Input
               id="accountNumber"
               name="accountNumber"
               type="text"
               inputMode="numeric"
               required
-              className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Contoh: 7123456789"
             />
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="accountHolderName" className="text-sm font-medium text-gray-700">
+            <label htmlFor="accountHolderName" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Nama Pemilik Rekening
             </label>
-            <input
+            <Input
               id="accountHolderName"
               name="accountHolderName"
               type="text"
               required
-              className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Sesuai buku tabungan"
             />
           </div>
@@ -173,18 +169,18 @@ export function AccountForm({ defaultKind = 'cash_holder' }: AccountFormProps) {
 
       {/* Initial balance */}
       <div className="space-y-1.5">
-        <label htmlFor="balance" className="text-sm font-medium text-gray-700">
+        <label htmlFor="balance" className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Saldo Awal
         </label>
         <div className="relative">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
-          <input
+          <Input
             id="balance"
             name="balance"
             type="text"
             inputMode="numeric"
             defaultValue="0"
-            className="w-full pl-9 pr-3 py-2.5 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="pl-9"
             placeholder="0"
           />
         </div>

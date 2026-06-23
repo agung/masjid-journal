@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { signIn } from '@/lib/auth-client'
 import { AppLogo } from '@/components/ui/app-logo'
+import { Input } from '@/components/ui/input'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
 export default function LoginPage() {
@@ -60,15 +61,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 dark:bg-gray-950">
       <div className="w-full max-w-sm">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-3">
             <AppLogo size={56} />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Keuangan Masjid</h1>
-          <p className="text-sm text-gray-500 mt-1">Masuk ke akun Anda</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Keuangan Masjid</h1>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Masuk ke akun Anda</p>
         </div>
 
         {/* Google Sign-In */}
@@ -76,7 +77,7 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={googleLoading}
-          className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-sm font-medium text-gray-700 transition-colors shadow-xs mb-4"
+          className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 bg-white border hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-sm font-medium text-gray-700 transition-colors shadow-xs mb-4 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
         >
           {googleLoading ? (
             <Loader2 size={18} className="animate-spin shrink-0" />
@@ -93,48 +94,47 @@ export default function LoginPage() {
 
         {/* Divider */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="flex-1 h-px bg-gray-200" />
+          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
           <span className="text-xs text-gray-400 uppercase tracking-wider">atau</span>
-          <div className="flex-1 h-px bg-gray-200" />
+          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 dark:bg-red-950/30 dark:border-red-900/50 dark:text-red-400">
               {error}
             </div>
           )}
 
           <div className="space-y-1.5">
-            <label htmlFor="email" className="text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Email
             </label>
-            <input
+            <Input
               id="email"
               type="email"
               autoComplete="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               placeholder="email@masjid.com"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="password" className="text-sm font-medium text-gray-700">
+            <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Password
             </label>
             <div className="relative">
-              <input
+              <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2.5 pr-10 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="pr-10"
                 placeholder="••••••••"
               />
               <button

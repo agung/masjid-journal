@@ -1,4 +1,19 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-green-50: #E8FBF3;
+  --color-green-100: #C2F4DF;
+  --color-green-200: #9EEDCC;
+  --color-green-300: #6EE4B3;
+  --color-green-400: #56DB9F;
+  --color-green-500: #3ECF8E;
+  --color-green-600: #249361;
+  --color-green-700: #1B724A;
+  --color-green-800: #125137;
+  --color-green-900: #0A3020;
+  --default-border-color: hsl(var(--border));
+}
 
 :root {
   --background: 0 0% 100%;
@@ -7,7 +22,7 @@
   --card-foreground: 222.2 84% 4.9%;
   --popover: 0 0% 100%;
   --popover-foreground: 222.2 84% 4.9%;
-  --primary: 142 70% 35%;
+  --primary: 152 60% 53%;
   --primary-foreground: 0 0% 100%;
   --secondary: 210 40% 96.1%;
   --secondary-foreground: 222.2 47.4% 11.2%;
@@ -19,45 +34,45 @@
   --destructive-foreground: 210 40% 98%;
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
-  --ring: 142 70% 35%;
+  --ring: 152 60% 53%;
   --radius: 0.75rem;
 }
 
 .dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 142 70% 45%;
+  --background: 0 0% 7%;
+  --foreground: 210 40% 96%;
+  --card: 0 0% 11%;
+  --card-foreground: 210 40% 96%;
+  --popover: 0 0% 11%;
+  --popover-foreground: 210 40% 96%;
+  --primary: 152 60% 53%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217.2 32.6% 17.5%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 210 40% 96%;
+  --muted: 0 0% 15%;
   --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
+  --accent: 0 0% 15%;
+  --accent-foreground: 210 40% 96%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 210 40% 98%;
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 142 70% 45%;
+  --border: 215 16.3% 16.9%;
+  --input: 215 16.3% 16.9%;
+  --ring: 152 60% 53%;
 }
 
-* {
-  border-color: hsl(var(--border));
+@layer base {
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    border-color: var(--default-border-color, currentColor);
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 
-body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  /* Safe area for mobile phones with notch/home indicator */
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* Bottom nav safe area */
 .pb-safe {
   padding-bottom: calc(4rem + env(safe-area-inset-bottom));
 }

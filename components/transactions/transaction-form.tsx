@@ -7,6 +7,15 @@ import { ProofUpload, type ProofUploadResult } from '@/components/transactions/p
 import { TRANSACTION_TYPE_CONFIG } from '@/lib/transaction-icons'
 import type { MasjidAccount, Category } from '@/drizzle/schema'
 import type { CreateTransactionInput } from '@/lib/validations/transaction'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 
 type TransactionType = 'income' | 'expense' | 'transfer' | 'deposit' | 'withdrawal'
 
@@ -26,6 +35,9 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [proof, setProof] = useState<ProofUploadResult | null>(null)
+  const [categoryId, setCategoryId] = useState('')
+  const [sourceAccountId, setSourceAccountId] = useState('')
+  const [targetAccountId, setTargetAccountId] = useState('')
 
   const cashHolders = accounts.filter((a) => a.kind === 'cash_holder' && a.isActive)
   const bankAccounts = accounts.filter((a) => a.kind === 'bank' && a.isActive)
@@ -62,19 +74,19 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
 
       switch (type) {
         case 'income':
-          input = { ...common, type: 'income', categoryId: get('categoryId'), targetAccountId: get('targetAccountId') }
+          input = { ...common, type: 'income', categoryId, targetAccountId }
           break
         case 'expense':
-          input = { ...common, type: 'expense', categoryId: get('categoryId'), sourceAccountId: get('sourceAccountId') }
+          input = { ...common, type: 'expense', categoryId, sourceAccountId }
           break
         case 'transfer':
-          input = { ...common, type: 'transfer', sourceAccountId: get('sourceAccountId'), targetAccountId: get('targetAccountId') }
+          input = { ...common, type: 'transfer', sourceAccountId, targetAccountId }
           break
         case 'deposit':
-          input = { ...common, type: 'deposit', sourceAccountId: get('sourceAccountId'), targetAccountId: get('targetAccountId') }
+          input = { ...common, type: 'deposit', sourceAccountId, targetAccountId }
           break
         case 'withdrawal':
-          input = { ...common, type: 'withdrawal', sourceAccountId: get('sourceAccountId'), targetAccountId: get('targetAccountId') }
+          input = { ...common, type: 'withdrawal', sourceAccountId, targetAccountId }
           break
       }
 
@@ -97,7 +109,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
   if (step === 1) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-gray-500 text-center">Pilih jenis transaksi</p>
+        <p className="text-sm text-gray-500 text-center dark:text-gray-400">Pilih jenis transaksi</p>
         <div className="grid grid-cols-1 gap-2">
           {TRANSACTION_TYPES.map((t) => {
             const Icon = t.icon
@@ -105,9 +117,9 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
               <button
                 key={t.type}
                 type="button"
-                onClick={() => { setType(t.type); setStep(2) }}
+                onClick={() => { setType(t.type); setCategoryId(''); setSourceAccountId(''); setTargetAccountId(''); setStep(2) }}
                 className={`flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-colors hover:shadow-sm ${
-                  type === t.type ? t.borderColor : 'border-gray-200 hover:border-gray-300'
+                  type === t.type ? t.borderColor : 'border dark:hover:border-gray-500'
                 }`}
               >
                 <span className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${t.borderColor}`}>
@@ -147,24 +159,24 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 dark:bg-red-950/30 dark:border-red-900/50 dark:text-red-400">
           {error}
         </div>
       )}
 
       {/* Amount */}
       <div className="space-y-1.5">
-        <label htmlFor="amount" className="text-sm font-medium text-gray-700">Nominal</label>
+        <label htmlFor="amount" className="text-sm font-medium text-gray-700 dark:text-gray-300">Nominal</label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium">Rp</span>
-          <input
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium dark:text-gray-400">Rp</span>
+          <Input
             id="amount"
             name="amount"
             type="text"
             inputMode="numeric"
             required
             onChange={(e) => { e.target.value = formatAmount(e.target.value) }}
-            className="w-full pl-10 pr-3 py-3 bg-gray-100 border-0 rounded-xl text-lg font-bold focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="pl-10 text-lg font-bold"
             placeholder="0"
           />
         </div>
@@ -173,156 +185,170 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
       {/* Category (income / expense only) */}
       {(type === 'income' || type === 'expense') && (
         <div className="space-y-1.5">
-          <label htmlFor="categoryId" className="text-sm font-medium text-gray-700">Kategori</label>
-          <select
-            id="categoryId"
-            name="categoryId"
-            required
-            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-          >
-            <option value="">Pilih kategori...</option>
-            {(type === 'income' ? incomeCategories : expenseCategories).map((c) => (
-              <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
-            ))}
-          </select>
+          <label htmlFor="categoryId" className="text-sm font-medium text-gray-700 dark:text-gray-300">Kategori</label>
+          <Select value={categoryId} onValueChange={setCategoryId}>
+            <SelectTrigger id="categoryId">
+              <SelectValue placeholder="Pilih kategori..." />
+            </SelectTrigger>
+            <SelectContent>
+              {(type === 'income' ? incomeCategories : expenseCategories).map((c) => (
+                <SelectItem key={c.id} value={c.id}>{c.icon} {c.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
 
       {/* Source account */}
       {(type === 'expense' || type === 'transfer') && (
         <div className="space-y-1.5">
-          <label htmlFor="sourceAccountId" className="text-sm font-medium text-gray-700">Dari Pemegang Kas</label>
-          <select
-            id="sourceAccountId"
-            name="sourceAccountId"
-            required
-            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-          >
-            <option value="">Pilih pemegang kas...</option>
-            {cashHolders.map((a) => (
-              <option key={a.id} value={a.id}>{a.name} ({a.holderName})</option>
-            ))}
-          </select>
+          <label htmlFor="sourceAccountId" className="text-sm font-medium text-gray-700 dark:text-gray-300">DariPemegang Kas</label>
+          <Select value={sourceAccountId} onValueChange={setSourceAccountId}>
+            <SelectTrigger id="sourceAccountId">
+              <SelectValue placeholder="Pilih pemegang kas..." />
+            </SelectTrigger>
+            <SelectContent>
+              {cashHolders.map((a) => (
+                <SelectItem key={a.id} value={a.id}>{a.name} ({a.holderName})</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
 
       {type === 'deposit' && (
         <div className="space-y-1.5">
-          <label htmlFor="sourceAccountId" className="text-sm font-medium text-gray-700">Dari Pemegang Kas</label>
-          <select id="sourceAccountId" name="sourceAccountId" required
-            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-            <option value="">Pilih pemegang kas...</option>
-            {cashHolders.map((a) => (
-              <option key={a.id} value={a.id}>{a.name} ({a.holderName})</option>
-            ))}
-          </select>
+          <label htmlFor="sourceAccountId" className="text-sm font-medium text-gray-700 dark:text-gray-300">DariPemegang Kas</label>
+          <Select value={sourceAccountId} onValueChange={setSourceAccountId}>
+            <SelectTrigger id="sourceAccountId">
+              <SelectValue placeholder="Pilih pemegang kas..." />
+            </SelectTrigger>
+            <SelectContent>
+              {cashHolders.map((a) => (
+                <SelectItem key={a.id} value={a.id}>{a.name} ({a.holderName})</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
 
       {type === 'withdrawal' && (
         <div className="space-y-1.5">
-          <label htmlFor="sourceAccountId" className="text-sm font-medium text-gray-700">Dari Rekening Bank</label>
-          <select id="sourceAccountId" name="sourceAccountId" required
-            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-            <option value="">Pilih rekening bank...</option>
-            {bankAccounts.map((a) => (
-              <option key={a.id} value={a.id}>{a.name} — {a.bankName}</option>
-            ))}
-          </select>
+          <label htmlFor="sourceAccountId" className="text-sm font-medium text-gray-700 dark:text-gray-300">DariRekening Bank</label>
+          <Select value={sourceAccountId} onValueChange={setSourceAccountId}>
+            <SelectTrigger id="sourceAccountId">
+              <SelectValue placeholder="Pilih rekening bank..." />
+            </SelectTrigger>
+            <SelectContent>
+              {bankAccounts.map((a) => (
+                <SelectItem key={a.id} value={a.id}>{a.name} — {a.bankName}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
 
       {/* Target account */}
       {type === 'income' && (
         <div className="space-y-1.5">
-          <label htmlFor="targetAccountId" className="text-sm font-medium text-gray-700">Ke Akun</label>
-          <select id="targetAccountId" name="targetAccountId" required
-            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-            <option value="">Pilih akun penerima...</option>
-            {accounts.filter((a) => a.isActive).map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.kind === 'cash_holder' ? 'Kas' : 'Bank'} — {a.name}
-              </option>
-            ))}
-          </select>
+          <label htmlFor="targetAccountId" className="text-sm font-medium text-gray-700 dark:text-gray-300">KeAkun</label>
+          <Select value={targetAccountId} onValueChange={setTargetAccountId}>
+            <SelectTrigger id="targetAccountId">
+              <SelectValue placeholder="Pilih akun penerima..." />
+            </SelectTrigger>
+            <SelectContent>
+              {accounts.filter((a) => a.isActive).map((a) => (
+                <SelectItem key={a.id} value={a.id}>
+                  {a.kind === 'cash_holder' ? 'Kas' : 'Bank'} — {a.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
 
       {type === 'transfer' && (
         <div className="space-y-1.5">
-          <label htmlFor="targetAccountId" className="text-sm font-medium text-gray-700">Ke Pemegang Kas</label>
-          <select id="targetAccountId" name="targetAccountId" required
-            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-            <option value="">Pilih pemegang kas...</option>
-            {cashHolders.map((a) => (
-              <option key={a.id} value={a.id}>{a.name} ({a.holderName})</option>
-            ))}
-          </select>
+          <label htmlFor="targetAccountId" className="text-sm font-medium text-gray-700 dark:text-gray-300">KePemegang Kas</label>
+          <Select value={targetAccountId} onValueChange={setTargetAccountId}>
+            <SelectTrigger id="targetAccountId">
+              <SelectValue placeholder="Pilih pemegang kas..." />
+            </SelectTrigger>
+            <SelectContent>
+              {cashHolders.map((a) => (
+                <SelectItem key={a.id} value={a.id}>{a.name} ({a.holderName})</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
 
       {type === 'deposit' && (
         <div className="space-y-1.5">
-          <label htmlFor="targetAccountId" className="text-sm font-medium text-gray-700">Ke Rekening Bank</label>
-          <select id="targetAccountId" name="targetAccountId" required
-            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-            <option value="">Pilih rekening bank...</option>
-            {bankAccounts.map((a) => (
-              <option key={a.id} value={a.id}>{a.name} — {a.bankName}</option>
-            ))}
-          </select>
+          <label htmlFor="targetAccountId" className="text-sm font-medium text-gray-700 dark:text-gray-300">KeRekening Bank</label>
+          <Select value={targetAccountId} onValueChange={setTargetAccountId}>
+            <SelectTrigger id="targetAccountId">
+              <SelectValue placeholder="Pilih rekening bank..." />
+            </SelectTrigger>
+            <SelectContent>
+              {bankAccounts.map((a) => (
+                <SelectItem key={a.id} value={a.id}>{a.name} — {a.bankName}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
 
       {type === 'withdrawal' && (
         <div className="space-y-1.5">
-          <label htmlFor="targetAccountId" className="text-sm font-medium text-gray-700">Ke Pemegang Kas</label>
-          <select id="targetAccountId" name="targetAccountId" required
-            className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-            <option value="">Pilih pemegang kas...</option>
-            {cashHolders.map((a) => (
-              <option key={a.id} value={a.id}>{a.name} ({a.holderName})</option>
-            ))}
-          </select>
+          <label htmlFor="targetAccountId" className="text-sm font-medium text-gray-700 dark:text-gray-300">KePemegang Kas</label>
+          <Select value={targetAccountId} onValueChange={setTargetAccountId}>
+            <SelectTrigger id="targetAccountId">
+              <SelectValue placeholder="Pilih pemegang kas..." />
+            </SelectTrigger>
+            <SelectContent>
+              {cashHolders.map((a) => (
+                <SelectItem key={a.id} value={a.id}>{a.name} ({a.holderName})</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
 
       {/* Description */}
       <div className="space-y-1.5">
-        <label htmlFor="description" className="text-sm font-medium text-gray-700">Keterangan</label>
-        <input
+        <label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300">Keterangan</label>
+        <Input
           id="description"
           name="description"
           type="text"
           required
-          className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
           placeholder="Contoh: Infak Jumat 21 Juni"
         />
       </div>
 
       {/* Date */}
       <div className="space-y-1.5">
-        <label htmlFor="transactionDate" className="text-sm font-medium text-gray-700">Tanggal</label>
-        <input
+        <label htmlFor="transactionDate" className="text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal</label>
+        <Input
           id="transactionDate"
           name="transactionDate"
           type="date"
           required
           defaultValue={new Date().toISOString().split('T')[0]}
-          className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
         />
       </div>
 
       {/* Notes (optional) */}
       <div className="space-y-1.5">
-        <label htmlFor="notes" className="text-sm font-medium text-gray-700">
-          Catatan <span className="text-gray-400 font-normal">(opsional)</span>
+        <label htmlFor="notes" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          Catatan <span className="text-gray-400 font-normal dark:text-gray-500">(opsional)</span>
         </label>
-        <textarea
+        <Textarea
           id="notes"
           name="notes"
           rows={2}
-          className="w-full px-3 py-2.5 bg-gray-100 border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+          className="resize-none"
           placeholder="Catatan tambahan..."
         />
       </div>
