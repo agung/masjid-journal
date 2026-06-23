@@ -2,17 +2,19 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 
+const appName = process.env.NEXT_PUBLIC_APP_NAME ?? 'Keuangan Masjid'
+
 export const metadata: Metadata = {
   title: {
-    default: 'Keuangan Masjid',
-    template: '%s | Keuangan Masjid',
+    default: appName,
+    template: `%s | ${appName}`,
   },
   description: 'Sistem pencatatan keuangan masjid',
   // manifest is now served dynamically via app/manifest.ts
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Keuangan Masjid',
+    title: appName,
   },
   formatDetection: {
     telephone: false,

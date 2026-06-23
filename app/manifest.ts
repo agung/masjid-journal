@@ -1,9 +1,10 @@
 import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
+  const appName = process.env.NEXT_PUBLIC_APP_NAME ?? 'Keuangan Masjid'
   return {
-    name: 'Keuangan Masjid',
-    short_name: 'KeuanganMasjid',
+    name: appName,
+    short_name: appName.replace(/\s+/g, ''),
     description: 'Sistem pencatatan keuangan masjid',
     start_url: '/dashboard',
     display: 'standalone',

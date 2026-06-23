@@ -24,7 +24,7 @@ export function TopBar({ orgName }: { orgName?: string }) {
     '/transactions', '/accounts', '/reports', '/settings',
   ].includes(pathname)
 
-  const title = PAGE_TITLES[pathname] ?? 'Keuangan Masjid'
+  const title = PAGE_TITLES[pathname] ?? process.env.NEXT_PUBLIC_APP_NAME ?? 'Keuangan Masjid'
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b no-print dark:bg-gray-900">
