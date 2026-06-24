@@ -1,65 +1,18 @@
-<svg width="100%" viewBox="170 125 340 255" role="img" xmlns="http://www.w3.org/2000/svg" style="">
-  <title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Logo MasjidKu Online</title>
-  <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Logo aplikasi MasjidKu Online - pencatatan keuangan masjid</desc>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Mosque Dome Mark -->
+  <path d="M100 40C80 40 65 55 60 75H140C135 55 120 40 100 40ZM100 30C105 30 105 25 100 25C95 25 95 30 100 30Z" fill="
+#1A5C3A" />
 
-  <defs>
-    
-  </defs>
-
-  
-
-  
-  <rect x="252" y="268" width="176" height="10" rx="3" fill="#1a5c3a" style="fill:rgb(26, 92, 58);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-  
-  <rect x="270" y="210" width="140" height="62" rx="4" fill="#1a5c3a" style="fill:rgb(26, 92, 58);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-  
-  <path d="M290 210 Q340 158 390 210 Z" fill="#1a5c3a" style="fill:rgb(26, 92, 58);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-  
-  
-  <circle cx="340" cy="150" r="10" fill="#c8a84b" style="fill:rgb(200, 168, 75);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  
-  <circle cx="344" cy="147" r="8" fill="white" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <circle cx="344" cy="147" r="8" fill="#1a5c3a" opacity="0" style="fill:rgb(26, 92, 58);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-  
-  <path d="M334 146 A10 10 0 1 1 346 158 A6 6 0 1 0 334 146 Z" fill="#c8a84b" style="fill:rgb(200, 168, 75);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-  
-  <rect x="258" y="218" width="20" height="52" rx="2" fill="#1a5c3a" style="fill:rgb(26, 92, 58);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  
-  <path d="M255 218 Q268 200 281 218 Z" fill="#1a5c3a" style="fill:rgb(26, 92, 58);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  
-  <circle cx="268" cy="195" r="5" fill="#c8a84b" style="fill:rgb(200, 168, 75);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-  
-  <rect x="402" y="218" width="20" height="52" rx="2" fill="#1a5c3a" style="fill:rgb(26, 92, 58);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  
-  <path d="M399 218 Q412 200 425 218 Z" fill="#1a5c3a" style="fill:rgb(26, 92, 58);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  
-  <circle cx="412" cy="195" r="5" fill="#c8a84b" style="fill:rgb(200, 168, 75);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-  
-  <path d="M323 278 L323 248 Q340 234 357 248 L357 278 Z" fill="#c8a84b" opacity="0.85" style="fill:rgb(200, 168, 75);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.85;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-  
-  <ellipse cx="298" cy="236" rx="9" ry="12" fill="#c8a84b" opacity="0.7" style="fill:rgb(200, 168, 75);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.7;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <ellipse cx="382" cy="236" rx="9" ry="12" fill="#c8a84b" opacity="0.7" style="fill:rgb(200, 168, 75);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.7;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-  
-  
-  <circle cx="408" cy="290" r="13" fill="#c8a84b" style="fill:rgb(200, 168, 75);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="408" y="295" text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="#1a5c3a" style="fill:rgb(26, 92, 58);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Arial;font-size:13px;font-weight:700;text-anchor:middle;dominant-baseline:auto">Rp</text>
-
-  
-  <text x="340" y="338" text-anchor="middle" style="fill:rgb(78, 202, 130);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:36px;font-weight:700;text-anchor:middle;dominant-baseline:auto">MasjidKu <tspan style="fill:rgb(232, 201, 107);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Arial, sans-serif;font-size:36px;font-weight:300;text-anchor:middle;dominant-baseline:auto">Online</tspan></text>
-
-  
-  <text x="340" y="362" text-anchor="middle" style="fill:rgb(125, 191, 153);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Arial, sans-serif;font-size:13px;font-weight:400;text-anchor:middle;dominant-baseline:auto">KEUANGAN MASJID DIGITAL</text>
-
-  
-  <rect x="230" y="370" width="220" height="2" rx="1" fill="#c8a84b" style="fill:rgb(200, 168, 75);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
+  <!-- Digital/Connectivity Elements (Wifi-style curves) -->
+  <path d="M70 90C80 82 120 82 130 90" fill="none" stroke="
+#C8A84B" stroke-width="4" stroke-linecap="round" />
+  <path d="M65 105C80 95 120 95 135 105" fill="none" stroke="
+#C8A84B" stroke-width="4" stroke-linecap="round" />
+  <path d="M60 120C80 108 120 108 140 120" fill="none" stroke="
+#C8A84B" stroke-width="4" stroke-linecap="round" />
+  <!-- Typography -->
+  <text x="100" y="160" font-family="sans-serif" font-weight="600" font-size="18" text-anchor="middle" fill="
+#1A5C3A">MASJID</text>
+  <text x="100" y="180" font-family="sans-serif" font-weight="400" font-size="16" text-anchor="middle" fill="
+#1A5C3A">ONLINE</text>
 </svg>
