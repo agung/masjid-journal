@@ -1,20 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
-  <!-- Background -->
-  <rect width="192" height="192" rx="40" fill="#16a34a"/>
-  <!-- Masjid dome -->
-  <ellipse cx="96" cy="72" rx="44" ry="36" fill="white"/>
-  <!-- Minaret left -->
-  <rect x="38" y="72" width="16" height="72" rx="4" fill="white"/>
-  <ellipse cx="46" cy="72" rx="10" ry="12" fill="white"/>
-  <!-- Minaret right -->
-  <rect x="138" y="72" width="16" height="72" rx="4" fill="white"/>
-  <ellipse cx="146" cy="72" rx="10" ry="12" fill="white"/>
-  <!-- Main building -->
-  <rect x="54" y="104" width="84" height="40" rx="0" fill="white"/>
-  <!-- Door -->
-  <rect x="85" y="118" width="22" height="26" rx="11" fill="#16a34a"/>
-  <!-- Star crescent -->
-  <text x="80" y="60" font-size="20" fill="#16a34a" font-family="serif">★</text>
-  <!-- Ground line -->
-  <rect x="24" y="144" width="144" height="8" rx="4" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 20 120 90">
+  <style>
+    .dome {
+      fill: none;
+      stroke: #1A5C3A;
+      stroke-width: 4.5;
+      stroke-linecap: round;
+      transition: stroke 0.2s ease-in-out;
+    }
+    .circle {
+      fill: #1A5C3A;
+      transition: fill 0.2s ease-in-out;
+    }
+    .gold {
+      fill: none;
+      stroke: #C8A84B;
+      stroke-width: 4.5;
+      stroke-linecap: round;
+    }
+    @media (prefers-color-scheme: dark) {
+      .dome {
+        stroke: #3ECF8E;
+      }
+      .circle {
+        fill: #3ECF8E;
+      }
+    }
+  </style>
+  <!-- Mosque Dome Mark -->
+  <path class="dome" d="M60 75C65 55 80 40 100 40C120 40 135 55 140 75" />
+  <!-- Antenna Stem -->
+  <path class="dome" d="M100 40V31" />
+  <!-- Top Circle -->
+  <circle class="circle" cx="100" cy="27" r="4" />
+  <!-- Golden/Connectivity Curves -->
+  <path class="gold" d="M72 82C82 78 118 78 128 82" />
+  <path class="gold" d="M66 91C78 86 122 86 134 91" />
+  <path class="gold" d="M60 100C75 94 125 94 140 100" />
 </svg>

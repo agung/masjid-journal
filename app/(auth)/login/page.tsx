@@ -66,7 +66,7 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-3">
-            <AppLogo size={150} />
+            <AppLogo size={64} layout="horizontal" />
           </div>
           <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Masuk ke akun Anda</p>
         </div>

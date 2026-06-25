@@ -1,8 +1,8 @@
 import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { listTransactionMovements } from '@/lib/server/transactions'
 import { listAccounts } from '@/lib/server/accounts'
-import { LedgerRow, type LedgerRowData } from '@/components/transactions/ledger-row'
-import { LedgerFilters } from '@/components/transactions/ledger-filters'
+import { type LedgerRowData } from '@/components/transactions/ledger-row'
+import { LedgerContainer } from '@/components/transactions/ledger-container'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 
@@ -54,27 +54,14 @@ export default async function TransactionsPage({
         </Link>
       </div>
 
-      <LedgerFilters
+      <LedgerContainer
         accounts={accounts}
+        rows={rows as LedgerRowData[]}
         currentYear={pYear}
         currentMonth={pMonth}
         currentAccountId={accountId as string | undefined}
         currentType={type as string | undefined}
       />
-
-      {/* Ledger list */}
-      {rows.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed dark:bg-gray-900">
-          <p className="text-gray-500 dark:text-gray-400 mb-2">Belum ada transaksi bulan ini</p>
-          <Link href="/transactions/new" className="text-green-600 font-medium">Buat Transaksi Baru</Link>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {rows.map((row) => (
-            <LedgerRow key={row.movementId} row={row as LedgerRowData} />
-          ))}
-        </div>
-      )}
     </div>
   )
 }
