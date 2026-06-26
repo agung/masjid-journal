@@ -4,13 +4,13 @@ interface AppLogoProps {
   className?: string
   size?: number // Represents the height of the logo (default: 48)
   layout?: 'horizontal' | 'vertical' | 'icon-only'
-  themeMode?: 'light' | 'dark' | 'auto' // 'auto' adapts via dark: classes
+  themeMode?: 'light' | 'dark' | 'auto' | 'white' // 'auto' adapts via dark: classes
   showTagline?: boolean
   tagline?: string
 }
 
 /**
- * Premium AppLogo component for MasjidKu Online.
+ * Premium AppLogo component for Masjidku Online.
  * Supports light mode, dark mode (without green background),
  * and different layouts (horizontal, vertical, icon-only).
  */
@@ -20,7 +20,7 @@ export function AppLogo({
   layout = 'horizontal',
   themeMode = 'auto',
   showTagline = true,
-  tagline = 'PENCATATAN KEUANGAN MASJID',
+  tagline = 'Masjid Digital, Umat Terhubung',
 }: AppLogoProps) {
   // Compute width based on the layout's aspect ratio
   // icon-only: 4:3 (width = size * 1.33)
@@ -45,18 +45,21 @@ export function AppLogo({
   const getThemeClasses = (element: 'dome' | 'gold' | 'masjidku' | 'online' | 'tagline') => {
     switch (element) {
       case 'dome':
+        if (themeMode === 'white') return 'stroke-white'
         if (themeMode === 'light') return 'stroke-[#1A5C3A]'
         if (themeMode === 'dark') return 'stroke-[#3ECF8E]'
         return 'stroke-[#1A5C3A] dark:stroke-[#3ECF8E]'
       case 'gold':
         return 'stroke-[#C8A84B]'
       case 'masjidku':
+        if (themeMode === 'white') return 'fill-white'
         if (themeMode === 'light') return 'fill-[#1A5C3A]'
         if (themeMode === 'dark') return 'fill-[#3ECF8E]'
         return 'fill-[#1A5C3A] dark:fill-[#3ECF8E]'
       case 'online':
         return 'fill-[#C8A84B]'
       case 'tagline':
+        if (themeMode === 'white') return 'fill-white/80'
         if (themeMode === 'light') return 'fill-[#596573]'
         if (themeMode === 'dark') return 'fill-[#3ECF8E]/80'
         return 'fill-[#596573] dark:fill-[#3ECF8E]/80'
@@ -66,6 +69,7 @@ export function AppLogo({
   };
 
   const getCircleThemeClasses = () => {
+    if (themeMode === 'white') return 'fill-white'
     if (themeMode === 'light') return 'fill-[#1A5C3A]'
     if (themeMode === 'dark') return 'fill-[#3ECF8E]'
     return 'fill-[#1A5C3A] dark:fill-[#3ECF8E]'
@@ -156,6 +160,17 @@ export function AppLogo({
               r="4"
               className={cn('transition-colors duration-200', getCircleThemeClasses())}
             />
+            
+            {/* Horizontal divider line in gold */}
+            <path
+              d="M145 78H360"
+              fill="none"
+              className={cn('transition-colors duration-200', getThemeClasses('gold'))}
+              strokeWidth="1"
+              strokeLinecap="round"
+            />
+
+            {/* Golden/Connectivity Curves */}
             <path
               d="M62 82C72 78 108 78 118 82"
               fill="none"
@@ -182,33 +197,30 @@ export function AppLogo({
           {/* Typography */}
           <text
             x="145"
-            y="53"
-            fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-            fontWeight="800"
-            fontSize="26"
-            className={cn('transition-colors duration-200', getThemeClasses('masjidku'))}
+            y="68"
+            fontFamily="var(--font-kufi), 'Reem Kufi', 'Segoe UI', Roboto, sans-serif"
+            fontWeight="700"
+            fontSize="28"
           >
-            MasjidKu
-          </text>
-          <text
-            x="145"
-            y="78"
-            fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-            fontWeight="800"
-            fontSize="26"
-            className={getThemeClasses('online')}
-          >
-            Online
+            <tspan className={cn('transition-colors duration-200', getThemeClasses('masjidku'))}>
+              Masjidku
+            </tspan>
+            <tspan
+              fontFamily="var(--font-sans), Poppins, 'Segoe UI', Roboto, sans-serif"
+              fontWeight="600"
+              className={getThemeClasses('online')}
+            >
+              {' '}Online
+            </tspan>
           </text>
 
           {showTagline && (
             <text
               x="145"
-              y="98"
-              fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-              fontWeight="600"
-              fontSize="9"
-              letterSpacing="0.18em"
+              y="96"
+              fontFamily="var(--font-sans), Poppins, 'Segoe UI', Roboto, sans-serif"
+              fontWeight="400"
+              fontSize="13"
               className={cn('transition-colors duration-200', getThemeClasses('tagline'))}
             >
               {tagline}
@@ -242,6 +254,8 @@ export function AppLogo({
               r="4"
               className={cn('transition-colors duration-200', getCircleThemeClasses())}
             />
+
+            {/* Golden/Connectivity Curves */}
             <path
               d="M92 82C102 78 138 78 148 82"
               fill="none"
@@ -263,41 +277,46 @@ export function AppLogo({
               strokeWidth="4"
               strokeLinecap="round"
             />
+
+            {/* Horizontal divider line in gold (under the text baseline Y = 135) */}
+            <path
+              d="M50 142H190"
+              fill="none"
+              className={cn('transition-colors duration-200', getThemeClasses('gold'))}
+              strokeWidth="1"
+              strokeLinecap="round"
+            />
           </g>
 
           {/* Typography */}
           <text
             x="120"
-            y="125"
+            y="135"
             textAnchor="middle"
-            fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-            fontWeight="800"
-            fontSize="22"
-            className={cn('transition-colors duration-200', getThemeClasses('masjidku'))}
+            fontFamily="var(--font-kufi), 'Reem Kufi', 'Segoe UI', Roboto, sans-serif"
+            fontWeight="700"
+            fontSize="24"
           >
-            MasjidKu
-          </text>
-          <text
-            x="120"
-            y="148"
-            textAnchor="middle"
-            fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-            fontWeight="800"
-            fontSize="22"
-            className={getThemeClasses('online')}
-          >
-            Online
+            <tspan className={cn('transition-colors duration-200', getThemeClasses('masjidku'))}>
+              Masjidku
+            </tspan>
+            <tspan
+              fontFamily="var(--font-sans), Poppins, 'Segoe UI', Roboto, sans-serif"
+              fontWeight="600"
+              className={getThemeClasses('online')}
+            >
+              {' '}Online
+            </tspan>
           </text>
 
           {showTagline && (
             <text
               x="120"
-              y="167"
+              y="158"
               textAnchor="middle"
-              fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-              fontWeight="600"
-              fontSize="8.5"
-              letterSpacing="0.18em"
+              fontFamily="var(--font-sans), Poppins, 'Segoe UI', Roboto, sans-serif"
+              fontWeight="400"
+              fontSize="10"
               className={cn('transition-colors duration-200', getThemeClasses('tagline'))}
             >
               {tagline}
@@ -308,3 +327,4 @@ export function AppLogo({
     </svg>
   )
 }
+

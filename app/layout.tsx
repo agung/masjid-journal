@@ -1,6 +1,20 @@
 import type { Metadata, Viewport } from 'next'
+import { Poppins, Reem_Kufi } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/providers/theme-provider'
+import { SplashScreen } from '@/components/ui/splash-screen'
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-poppins',
+})
+
+const reemKufi = Reem_Kufi({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-reem-kufi',
+})
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME ?? 'Keuangan Masjid'
 
@@ -26,7 +40,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#16a34a',
+  themeColor: '#1A5C3A',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -39,9 +53,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="id" suppressHydrationWarning>
-      <body>
+    <html lang="id" className={`${poppins.variable} ${reemKufi.variable}`} suppressHydrationWarning>
+      <body className="font-sans antialiased">
         <ThemeProvider>
+          <SplashScreen />
           {children}
         </ThemeProvider>
       </body>

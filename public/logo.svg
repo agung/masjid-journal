@@ -1,18 +1,22 @@
-<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <!-- Mosque Dome Mark -->
-  <path d="M100 40C80 40 65 55 60 75H140C135 55 120 40 100 40ZM100 30C105 30 105 25 100 25C95 25 95 30 100 30Z" fill="
-#1A5C3A" />
-
-  <!-- Digital/Connectivity Elements (Wifi-style curves) -->
-  <path d="M70 90C80 82 120 82 130 90" fill="none" stroke="
-#C8A84B" stroke-width="4" stroke-linecap="round" />
-  <path d="M65 105C80 95 120 95 135 105" fill="none" stroke="
-#C8A84B" stroke-width="4" stroke-linecap="round" />
-  <path d="M60 120C80 108 120 108 140 120" fill="none" stroke="
-#C8A84B" stroke-width="4" stroke-linecap="round" />
-  <!-- Typography -->
-  <text x="100" y="160" font-family="sans-serif" font-weight="600" font-size="18" text-anchor="middle" fill="
-#1A5C3A">MASJID</text>
-  <text x="100" y="180" font-family="sans-serif" font-weight="400" font-size="16" text-anchor="middle" fill="
-#1A5C3A">ONLINE</text>
+<svg width="340" height="90" viewBox="40 20 340 90" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dome Mark (Center = 90) -->
+  <path d="M50 75C55 55 70 40 90 40C110 40 125 55 130 75" fill="none" stroke="#1A5C3A" stroke-width="4" stroke-linecap="round" />
+  <path d="M90 40V31" fill="none" stroke="#1A5C3A" stroke-width="4" stroke-linecap="round" />
+  <circle cx="90" cy="27" r="4" fill="#1A5C3A" />
+  
+  <!-- Divider line (starts under text at X=145) -->
+  <line x1="145" y1="78" x2="360" y2="78" stroke="#C8A84B" stroke-width="1" />
+  
+  <!-- Golden/Connectivity Curves in their original shape -->
+  <path d="M62 82C72 78 108 78 118 82" fill="none" stroke="#C8A84B" stroke-width="4" stroke-linecap="round" />
+  <path d="M56 91C68 86 112 86 124 91" fill="none" stroke="#C8A84B" stroke-width="4" stroke-linecap="round" />
+  <path d="M50 100C65 94 115 94 130 100" fill="none" stroke="#C8A84B" stroke-width="4" stroke-linecap="round" />
+  
+  <!-- Typography using inline fonts as fallback so standard SVG viewing works -->
+  <text x="145" y="68" font-family="'Reem Kufi', 'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="28" fill="#1A5C3A">
+    Masjidku<tspan font-family="Poppins, 'Helvetica Neue', Arial, sans-serif" font-weight="600" fill="#C8A84B"> Online</tspan>
+  </text>
+  <text x="145" y="96" font-family="Poppins, 'Helvetica Neue', Arial, sans-serif" font-weight="400" font-size="13" fill="#596573">
+    Masjid Digital, Umat Terhubung
+  </text>
 </svg>

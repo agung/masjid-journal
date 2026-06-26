@@ -13,6 +13,8 @@
   --color-green-800: #125137;
   --color-green-900: #0A3020;
   --default-border-color: hsl(var(--border));
+  --font-sans: var(--font-poppins), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-kufi: var(--font-reem-kufi), serif;
 }
 
 :root {
@@ -68,7 +70,7 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: var(--font-sans);
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
