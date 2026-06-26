@@ -39,4 +39,13 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withSerwist(nextConfig)
+const isDev = process.env.NODE_ENV === 'development'
+const isTurbopack = process.env.TURBOPACK === '1' || process.argv.includes('--turbo') || process.argv.includes('--turbopack')
+
+export default (isDev || isTurbopack)
+  ? nextConfig
+  : withSerwistInit({
+      swSrc: 'app/sw.ts',
+      swDest: 'public/sw.js',
+      disable: false,
+    })(nextConfig)
