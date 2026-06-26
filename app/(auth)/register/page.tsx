@@ -1,15 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signUp, signIn } from '@/lib/auth-client'
+import { signUp, signIn, useSession } from '@/lib/auth-client'
 import { AppLogo } from '@/components/ui/app-logo'
 import { Input } from '@/components/ui/input'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
 export default function RegisterPage() {
   const router = useRouter()
+  const { data: session } = useSession()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -17,6 +18,13 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+
+  useEffect(() => {
+    if (session) {
+      router.push('/dashboard')
+      router.refresh()
+    }
+  }, [session, router])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

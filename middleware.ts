@@ -14,7 +14,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const session = getSessionCookie(request)
+  // 1. Dapatkan session dari cookies. getSessionCookie adalah optimistic check bawaan Better Auth.
+  let session: any = getSessionCookie(request)
+
+  // Fallback: Jika getSessionCookie bernilai null (misal karena SSL termination / proxy membuat
+  // deteksi protokol HTTPS gagal dan mencari nama cookie HTTP biasa sedangkan Safari hanya mengirim cookie __Secure-),
+  // kita cari manual cookie secure & non-secure.
+  if (!session) {
+    const secureToken = request.cookies.get('__Secure-better-auth.session_token')
+    const normalToken = request.cookies.get('better-auth.session_token')
+    if (secureToken || normalToken) {
+      session = secureToken?.value || normalToken?.value || null
+    }
+  }
 
   const isPublicPath = PUBLIC_PATHS.includes(pathname)
 
@@ -22,13 +34,13 @@ export async function middleware(request: NextRequest) {
   if (!session && !isPublicPath) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)
-    return NextResponse.redirect(loginUrl)
+    const response = NextResponse.redirect(loginUrl)
+    // Hindari caching redirect di router Next.js (terutama saat prefetch)
+    response.headers.set('x-middleware-cache', 'no-cache')
+    return response
   }
 
-  // Already authenticated → redirect away from auth pages
-  if (session && isPublicPath && pathname !== '/') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
+
 
   return NextResponse.next()
 }
