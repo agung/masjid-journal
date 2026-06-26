@@ -7,6 +7,8 @@ import type { MasjidAccount, Category } from '@/drizzle/schema'
 export default async function NewTransactionPage() {
   const session = await requireRole('treasurer')
   const orgId = session.activeOrganizationId!
+  const userRole = session.activeOrganizationRole
+  const userId = session.user.id
 
   const [rawAccounts, categories] = await Promise.all([
     listAccounts(orgId),
@@ -18,7 +20,12 @@ export default async function NewTransactionPage() {
 
   return (
     <div className="p-4 max-w-md mx-auto">
-      <TransactionForm accounts={accounts} categories={categories as Category[]} />
+      <TransactionForm
+        accounts={accounts}
+        categories={categories as Category[]}
+        userRole={userRole}
+        userId={userId}
+      />
     </div>
   )
 }

@@ -16,8 +16,8 @@ interface Account {
 interface LedgerContainerProps {
   accounts: Account[]
   rows: LedgerRowData[]
-  currentYear: number
-  currentMonth: number
+  startDate: string
+  endDate: string
   currentAccountId?: string
   currentType?: string
 }
@@ -25,8 +25,8 @@ interface LedgerContainerProps {
 export function LedgerContainer({
   accounts,
   rows,
-  currentYear,
-  currentMonth,
+  startDate,
+  endDate,
   currentAccountId,
   currentType,
 }: LedgerContainerProps) {
@@ -44,8 +44,8 @@ export function LedgerContainer({
     <div className="space-y-4">
       <LedgerFilters
         accounts={accounts}
-        currentYear={currentYear}
-        currentMonth={currentMonth}
+        startDate={startDate}
+        endDate={endDate}
         currentAccountId={currentAccountId}
         currentType={currentType}
         onFilterChange={handleFilterChange}

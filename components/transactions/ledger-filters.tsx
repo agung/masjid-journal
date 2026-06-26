@@ -9,6 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { DateRangePicker } from '@/components/ui/date-range-picker'
+import { type DateRange } from 'react-day-picker'
 
 interface Account {
   id: string
@@ -18,17 +20,29 @@ interface Account {
 
 interface LedgerFiltersProps {
   accounts: Account[]
-  currentYear: number
-  currentMonth: number
+  startDate: string
+  endDate: string
   currentAccountId?: string
   currentType?: string
   onFilterChange?: (url: string) => void
 }
 
+function parseLocalDate(dateStr: string): Date {
+  const [year, month, day] = dateStr.split('-').map(Number)
+  return new Date(year, month - 1, day)
+}
+
+function formatLocalDate(date: Date): string {
+  const yyyy = date.getFullYear()
+  const mm = String(date.getMonth() + 1).padStart(2, '0')
+  const dd = String(date.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
+}
+
 export function LedgerFilters({
   accounts,
-  currentYear,
-  currentMonth,
+  startDate,
+  endDate,
   currentAccountId,
   currentType,
   onFilterChange,
@@ -38,8 +52,10 @@ export function LedgerFilters({
   // Local state to instantly update the UI selection on client-side
   const [selectedAccountId, setSelectedAccountId] = useState(currentAccountId ?? '')
   const [selectedType, setSelectedType] = useState(currentType ?? '')
-  const [selectedYear, setSelectedYear] = useState(currentYear)
-  const [selectedMonth, setSelectedMonth] = useState(currentMonth)
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: parseLocalDate(startDate),
+    to: parseLocalDate(endDate),
+  })
 
   // Sync state with props when they change (e.g. initial render or URL change)
   useEffect(() => {
@@ -51,9 +67,11 @@ export function LedgerFilters({
   }, [currentType])
 
   useEffect(() => {
-    setSelectedYear(currentYear)
-    setSelectedMonth(currentMonth)
-  }, [currentYear, currentMonth])
+    setDateRange({
+      from: parseLocalDate(startDate),
+      to: parseLocalDate(endDate),
+    })
+  }, [startDate, endDate])
 
   const navigate = useCallback((url: string) => {
     if (onFilterChange) {
@@ -67,8 +85,8 @@ export function LedgerFilters({
     (overrides: Record<string, string | undefined>) => {
       const params = new URLSearchParams()
       const merged = {
-        year: String(currentYear),
-        month: String(currentMonth),
+        startDate,
+        endDate,
         accountId: currentAccountId,
         type: currentType,
         ...overrides,
@@ -78,19 +96,20 @@ export function LedgerFilters({
       }
       return `/transactions?${params.toString()}`
     },
-    [currentYear, currentMonth, currentAccountId, currentType]
+    [startDate, endDate, currentAccountId, currentType]
   )
 
-  // Build prev/next month
-  const prevDate = new Date(currentYear, currentMonth - 2) // -2 because month is 1-indexed
-  const currDate = new Date(currentYear, currentMonth - 1)
-  const nextDate = new Date(currentYear, currentMonth)
-
-  const months = [
-    { year: prevDate.getFullYear(), month: prevDate.getMonth() + 1 },
-    { year: currDate.getFullYear(), month: currDate.getMonth() + 1 },
-    { year: nextDate.getFullYear(), month: nextDate.getMonth() + 1 },
-  ]
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    setDateRange(range)
+    if (range?.from && range?.to) {
+      navigate(
+        buildUrl({
+          startDate: formatLocalDate(range.from),
+          endDate: formatLocalDate(range.to),
+        })
+      )
+    }
+  }
 
   const TRANSACTION_TYPES = [
     { value: '', label: 'Semua Tipe' },
@@ -103,35 +122,13 @@ export function LedgerFilters({
 
   return (
     <div className="space-y-3 mb-4">
-      {/* Month tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
-        {months.map((m) => {
-          const isActive = m.year === selectedYear && m.month === selectedMonth
-          const label = new Date(m.year, m.month - 1).toLocaleString('id-ID', {
-            month: 'short',
-            year: 'numeric',
-          })
-          return (
-            <button
-              key={`${m.year}-${m.month}`}
-              type="button"
-              onClick={() => {
-                setSelectedYear(m.year)
-                setSelectedMonth(m.month)
-                navigate(
-                  buildUrl({ year: String(m.year), month: String(m.month) })
-                )
-              }}
-              className={`text-xs px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors shrink-0 ${
-                isActive
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
-              }`}
-            >
-              {label}
-            </button>
-          )
-        })}
+      {/* Date Range Picker */}
+      <div className="w-full">
+        <DateRangePicker
+          value={dateRange}
+          onChange={handleDateRangeChange}
+          placeholder="Filter rentang tanggal"
+        />
       </div>
 
       {/* Account + type filters */}

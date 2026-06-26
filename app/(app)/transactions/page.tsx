@@ -5,6 +5,12 @@ import { type LedgerRowData } from '@/components/transactions/ledger-row'
 import { LedgerContainer } from '@/components/transactions/ledger-container'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
+import { formatDate } from '@/lib/formatters'
+
+function parseLocalDate(dateStr: string): Date {
+  const [year, month, day] = dateStr.split('-').map(Number)
+  return new Date(year, month - 1, day)
+}
 
 export default async function TransactionsPage({
   searchParams,
@@ -18,17 +24,23 @@ export default async function TransactionsPage({
     return <div className="p-4 text-sm text-gray-500 dark:text-gray-400">Belum ada organisasi aktif. Buat di <a href="/dashboard" className="text-green-600">Dashboard</a>.</div>
   }
 
-  const { month, year, accountId, type } = await searchParams
+  const { startDate, endDate, accountId, type } = await searchParams
 
   const now = new Date()
-  const pYear = year ? parseInt(year as string, 10) : now.getFullYear()
-  const pMonth = month ? parseInt(month as string, 10) : now.getMonth() + 1
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+  const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+
+  const defaultStartDate = firstDayOfMonth.toISOString().split('T')[0]
+  const defaultEndDate = lastDayOfMonth.toISOString().split('T')[0]
+
+  const pStartDate = (startDate as string) || defaultStartDate
+  const pEndDate = (endDate as string) || defaultEndDate
 
   const [rows, accounts] = await Promise.all([
     listTransactionMovements({
       organizationId: orgId,
-      year: pYear,
-      month: pMonth,
+      startDate: pStartDate,
+      endDate: pEndDate,
       accountId: accountId as string,
       type: type as string,
     }),
@@ -42,7 +54,7 @@ export default async function TransactionsPage({
         <div>
           <h1 className="text-xl font-bold dark:text-gray-100">Ledger Transaksi</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {new Date(pYear, pMonth - 1).toLocaleString('id-ID', { month: 'long', year: 'numeric' })}
+            {formatDate(parseLocalDate(pStartDate))} - {formatDate(parseLocalDate(pEndDate))}
           </p>
         </div>
         <Link
@@ -57,8 +69,8 @@ export default async function TransactionsPage({
       <LedgerContainer
         accounts={accounts}
         rows={rows as LedgerRowData[]}
-        currentYear={pYear}
-        currentMonth={pMonth}
+        startDate={pStartDate}
+        endDate={pEndDate}
         currentAccountId={accountId as string | undefined}
         currentType={type as string | undefined}
       />

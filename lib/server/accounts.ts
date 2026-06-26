@@ -44,6 +44,7 @@ export async function listAccounts(organizationId: string) {
       kind: masjidAccount.kind,
       name: masjidAccount.name,
       holderName: masjidAccount.holderName,
+      holderUserId: masjidAccount.holderUserId,
       bankName: masjidAccount.bankName,
       accountNumber: masjidAccount.accountNumber,
       accountHolderName: masjidAccount.accountHolderName,

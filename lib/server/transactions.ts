@@ -101,6 +101,48 @@ export async function createTransaction(
   try {
     const session = await requireRole('treasurer')
     const orgId = session.activeOrganizationId!
+    const userRole = session.activeOrganizationRole!
+    const userId = session.user.id
+
+    // Restrict admin/treasurer transactions to their own cash holder account
+    if (userRole === 'admin' || userRole === 'treasurer') {
+      if (input.type !== 'income' && input.type !== 'expense') {
+        return { success: false, error: 'Tipe transaksi tidak diperbolehkan untuk peran Anda.' }
+      }
+
+      // Fetch user's cash holder account
+      const [userCashAccount] = await db
+        .select()
+        .from(masjidAccount)
+        .where(
+          and(
+            eq(masjidAccount.organizationId, orgId),
+            eq(masjidAccount.holderUserId, userId),
+            eq(masjidAccount.kind, 'cash_holder'),
+            eq(masjidAccount.isActive, true)
+          )
+        )
+        .limit(1)
+
+      if (!userCashAccount) {
+        return { success: false, error: 'Anda belum memiliki akun pemegang kas yang aktif.' }
+      }
+
+      // Enforce matching target/source account and validate balance for expenses
+      if (input.type === 'income') {
+        input.targetAccountId = userCashAccount.id
+      } else if (input.type === 'expense') {
+        input.sourceAccountId = userCashAccount.id
+
+        const rawAmount = typeof input.amount === 'number' 
+          ? input.amount 
+          : parseInt(String(input.amount).replace(/[^0-9]/g, ''), 10) || 0
+
+        if (userCashAccount.balance < rawAmount) {
+          return { success: false, error: 'Saldo Anda tidak mencukupi. Saldo kas Anda saat ini: ' + userCashAccount.balance.toLocaleString('id-ID') }
+        }
+      }
+    }
 
     // Validate input
     const parsed = createTransactionSchema.safeParse(input)
@@ -245,26 +287,22 @@ export async function createTransaction(
 
 export async function listTransactionMovements({
   organizationId,
-  year,
-  month,
+  startDate,
+  endDate,
   accountId,
   type,
   page = 1,
   pageSize = 50,
 }: {
   organizationId: string
-  year: number
-  month: number
+  startDate: string
+  endDate: string
   accountId?: string
   type?: string
   page?: number
   pageSize?: number
 }) {
   const offset = (page - 1) * pageSize
-
-  // Build date range for the month
-  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
-  const endDate = new Date(year, month, 0).toISOString().split('T')[0] // last day of month
 
   const rows = await db
     .select({
