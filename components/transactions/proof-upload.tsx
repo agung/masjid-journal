@@ -129,7 +129,6 @@ export function ProofUpload({ onUploaded, onClear }: ProofUploadProps) {
             id="proof-file"
             type="file"
             accept="image/*"
-            capture="environment"
             className="sr-only"
             onChange={handleFileChange}
           />
