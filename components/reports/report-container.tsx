@@ -6,6 +6,8 @@ import { ReportSkeleton } from './report-skeleton'
 import { formatRupiah, formatDate } from '@/lib/formatters'
 import Link from 'next/link'
 import { FileDown } from 'lucide-react'
+import { InfiniteScrollList } from '@/components/ui/infinite-scroll-list'
+import { listReportTransactions } from '@/lib/server/reports'
 
 // Types matching report data from server
 interface MonthlyReport {
@@ -13,6 +15,7 @@ interface MonthlyReport {
   totalExpense: number
   openingBalance: number
   closingBalance: number
+  totalTransactionsCount: number
   incomeByCategory: Array<{ name: string; total: number }>
   expenseByCategory: Array<{ name: string; total: number }>
   transactions: Array<{
@@ -27,6 +30,7 @@ interface MonthlyReport {
 }
 
 interface ReportContainerProps {
+  organizationId: string
   report: MonthlyReport
   pYear: number
   pMonth: number
@@ -34,6 +38,7 @@ interface ReportContainerProps {
 }
 
 export function ReportContainer({
+  organizationId,
   report,
   pYear,
   pMonth,
@@ -45,6 +50,16 @@ export function ReportContainer({
   // Local state for active selection to respond instantly on click
   const [selectedYear, setSelectedYear] = useState(pYear)
   const [selectedMonth, setSelectedMonth] = useState(pMonth)
+
+  const fetchPage = async (page: number) => {
+    return listReportTransactions({
+      organizationId,
+      year: selectedYear,
+      month: selectedMonth,
+      page,
+      pageSize: 50,
+    })
+  }
 
   // Sync state with server-provided props on update
   useEffect(() => {
@@ -175,53 +190,58 @@ export function ReportContainer({
           {/* Transaction list */}
           <section>
             <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 dark:text-gray-400">
-              Rincian Transaksi ({report.transactions.length})
+              Rincian Transaksi ({report.totalTransactionsCount ?? report.transactions.length})
             </h2>
-            {report.transactions.length === 0 ? (
-              <div className="text-center py-8 bg-gray-50 rounded-xl border border-dashed dark:bg-gray-900">
-                <p className="text-sm text-gray-500 dark:text-gray-400">Tidak ada transaksi bulan ini.</p>
-              </div>
-            ) : (
-              <div className="bg-white border rounded-xl overflow-hidden dark:bg-gray-900">
-                {/* Table header */}
-                <div className="hidden md:grid grid-cols-[auto_1fr_auto_auto] gap-4 px-4 py-2 bg-gray-50 border-b text-xs font-medium text-gray-500 uppercase dark:bg-gray-800 dark:text-gray-400 border-gray-100 dark:border-gray-800">
-                  <span>Tanggal</span>
-                  <span>Keterangan</span>
-                  <span>Kategori</span>
-                  <span className="text-right">Nominal</span>
-                </div>
-                {report.transactions.map((tx) => (
-                  <Link
-                    key={tx.id}
-                    href={`/transactions/${tx.id}`}
-                    className="flex items-center justify-between px-4 py-3.5 border-b last:border-b-0 hover:bg-gray-50 transition-colors dark:hover:bg-gray-800 dark:border-gray-800"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-xs text-gray-400 dark:text-gray-500">{formatDate(tx.transactionDate)}</span>
-                        <span className="text-xs font-mono text-gray-400 dark:text-gray-500">{tx.transactionNo}</span>
-                      </div>
-                      <p className="text-sm font-medium text-gray-900 truncate dark:text-gray-100">{tx.description}</p>
-                      {tx.categoryName && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{tx.categoryName}</p>
-                      )}
-                    </div>
-                    <span
-                      className={`text-sm font-bold ml-4 ${
-                        tx.type === 'income'
-                          ? 'text-green-600 dark:text-green-400'
-                          : tx.type === 'expense'
-                          ? 'text-red-600 dark:text-red-400'
-                          : 'text-gray-600 dark:text-gray-400'
-                      }`}
-                    >
-                      {tx.type === 'income' ? '+' : tx.type === 'expense' ? '-' : ''}
-                      {formatRupiah(tx.amount)}
-                    </span>
-                  </Link>
-                ))}
+            {report.totalTransactionsCount > 0 && (
+              <div className="hidden md:grid grid-cols-[auto_1fr_auto_auto] gap-4 px-4 py-2 bg-gray-50 border border-b-0 rounded-t-xl text-xs font-medium text-gray-500 uppercase dark:bg-gray-800 dark:text-gray-400 border-gray-100 dark:border-gray-800">
+                <span className="w-24">Tanggal</span>
+                <span>Keterangan</span>
+                <span className="w-28">Kategori</span>
+                <span className="text-right w-28">Nominal</span>
               </div>
             )}
+            <InfiniteScrollList
+              initialItems={report.transactions}
+              fetchPage={fetchPage}
+              pageSize={50}
+              dependencies={[selectedYear, selectedMonth]}
+              className="bg-white border rounded-b-xl overflow-hidden dark:bg-gray-900 divide-y dark:divide-gray-800"
+              renderItem={(tx) => (
+                <Link
+                  key={tx.id}
+                  href={`/transactions/${tx.id}`}
+                  className="flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 transition-colors dark:hover:bg-gray-800 dark:border-gray-800"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-xs text-gray-400 dark:text-gray-500">{formatDate(tx.transactionDate)}</span>
+                      <span className="text-xs font-mono text-gray-400 dark:text-gray-500">{tx.transactionNo}</span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900 truncate dark:text-gray-100">{tx.description}</p>
+                    {tx.categoryName && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{tx.categoryName}</p>
+                    )}
+                  </div>
+                  <span
+                    className={`text-sm font-bold ml-4 ${
+                      tx.type === 'income'
+                        ? 'text-green-600 dark:text-green-400'
+                        : tx.type === 'expense'
+                        ? 'text-red-600 dark:text-red-400'
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    {tx.type === 'income' ? '+' : tx.type === 'expense' ? '-' : ''}
+                    {formatRupiah(tx.amount)}
+                  </span>
+                </Link>
+              )}
+              emptyState={
+                <div className="text-center py-8 bg-gray-50 rounded-xl border border-dashed dark:bg-gray-900">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Tidak ada transaksi bulan ini.</p>
+                </div>
+              }
+            />
           </section>
         </div>
       )}

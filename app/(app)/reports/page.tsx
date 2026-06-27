@@ -29,6 +29,7 @@ export default async function ReportsPage({
   return (
     <div className="p-4 max-w-2xl mx-auto">
       <ReportContainer
+        organizationId={orgId}
         report={report}
         pYear={pYear}
         pMonth={pMonth}

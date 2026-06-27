@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createTransaction } from '@/lib/server/transactions'
+import { createTransaction, updateTransaction } from '@/lib/server/transactions'
 import { ProofUpload, type ProofUploadResult } from '@/components/transactions/proof-upload'
 import { TRANSACTION_TYPE_CONFIG } from '@/lib/transaction-icons'
-import type { MasjidAccount, Category } from '@/drizzle/schema'
+import type { MasjidAccount, Category, Transaction } from '@/drizzle/schema'
 import type { CreateTransactionInput } from '@/lib/validations/transaction'
 import { Input } from '@/components/ui/input'
 import {
@@ -29,19 +29,30 @@ interface TransactionFormProps {
   categories: Category[]
   userRole?: string
   userId?: string
+  transaction?: Transaction & { movements: { id: string; direction: 'in' | 'out'; amount: number; signedAmount: number; balanceBefore: number; balanceAfter: number; accountId: string; accountName: string; accountKind: string }[] }
 }
 
-export function TransactionForm({ accounts, categories, userRole, userId }: TransactionFormProps) {
+export function TransactionForm({ accounts, categories, userRole, userId, transaction }: TransactionFormProps) {
   const router = useRouter()
-  const [step, setStep] = useState<1 | 2>(1)
-  const [type, setType] = useState<TransactionType | null>(null)
+  const [step, setStep] = useState<1 | 2>(transaction ? 2 : 1)
+  const [type, setType] = useState<TransactionType | null>(transaction ? (transaction.type as TransactionType) : null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [proof, setProof] = useState<ProofUploadResult | null>(null)
-  const [categoryId, setCategoryId] = useState('')
-  const [sourceAccountId, setSourceAccountId] = useState('')
-  const [targetAccountId, setTargetAccountId] = useState('')
-  const [transactionDate, setTransactionDate] = useState<Date>(new Date())
+  const [proof, setProof] = useState<ProofUploadResult | null>(
+    transaction?.proofStoragePath
+      ? { fileId: transaction.proofStoragePath, webViewLink: transaction.proofPublicUrl ?? '', webContentLink: '' }
+      : null
+  )
+  const [categoryId, setCategoryId] = useState(transaction?.categoryId ?? '')
+  const [sourceAccountId, setSourceAccountId] = useState(
+    transaction?.movements?.find((m) => m.direction === 'out')?.accountId ?? ''
+  )
+  const [targetAccountId, setTargetAccountId] = useState(
+    transaction?.movements?.find((m) => m.direction === 'in')?.accountId ?? ''
+  )
+  const [transactionDate, setTransactionDate] = useState<Date>(
+    transaction ? new Date(transaction.transactionDate) : new Date()
+  )
 
   const isUserRestricted = userRole === 'admin' || userRole === 'treasurer'
 
@@ -134,16 +145,23 @@ export function TransactionForm({ accounts, categories, userRole, userId }: Tran
           break
       }
 
-      const result = await createTransaction(input!)
+      const result = transaction
+        ? await updateTransaction(transaction.id, input!)
+        : await createTransaction(input!)
       if (!result.success) {
         setError(result.error)
         return
       }
 
-      router.push('/dashboard')
+      if (transaction) {
+        router.push(`/transactions/${transaction.id}`)
+      } else {
+        router.push('/dashboard')
+      }
       router.refresh()
-    } catch {
-      setError('Terjadi kesalahan. Silakan coba lagi.')
+    } catch (e: unknown) {
+      const errMsg = e instanceof Error ? e.message : 'Terjadi kesalahan. Silakan coba lagi.'
+      setError(errMsg)
     } finally {
       setLoading(false)
     }
@@ -241,6 +259,7 @@ export function TransactionForm({ accounts, categories, userRole, userId }: Tran
             inputMode="numeric"
             required
             onChange={(e) => { e.target.value = formatAmount(e.target.value) }}
+            defaultValue={transaction ? formatAmount(String(transaction.amount)) : undefined}
             className="pl-10 text-lg font-bold"
             placeholder="0"
           />
@@ -403,6 +422,7 @@ export function TransactionForm({ accounts, categories, userRole, userId }: Tran
           name="description"
           type="text"
           required
+          defaultValue={transaction?.description}
           placeholder="Contoh: Infak Jumat 21 Juni"
         />
       </div>
@@ -433,6 +453,7 @@ export function TransactionForm({ accounts, categories, userRole, userId }: Tran
           id="notes"
           name="notes"
           rows={2}
+          defaultValue={transaction?.notes ?? undefined}
           className="resize-none"
           placeholder="Catatan tambahan..."
         />
@@ -442,6 +463,7 @@ export function TransactionForm({ accounts, categories, userRole, userId }: Tran
       <ProofUpload
         onUploaded={(result) => setProof(result)}
         onClear={() => setProof(null)}
+        initialPreview={transaction?.proofPublicUrl}
       />
 
       <button

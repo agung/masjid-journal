@@ -133,11 +133,13 @@ export async function GET(req: NextRequest) {
     year,
     month,
     accountSummary,
-    movements: movements.map((m) => ({
-      ...m,
-      amount: Number(m.amount ?? 0),
-      balanceAfter: Number(m.balanceAfter ?? 0),
-    })),
+    movements: movements
+      .filter((m) => m.transactionType !== 'transfer')
+      .map((m) => ({
+        ...m,
+        amount: Number(m.amount ?? 0),
+        balanceAfter: Number(m.balanceAfter ?? 0),
+      })),
     generatedAt,
   })
 

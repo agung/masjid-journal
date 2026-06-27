@@ -13,6 +13,7 @@ export interface ProofUploadResult {
 interface ProofUploadProps {
   onUploaded: (result: ProofUploadResult) => void
   onClear: () => void
+  initialPreview?: string | null
 }
 
 /**
@@ -55,8 +56,8 @@ async function compressImage(file: File): Promise<Blob> {
   })
 }
 
-export function ProofUpload({ onUploaded, onClear }: ProofUploadProps) {
-  const [preview, setPreview] = useState<string | null>(null)
+export function ProofUpload({ onUploaded, onClear, initialPreview }: ProofUploadProps) {
+  const [preview, setPreview] = useState<string | null>(initialPreview ?? null)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)

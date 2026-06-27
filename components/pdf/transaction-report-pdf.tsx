@@ -231,23 +231,26 @@ export function TransactionReportPdf({
 }: TransactionReportPdfProps) {
   const periodLabel = formatMonthYear(new Date(year, month - 1))
 
-  // Calculate combined running total across ALL accounts (cash + bank).
-  // Opening total = current total across all accounts minus net change from
-  // this period's movements. Each movement then adds/subtracts its signed
-  // amount so the last row's value = current totalAll (matches Ringkasan Saldo).
-  const totalAll = accountSummary.totalCash + accountSummary.totalBank
+  // Calculate running total across On-Hand (Cash) accounts only.
+  // Opening total = current total cash minus net change from cash movements.
+  const totalCash = accountSummary.totalCash
 
-  const netChange = movements.reduce((sum, m) => {
-    const amt = Number(m.amount ?? 0)
-    return sum + (m.direction === 'in' ? amt : -amt)
-  }, 0)
+  const netChangeCash = movements
+    .filter((m) => m.accountKind === 'cash_holder')
+    .reduce((sum, m) => {
+      const amt = Number(m.amount ?? 0)
+      return sum + (m.direction === 'in' ? amt : -amt)
+    }, 0)
 
-  const openingTotal = totalAll - netChange
+  const openingTotal = totalCash - netChangeCash
 
-  // Build enriched movements with cumulative combined total
+  // Build enriched movements with cumulative cash-only total
   let runningTotal = openingTotal
   const enrichedMovements = movements.map((m) => {
-    const signedAmount = m.direction === 'in' ? Number(m.amount ?? 0) : -Number(m.amount ?? 0)
+    const isCash = m.accountKind === 'cash_holder'
+    const signedAmount = isCash
+      ? (m.direction === 'in' ? Number(m.amount ?? 0) : -Number(m.amount ?? 0))
+      : 0
     runningTotal += signedAmount
     return { ...m, cumulativeBalance: runningTotal }
   })
@@ -276,11 +279,11 @@ export function TransactionReportPdf({
         <View style={styles.summarySection}>
           <Text style={styles.sectionTitle}>Ringkasan Saldo</Text>
           <View style={styles.summaryGrid}>
-            {/* Bank card */}
+            {/* Saldo Awal Kas card */}
             <View style={styles.summaryCard}>
-              <Text style={styles.summaryCardLabel}>Saldo Bank</Text>
+              <Text style={styles.summaryCardLabel}>Saldo Awal Kas (On-Hand)</Text>
               <Text style={styles.summaryCardTotal}>
-                {formatRupiah(accountSummary.totalBank)}
+                {formatRupiah(openingTotal)}
               </Text>
             </View>
 
@@ -291,16 +294,14 @@ export function TransactionReportPdf({
                 {formatRupiah(accountSummary.totalCash)}
               </Text>
             </View>
-          </View>
 
-          {/* Opening balance line */}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6, paddingTop: 6, borderTopWidth: 1, borderTopColor: COLORS.border }}>
-            <Text style={{ fontSize: 8, fontFamily: 'Helvetica-Bold', color: COLORS.subtext }}>
-              Saldo Awal Periode
-            </Text>
-            <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: COLORS.heading }}>
-              {formatRupiah(openingTotal)}
-            </Text>
+            {/* Bank card */}
+            <View style={styles.summaryCard}>
+              <Text style={styles.summaryCardLabel}>Saldo Bank</Text>
+              <Text style={styles.summaryCardTotal}>
+                {formatRupiah(accountSummary.totalBank)}
+              </Text>
+            </View>
           </View>
         </View>
 

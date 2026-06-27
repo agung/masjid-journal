@@ -67,6 +67,7 @@ export default async function TransactionsPage({
       </div>
 
       <LedgerContainer
+        organizationId={orgId}
         accounts={accounts}
         rows={rows as LedgerRowData[]}
         startDate={pStartDate}

@@ -4,8 +4,11 @@ import { getProofSignedUrl } from '@/lib/server/storage'
 import { formatRupiah, formatDate } from '@/lib/formatters'
 import { TRANSACTION_TYPE_CONFIG } from '@/lib/transaction-icons'
 import { notFound } from 'next/navigation'
-import { Wallet, Landmark } from 'lucide-react'
+import { Wallet, Landmark, Pencil, Clock } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { hasMinRole } from '@/lib/auth/roles'
+import { DeleteTransactionButton } from '@/components/transactions/delete-transaction-button'
 
 /**
  * Convert a stored proof URL into an embeddable image URL.
@@ -46,8 +49,50 @@ export default async function TransactionDetailPage({ params }: Props) {
     (await getProofSignedUrl(tx.proofStoragePath)) ??
     embeddableProofUrl(tx.proofPublicUrl)
 
+  const userRole = ctx.role
+  const isWithin1Hour = (Date.now() - tx.createdAt.getTime()) < 60 * 60 * 1000
+  const canEdit = userRole && hasMinRole(userRole, 'treasurer') && isWithin1Hour
+  const canDelete = userRole && hasMinRole(userRole, 'admin') && isWithin1Hour
+
   return (
     <div className="p-4 max-w-md mx-auto pb-24">
+
+      {/* Lock warning */}
+      {!isWithin1Hour && (
+        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-2xl p-4 mb-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-200">
+          <Clock className="text-amber-500 shrink-0 mt-0.5" size={18} />
+          <div>
+            <p className="text-sm font-semibold text-amber-800 dark:text-amber-400">Terkunci (Lock Window)</p>
+            <p className="text-xs text-amber-600 dark:text-amber-500 mt-1 leading-relaxed">
+              Transaksi ini dibuat pada {tx.createdAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} ({formatDate(tx.createdAt)}). Perubahan atau penghapusan hanya diperbolehkan dalam waktu 1 jam setelah dibuat.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Edit & Delete actions */}
+      {isWithin1Hour && (canEdit || canDelete) && (
+        <div className="flex gap-2 mb-4">
+          {canEdit && (
+            <Link
+              href={`/transactions/${tx.id}/edit`}
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 font-semibold rounded-xl text-sm transition-all active:scale-98 dark:bg-gray-900 dark:hover:bg-gray-800 dark:border-gray-800 dark:text-gray-200"
+            >
+              <Pencil size={16} />
+              Edit Transaksi
+            </Link>
+          )}
+          {canDelete && (
+            <div className="flex-1">
+              <DeleteTransactionButton
+                transactionId={tx.id}
+                transactionNo={tx.transactionNo}
+                description={tx.description}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Transaction card */}
       <div className="bg-white border rounded-2xl p-5 mb-4 space-y-4 dark:bg-gray-900">

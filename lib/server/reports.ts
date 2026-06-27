@@ -151,7 +151,8 @@ export async function getMonthlyReport(
   return {
     year,
     month,
-    transactions,
+    transactions: transactions.slice(0, 50),
+    totalTransactionsCount: transactions.length,
     totalIncome,
     totalExpense,
     netFlow: totalIncome - totalExpense,
@@ -226,4 +227,48 @@ export async function getMovementsForReport(
       )
     )
     .orderBy(sql`${transaction.transactionDate} ASC, ${transactionMovement.createdAt} ASC`)
+}
+
+export async function listReportTransactions({
+  organizationId,
+  year,
+  month,
+  page = 1,
+  pageSize = 50,
+}: {
+  organizationId: string
+  year: number
+  month: number
+  page?: number
+  pageSize?: number
+}) {
+  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+  const lastDay = new Date(year, month, 0).getDate()
+  const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+  const offset = (page - 1) * pageSize
+
+  return db
+    .select({
+      id: transaction.id,
+      transactionNo: transaction.transactionNo,
+      type: transaction.type,
+      transactionDate: transaction.transactionDate,
+      amount: transaction.amount,
+      description: transaction.description,
+      categoryId: transaction.categoryId,
+      categoryName: category.name,
+      categoryType: category.type,
+    })
+    .from(transaction)
+    .leftJoin(category, eq(transaction.categoryId, category.id))
+    .where(
+      and(
+        eq(transaction.organizationId, organizationId),
+        gte(transaction.transactionDate, startDate),
+        lte(transaction.transactionDate, endDate)
+      )
+    )
+    .orderBy(transaction.transactionDate)
+    .limit(pageSize)
+    .offset(offset)
 }
