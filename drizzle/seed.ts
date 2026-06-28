@@ -6,8 +6,6 @@
  */
 
 import * as dotenv from 'dotenv'
-import postgres from 'postgres'
-import { drizzle } from 'drizzle-orm/postgres-js'
 import { category } from './schema'
 import crypto from 'crypto'
 
@@ -21,8 +19,7 @@ if (!DATABASE_URL) {
   process.exit(1)
 }
 
-const client = postgres(DATABASE_URL, { max: 1 })
-const db = drizzle(client)
+const IS_MYSQL = DATABASE_URL?.startsWith('mysql:') ?? false
 
 const DEFAULT_INCOME_CATEGORIES = [
   { name: 'Infak Jumat', icon: '🕌' },
@@ -48,8 +45,25 @@ const DEFAULT_EXPENSE_CATEGORIES = [
 async function seed() {
   console.log('🌱 Seeding default categories...')
 
-  const now = new Date()
+  let db: any
+  let client: any
 
+  if (IS_MYSQL) {
+    // MySQL setup
+    const mysql = await import('mysql2/promise')
+    const { drizzle } = await import('drizzle-orm/mysql2')
+    const pool = mysql.createPool({ uri: DATABASE_URL! })
+    db = drizzle(pool)
+    client = pool
+  } else {
+    // PostgreSQL setup
+    const postgres = (await import('postgres')).default
+    const { drizzle } = await import('drizzle-orm/postgres-js')
+    client = postgres(DATABASE_URL!, { max: 1 })
+    db = drizzle(client)
+  }
+
+  // Don't set createdAt manually - let the database DEFAULT handle it
   const incomeCategories = DEFAULT_INCOME_CATEGORIES.map((c) => ({
     id: crypto.randomUUID(),
     organizationId: null,
@@ -58,7 +72,6 @@ async function seed() {
     icon: c.icon,
     isSystem: true,
     isActive: true,
-    createdAt: now,
   }))
 
   const expenseCategories = DEFAULT_EXPENSE_CATEGORIES.map((c) => ({
@@ -69,18 +82,26 @@ async function seed() {
     icon: c.icon,
     isSystem: true,
     isActive: true,
-    createdAt: now,
   }))
 
-  await db
-    .insert(category)
-    .values([...incomeCategories, ...expenseCategories])
-    .onConflictDoNothing()
+  // MySQL doesn't have onConflictDoNothing, use INSERT IGNORE or check existence first
+  try {
+    await db.insert(category).values([...incomeCategories, ...expenseCategories])
+  } catch (err: any) {
+    // Ignore duplicate key errors
+    if (!err.message?.includes('Duplicate entry')) {
+      throw err
+    }
+  }
 
   console.log(`✅ Inserted ${incomeCategories.length} income categories`)
   console.log(`✅ Inserted ${expenseCategories.length} expense categories`)
 
-  await client.end()
+  if (IS_MYSQL) {
+    await client.end()
+  } else {
+    await client.end()
+  }
   console.log('🏁 Seed complete!')
 }
 

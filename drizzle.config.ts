@@ -5,12 +5,15 @@ import * as dotenv from 'dotenv'
 dotenv.config({ path: '.env.local' })
 dotenv.config({ path: '.env' })
 
+const DATABASE_URL = process.env.DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/masjid_journal'
+const IS_MYSQL = DATABASE_URL.startsWith('mysql:')
+
 export default defineConfig({
-  schema: './drizzle/schema.ts',
-  out: './drizzle/migrations',
-  dialect: 'postgresql',
+  schema: IS_MYSQL ? './drizzle/schema.mysql.ts' : './drizzle/schema.pg.ts',
+  out: IS_MYSQL ? './drizzle/migrations/mysql' : './drizzle/migrations',
+  dialect: IS_MYSQL ? 'mysql' : 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/masjid_journal',
+    url: DATABASE_URL,
   },
   verbose: true,
   strict: true,

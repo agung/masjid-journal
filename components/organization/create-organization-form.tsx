@@ -16,7 +16,13 @@ export function CreateOrganizationForm() {
     const formData = new FormData(e.currentTarget)
 
     try {
-      await createOrganizationAction(formData)
+      const result = await createOrganizationAction(formData)
+
+      // Handle returned error (not thrown)
+      if (result && !result.success) {
+        setError(result.error ?? 'Gagal membuat organisasi.')
+        setLoading(false)
+      }
     } catch (err) {
       // Next.js redirect throws NEXT_REDIRECT which is not an error
       if (

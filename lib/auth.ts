@@ -2,7 +2,7 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { createAccessControl } from 'better-auth/plugins/access'
 import { organization } from 'better-auth/plugins'
-import { db } from '@/lib/db'
+import { db, getDialect } from '@/lib/db'
 
 /**
  * Define statements (resources + actions) for the access control system.
@@ -59,7 +59,7 @@ const ownerRole = ac.newRole({
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
-    provider: 'pg',
+    provider: getDialect() === 'mysql' ? 'mysql' : 'pg',
   }),
 
   emailAndPassword: {

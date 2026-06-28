@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, sql } from 'drizzle-orm'
 import crypto from 'crypto'
 import { db } from '@/lib/db'
 import { masjidAccount } from '@/drizzle/schema'
@@ -56,7 +56,7 @@ export async function listAccounts(organizationId: string) {
     .where(eq(masjidAccount.organizationId, organizationId))
     .orderBy(masjidAccount.kind, masjidAccount.name)
 
-  return accounts.map((account) => ({
+  return accounts.map((account: any) => ({
     ...account,
     currentBalance: Number(account.balance ?? 0),
   }))
@@ -88,8 +88,7 @@ export async function createCashHolder(
       balance,
       isActive: true,
       createdBy: session.user.id,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      updatedAt: sql`CURRENT_TIMESTAMP`,
     })
 
     revalidatePath('/accounts')
@@ -124,8 +123,7 @@ export async function createBankAccount(
       balance,
       isActive: true,
       createdBy: session.user.id,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      updatedAt: sql`CURRENT_TIMESTAMP`,
     })
 
     revalidatePath('/accounts')
@@ -161,7 +159,7 @@ export async function updateAccount(
 
     await db
       .update(masjidAccount)
-      .set({ ...validated.data, updatedAt: new Date() })
+      .set({ ...validated.data, updatedAt: sql`CURRENT_TIMESTAMP` })
       .where(eq(masjidAccount.id, accountId))
 
     revalidatePath('/accounts')
@@ -193,7 +191,7 @@ export async function toggleAccountActive(
 
     await db
       .update(masjidAccount)
-      .set({ isActive, updatedAt: new Date() })
+      .set({ isActive, updatedAt: sql`CURRENT_TIMESTAMP` })
       .where(and(eq(masjidAccount.id, accountId), eq(masjidAccount.organizationId, orgId)))
 
     revalidatePath('/accounts')

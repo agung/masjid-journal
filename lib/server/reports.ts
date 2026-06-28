@@ -24,12 +24,12 @@ export async function getAccountSummary(organizationId: string) {
       )
     )
 
-  const cashHolders = accounts.filter((a) => a.kind === 'cash_holder')
-  const banks = accounts.filter((a) => a.kind === 'bank')
+  const cashHolders = accounts.filter((a: any) => a.kind === 'cash_holder')
+  const banks = accounts.filter((a: any) => a.kind === 'bank')
 
   // PostgreSQL bigint/numeric comes back as strings — cast to Number before summing.
-  const totalCash = cashHolders.reduce((sum, a) => sum + Number(a.currentBalance ?? 0), 0)
-  const totalBank = banks.reduce((sum, a) => sum + Number(a.currentBalance ?? 0), 0)
+  const totalCash = cashHolders.reduce((sum: any, a: any) => sum + Number(a.currentBalance ?? 0), 0)
+  const totalBank = banks.reduce((sum: any, a: any) => sum + Number(a.currentBalance ?? 0), 0)
 
   return {
     cashHolders,
@@ -136,12 +136,12 @@ export async function getMonthlyReport(
   const expenseByCategory = [...categoryMap.values()].filter((c) => c.type === 'expense')
 
   const totalIncome = transactions
-    .filter((t) => t.type === 'income')
-    .reduce((sum, t) => sum + Number(t.amount ?? 0), 0)
+    .filter((t: any) => t.type === 'income')
+    .reduce((sum: any, t: any) => sum + Number(t.amount ?? 0), 0)
 
   const totalExpense = transactions
-    .filter((t) => t.type === 'expense')
-    .reduce((sum, t) => sum + Number(t.amount ?? 0), 0)
+    .filter((t: any) => t.type === 'expense')
+    .reduce((sum: any, t: any) => sum + Number(t.amount ?? 0), 0)
 
   // Opening balance: total of all account balances at start of month
   // Approximate: currentBalance - netFlow

@@ -59,7 +59,6 @@ export async function createCategory(
       icon: icon ?? '➕',
       isSystem: false,
       isActive: true,
-      createdAt: new Date(),
     })
 
     revalidatePath('/categories')

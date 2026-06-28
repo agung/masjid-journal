@@ -1,7 +1,7 @@
 import { cache } from 'react'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, sql } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { member, organization, session as authSession } from '@/drizzle/schema'
@@ -51,7 +51,7 @@ export const getActiveOrganizationContext = cache(async function getActiveOrgani
       if (sessionData.id) {
         await db
           .update(authSession)
-          .set({ activeOrganizationId, updatedAt: new Date() })
+          .set({ activeOrganizationId, updatedAt: sql`CURRENT_TIMESTAMP` })
           .where(eq(authSession.id, sessionData.id))
       }
     }

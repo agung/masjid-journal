@@ -121,7 +121,7 @@ export default async function TransactionDetailPage({ params }: Props) {
       <div className="mb-4">
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 dark:text-gray-400">Pergerakan Saldo</h2>
         <div className="space-y-2">
-          {tx.movements.map((m) => (
+          {tx.movements.map((m: any) => (
             <div key={m.id} className="bg-white border rounded-xl p-4 dark:bg-gray-900">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">

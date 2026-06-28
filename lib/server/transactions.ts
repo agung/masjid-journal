@@ -163,7 +163,6 @@ export async function createTransaction(
     const txDate = new Date(data.transactionDate)
     const txId = crypto.randomUUID()
     const txNo = await generateTransactionNo(orgId, data.type as string, txDate)
-    const now = new Date()
 
     // Build movements based on transaction type
     type MovementInput = {
@@ -209,7 +208,6 @@ export async function createTransaction(
           signedAmount,
           balanceBefore,
           balanceAfter,
-          createdAt: now,
         }
       })
     )
@@ -243,8 +241,7 @@ export async function createTransaction(
       proofStoragePath: data.proofStoragePath ?? null,
       proofPublicUrl: data.proofPublicUrl ?? null,
       createdBy: session.user.id,
-      createdAt: now,
-      updatedAt: now,
+      updatedAt: sql`CURRENT_TIMESTAMP`,
     })
 
     await db.insert(transactionMovement).values(resolvedMovements)
@@ -267,7 +264,6 @@ export async function createTransaction(
       entityId: txId,
       before: null,
       after: { transactionNo: txNo, type: data.type, amount: data.amount },
-      createdAt: now,
     })
 
     revalidatePath('/transactions')
@@ -411,7 +407,7 @@ export async function deleteTransaction(
     }
 
     // Begin transaction
-    await db.transaction(async (trx) => {
+    await db.transaction(async (trx: any) => {
       // Group old movements by accountId to compute net delta
       const deltas: Record<string, { delta: number; minCreatedAt: Date }> = {}
       for (const m of tx.movements) {
@@ -519,7 +515,6 @@ export async function deleteTransaction(
           description: tx.description,
         },
         after: null,
-        createdAt: now,
       })
     })
 
@@ -651,7 +646,7 @@ export async function updateTransaction(
     }
 
     // Assign roles to old movements
-    const oldMovementsWithRoles = tx.movements.map((m) => {
+    const oldMovementsWithRoles = tx.movements.map((m: any) => {
       let role: 'source' | 'target'
       if (tx.type === 'income') role = 'target'
       else if (tx.type === 'expense') role = 'source'
@@ -676,7 +671,7 @@ export async function updateTransaction(
     })
 
     // Begin database transaction
-    await db.transaction(async (trx) => {
+    await db.transaction(async (trx: any) => {
       const accountChanges: Record<string, { delta: number; minCreatedAt: Date }> = {}
       const addChange = (accountId: string, delta: number, createdAt: Date) => {
         if (!accountChanges[accountId]) {
@@ -689,8 +684,8 @@ export async function updateTransaction(
         }
       }
 
-      const oldSourceM = oldMovementsWithRoles.find((m) => m.role === 'source')
-      const oldTargetM = oldMovementsWithRoles.find((m) => m.role === 'target')
+      const oldSourceM = oldMovementsWithRoles.find((m: any) => m.role === 'source')
+      const oldTargetM = oldMovementsWithRoles.find((m: any) => m.role === 'target')
 
       const newSourceM = newMovementsWithRoles.find((m) => m.role === 'source')
       const newTargetM = newMovementsWithRoles.find((m) => m.role === 'target')
@@ -925,7 +920,7 @@ export async function updateTransaction(
           proofStoragePath: data.proofStoragePath ?? null,
           proofPublicUrl: data.proofPublicUrl ?? null,
           updatedBy: userId,
-          updatedAt: now,
+          updatedAt: sql`CURRENT_TIMESTAMP`,
         })
         .where(eq(transaction.id, transactionId))
 
@@ -948,7 +943,6 @@ export async function updateTransaction(
           amount: data.amount,
           description: data.description,
         },
-        createdAt: now,
       })
     })
 

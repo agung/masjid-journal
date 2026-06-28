@@ -30,34 +30,38 @@ export async function createOrganizationAction(formData: FormData) {
   const id = crypto.randomUUID()
   const slugBase = slugify(name) || 'masjid'
   const slug = `${slugBase}-${id.slice(0, 6)}`
-  const now = new Date()
 
-  await db.insert(organization).values({
-    id,
-    name,
-    slug,
-    createdAt: now,
-  })
+  try {
+    await db.insert(organization).values({
+      id,
+      name,
+      slug,
+      // Let database DEFAULT handle createdAt
+    })
 
-  await db.insert(member).values({
-    id: crypto.randomUUID(),
-    organizationId: id,
-    userId: session.user.id,
-    role: 'owner',
-    createdAt: now,
-  })
+    await db.insert(member).values({
+      id: crypto.randomUUID(),
+      organizationId: id,
+      userId: session.user.id,
+      role: 'owner',
+      // Let database DEFAULT handle createdAt
+    })
 
-  const sessionId = (session.session as unknown as { id?: string }).id
-  if (sessionId) {
-    await db
-      .update(authSession)
-      .set({ activeOrganizationId: id, updatedAt: now })
-      .where(eq(authSession.id, sessionId))
+    const sessionId = (session.session as unknown as { id?: string }).id
+    if (sessionId) {
+      await db
+        .update(authSession)
+        .set({ activeOrganizationId: id })
+        .where(eq(authSession.id, sessionId))
+    }
+
+    revalidatePath('/dashboard')
+    revalidatePath('/settings')
+    redirect('/dashboard')
+  } catch (error) {
+    console.error('[createOrganization]', error)
+    return { success: false, error: 'Gagal membuat organisasi. Silakan coba lagi.' }
   }
-
-  revalidatePath('/dashboard')
-  revalidatePath('/settings')
-  redirect('/dashboard')
 }
 
 export async function updateOrganizationNameAction(formData: FormData): Promise<void> {
@@ -156,7 +160,6 @@ export async function addMemberAction(
       organizationId: orgId,
       userId,
       role,
-      createdAt: new Date(),
     })
 
     revalidatePath('/settings/members')

@@ -106,7 +106,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="space-y-2">
-            {recentMovements.map((m) => (
+            {recentMovements.map((m: any) => (
               <LedgerRow
                 key={m.movementId}
                 row={{

@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { eq, and, gt } from 'drizzle-orm'
+import { eq, and, gt, sql } from 'drizzle-orm'
 import crypto from 'crypto'
 import { db } from '@/lib/db'
 import { invitation, member, organization, session as authSession } from '@/drizzle/schema'
@@ -229,7 +229,7 @@ export async function acceptInvitationAction(
       .where(and(eq(member.organizationId, invite.organizationId), eq(member.userId, userId)))
       .limit(1)
 
-    await db.transaction(async (trx) => {
+    await db.transaction(async (trx: any) => {
       if (!existingMember) {
         // Link user to organization
         await trx.insert(member).values({
@@ -237,7 +237,6 @@ export async function acceptInvitationAction(
           organizationId: invite.organizationId,
           userId,
           role: invite.role ?? 'treasurer',
-          createdAt: new Date(),
         })
       }
 
@@ -252,7 +251,7 @@ export async function acceptInvitationAction(
       if (sessionId) {
         await trx
           .update(authSession)
-          .set({ activeOrganizationId: invite.organizationId, updatedAt: new Date() })
+          .set({ activeOrganizationId: invite.organizationId, updatedAt: sql`CURRENT_TIMESTAMP` })
           .where(eq(authSession.id, sessionId))
       }
     })

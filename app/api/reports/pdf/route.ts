@@ -1,6 +1,6 @@
 import { type NextRequest } from 'next/server'
 import { z } from 'zod'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, sql } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { member, organization, session as authSession } from '@/drizzle/schema'
@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
     if (activeOrgId && sessionRecord.id) {
       await db
         .update(authSession)
-        .set({ activeOrganizationId: activeOrgId, updatedAt: new Date() })
+        .set({ activeOrganizationId: activeOrgId, updatedAt: sql`CURRENT_TIMESTAMP` })
         .where(eq(authSession.id, sessionRecord.id))
     }
   }
@@ -105,7 +105,7 @@ export async function GET(req: NextRequest) {
       .from(organization)
       .where(eq(organization.id, activeOrgId))
       .limit(1)
-      .then((rows) => rows[0]),
+      .then((rows: any[]) => rows[0]),
     getAccountSummary(activeOrgId),
     getMovementsForReport(activeOrgId, year, month),
   ])
@@ -134,8 +134,8 @@ export async function GET(req: NextRequest) {
     month,
     accountSummary,
     movements: movements
-      .filter((m) => m.transactionType !== 'transfer')
-      .map((m) => ({
+      .filter((m: any) => m.transactionType !== 'transfer')
+      .map((m: any) => ({
         ...m,
         amount: Number(m.amount ?? 0),
         balanceAfter: Number(m.balanceAfter ?? 0),
