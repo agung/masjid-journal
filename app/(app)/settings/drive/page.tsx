@@ -18,10 +18,6 @@ export default async function DriveSetupPage() {
 
   return (
     <div className="p-4 max-w-md mx-auto pb-24">
-      <Link href="/settings" className="text-sm text-gray-500 hover:text-gray-700 mb-4 inline-block dark:text-gray-400 dark:hover:text-gray-200">
-        ← Kembali
-      </Link>
-
       <h1 className="text-xl font-bold mb-1 dark:text-gray-100">Penyimpanan Bukti</h1>
       <p className="text-sm text-gray-500 mb-6 dark:text-gray-400">
         Pilih tempat penyimpanan foto bukti transaksi

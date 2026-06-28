@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { ChevronLeft } from 'lucide-react'
 import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { DownloadPdfButton } from '@/components/reports/download-pdf-button'
 
@@ -37,14 +36,6 @@ export default async function ReportPreviewPage({
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-white shrink-0 dark:bg-gray-900">
         <div className="flex items-center gap-3">
-          <Link
-            href={`/reports?year=${pYear}&month=${pMonth}`}
-            className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors dark:text-gray-400 dark:hover:text-gray-200"
-          >
-            <ChevronLeft size={16} />
-            Kembali
-          </Link>
-          <div className="w-px h-4 bg-gray-200 dark:bg-gray-700" />
           <div>
             <p className="text-sm font-semibold text-gray-900 leading-tight dark:text-gray-100">Preview Laporan</p>
             <p className="text-xs text-gray-500 dark:text-gray-400">{monthLabel}</p>

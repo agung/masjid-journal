@@ -37,12 +37,6 @@ export default async function AcceptInvitePage({ searchParams }: AcceptInvitePag
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
               {inviteRes.error}
             </p>
-            <Link
-              href="/dashboard"
-              className="block w-full py-2.5 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl text-sm transition-colors text-center"
-            >
-              Kembali ke Dashboard
-            </Link>
           </div>
         </div>
       </div>
@@ -116,12 +110,6 @@ export default async function AcceptInvitePage({ searchParams }: AcceptInvitePag
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
               {acceptRes.error}
             </p>
-            <Link
-              href="/dashboard"
-              className="block w-full py-2.5 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl text-sm transition-colors text-center"
-            >
-              Kembali ke Dashboard
-            </Link>
           </div>
         </div>
       </div>
