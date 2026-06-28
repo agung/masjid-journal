@@ -145,8 +145,7 @@ export async function addMemberAction(
         userId = signupResult.user.id
       } catch (err) {
         console.error('[addMemberAction - signup]', err)
-        const errMsg = err instanceof Error ? err.message : 'Gagal mendaftarkan pengguna baru.'
-        return { success: false, error: errMsg }
+        return { success: false, error: 'Gagal mendaftarkan pengguna baru. Silakan coba lagi.' }
       }
     }
 

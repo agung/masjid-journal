@@ -44,8 +44,7 @@ export async function updateNameAction(
     return { success: true }
   } catch (err) {
     console.error('[updateNameAction]', err)
-    const msg = err instanceof Error ? err.message : 'Terjadi kesalahan'
-    return { success: false, error: msg }
+    return { success: false, error: 'Gagal memperbarui nama. Silakan coba lagi.' }
   }
 }
 
@@ -103,10 +102,10 @@ export async function changePasswordAction(
     return { success: true }
   } catch (err) {
     console.error('[changePasswordAction]', err)
-    const msg = err instanceof Error ? err.message : 'Terjadi kesalahan'
+    const msg = err instanceof Error ? err.message : ''
     if (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('incorrect')) {
       return { success: false, error: 'Password saat ini tidak benar' }
     }
-    return { success: false, error: msg }
+    return { success: false, error: 'Gagal mengubah password. Silakan coba lagi.' }
   }
 }

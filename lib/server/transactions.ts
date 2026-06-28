@@ -526,8 +526,13 @@ export async function deleteTransaction(
     return { success: true }
   } catch (err: unknown) {
     console.error('[deleteTransaction]', err)
-    const errMsg = err instanceof Error ? err.message : 'Gagal menghapus transaksi.'
-    return { success: false, error: errMsg }
+    // Don't expose raw database errors to frontend
+    if (err instanceof Error && err.message.startsWith('Saldo')) {
+      // User-friendly error about balance constraint — safe to show
+      return { success: false, error: err.message }
+    }
+    // Generic message for database/internal errors
+    return { success: false, error: 'Gagal menghapus transaksi. Silakan coba lagi.' }
   }
 }
 
@@ -958,7 +963,11 @@ export async function updateTransaction(
     return { success: true }
   } catch (err: unknown) {
     console.error('[updateTransaction]', err)
-    const errMsg = err instanceof Error ? err.message : 'Gagal memperbarui transaksi.'
-    return { success: false, error: errMsg }
+    // Don't expose raw database errors to frontend
+    if (err instanceof Error && err.message.startsWith('Saldo')) {
+      // User-friendly error about balance constraint — safe to show
+      return { success: false, error: err.message }
+    }
+    return { success: false, error: 'Gagal memperbarui transaksi. Silakan coba lagi.' }
   }
 }
