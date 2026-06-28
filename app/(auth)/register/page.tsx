@@ -1,15 +1,26 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { signUp, signIn, useSession } from '@/lib/auth-client'
 import { AppLogo } from '@/components/ui/app-logo'
 import { Input } from '@/components/ui/input'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, Loader2, AlertTriangle } from 'lucide-react'
+import { getInvitationAction } from '@/lib/server/invitations'
 
-export default function RegisterPage() {
+const ROLE_LABEL: Record<string, string> = {
+  owner: 'Owner',
+  admin: 'Admin',
+  treasurer: 'Bendahara',
+  viewer: 'Viewer',
+}
+
+function RegisterForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const inviteToken = searchParams.get('invite_token')
+
   const { data: session } = useSession()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -19,12 +30,51 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
 
+  // Invitation info states
+  const [invitationLoading, setInvitationLoading] = useState(!!inviteToken)
+  const [inviteDetails, setInviteDetails] = useState<{
+    email: string
+    role: string
+    organizationName: string
+  } | null>(null)
+
+  // Redirect if session already exists
   useEffect(() => {
     if (session) {
-      router.push('/dashboard')
+      if (inviteToken) {
+        router.push(`/accept-invite?invite_token=${inviteToken}`)
+      } else {
+        router.push('/dashboard')
+      }
       router.refresh()
     }
-  }, [session, router])
+  }, [session, router, inviteToken])
+
+  // Fetch invitation info on mount
+  useEffect(() => {
+    if (!inviteToken) return
+
+    async function loadInvitation() {
+      try {
+        const res = await getInvitationAction(inviteToken!)
+        if (res.success) {
+          setInviteDetails(res)
+          if (res.email !== 'any') {
+            setEmail(res.email) // Prefill email
+          }
+        } else {
+          setError(res.error)
+        }
+      } catch (err) {
+        console.error(err)
+        setError('Gagal memproses tautan undangan.')
+      } finally {
+        setInvitationLoading(false)
+      }
+    }
+
+    loadInvitation()
+  }, [inviteToken])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -36,7 +86,9 @@ export default function RegisterPage() {
         name,
         email,
         password,
-        callbackURL: '/dashboard',
+        callbackURL: inviteToken
+          ? `/accept-invite?invite_token=${inviteToken}`
+          : '/dashboard',
       })
 
       if (result?.error) {
@@ -44,7 +96,13 @@ export default function RegisterPage() {
         return
       }
 
-      router.push('/dashboard')
+      // If signUp.email handles callbackURL redirect automatically, it will navigate.
+      // But just in case, we can also push manually:
+      if (inviteToken) {
+        router.push(`/accept-invite?invite_token=${inviteToken}`)
+      } else {
+        router.push('/dashboard')
+      }
       router.refresh()
     } catch {
       setError('Terjadi kesalahan. Silakan coba lagi.')
@@ -61,12 +119,22 @@ export default function RegisterPage() {
     try {
       await signIn.social({
         provider: 'google',
-        callbackURL: '/dashboard',
+        callbackURL: inviteToken
+          ? `/accept-invite?invite_token=${inviteToken}`
+          : '/dashboard',
       })
     } catch {
       setError('Terjadi kesalahan saat mendaftar dengan Google.')
       setGoogleLoading(false)
     }
+  }
+
+  if (invitationLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <Loader2 className="animate-spin text-green-600" size={32} />
+      </div>
+    )
   }
 
   return (
@@ -80,12 +148,19 @@ export default function RegisterPage() {
           <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Buat akun baru</p>
         </div>
 
+        {/* Invitation Greeting Banner */}
+        {inviteDetails && (
+          <div className="bg-green-50 border border-green-200 text-green-800 text-xs rounded-xl p-4 mb-4 dark:bg-green-950/30 dark:border-green-900/50 dark:text-green-400 leading-relaxed shadow-sm">
+            Anda diundang bergabung dengan <strong>{inviteDetails.organizationName}</strong> sebagai <strong>{ROLE_LABEL[inviteDetails.role] ?? inviteDetails.role}</strong>.
+          </div>
+        )}
+
         {/* Google Sign-Up */}
         <button
           type="button"
           onClick={handleGoogleSignUp}
           disabled={googleLoading}
-          className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 bg-white border hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-sm font-medium text-gray-700 transition-colors shadow-xs mb-4 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+          className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 bg-white border hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-sm font-medium text-gray-700 transition-colors shadow-xs mb-4 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:border-gray-800"
         >
           {googleLoading ? (
             <Loader2 size={18} className="animate-spin shrink-0" />
@@ -110,8 +185,9 @@ export default function RegisterPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 dark:bg-red-950/30 dark:border-red-900/50 dark:text-red-400">
-              {error}
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 dark:bg-red-950/30 dark:border-red-900/50 dark:text-red-400 flex gap-2 items-start">
+              <AlertTriangle className="shrink-0 mt-0.5" size={16} />
+              <span>{error}</span>
             </div>
           )}
 
@@ -142,7 +218,13 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="email@masjid.com"
+              disabled={!!inviteDetails && inviteDetails.email !== 'any'} // Disable email only if specific email invite
             />
+            {inviteDetails && inviteDetails.email !== 'any' && (
+              <p className="text-[10px] text-gray-400 leading-normal">
+                Alamat email dikunci ke alamat yang diundang demi alasan keamanan.
+              </p>
+            )}
           </div>
 
           <div className="space-y-1.5">
@@ -184,11 +266,26 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-gray-500 mt-6 dark:text-gray-400">
           Sudah punya akun?{' '}
-          <Link href="/login" className="text-green-600 hover:text-green-700 font-medium">
+          <Link
+            href={inviteToken ? `/login?invite_token=${inviteToken}` : '/login'}
+            className="text-green-600 hover:text-green-700 font-medium"
+          >
             Masuk
           </Link>
         </p>
       </div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <Loader2 className="animate-spin text-green-600" size={32} />
+      </div>
+    }>
+      <RegisterForm />
+    </Suspense>
   )
 }

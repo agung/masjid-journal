@@ -1,15 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { signIn, useSession } from '@/lib/auth-client'
 import { AppLogo } from '@/components/ui/app-logo'
 import { Input } from '@/components/ui/input'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const inviteToken = searchParams.get('invite_token')
+
   const { data: session } = useSession()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -18,12 +21,17 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
 
+  // Redirect if session already exists
   useEffect(() => {
     if (session) {
-      router.push('/dashboard')
+      if (inviteToken) {
+        router.push(`/accept-invite?invite_token=${inviteToken}`)
+      } else {
+        router.push('/dashboard')
+      }
       router.refresh()
     }
-  }, [session, router])
+  }, [session, router, inviteToken])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -34,7 +42,9 @@ export default function LoginPage() {
       const result = await signIn.email({
         email,
         password,
-        callbackURL: '/dashboard',
+        callbackURL: inviteToken
+          ? `/accept-invite?invite_token=${inviteToken}`
+          : '/dashboard',
       })
 
       if (result?.error) {
@@ -42,7 +52,11 @@ export default function LoginPage() {
         return
       }
 
-      router.push('/dashboard')
+      if (inviteToken) {
+        router.push(`/accept-invite?invite_token=${inviteToken}`)
+      } else {
+        router.push('/dashboard')
+      }
       router.refresh()
     } catch {
       setError('Terjadi kesalahan. Silakan coba lagi.')
@@ -59,9 +73,10 @@ export default function LoginPage() {
     try {
       await signIn.social({
         provider: 'google',
-        callbackURL: '/dashboard',
+        callbackURL: inviteToken
+          ? `/accept-invite?invite_token=${inviteToken}`
+          : '/dashboard',
       })
-      // signIn.social navigates away, so no need to handle redirect here
     } catch {
       setError('Terjadi kesalahan saat masuk dengan Google.')
       setGoogleLoading(false)
@@ -79,12 +94,19 @@ export default function LoginPage() {
           <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Masuk ke akun Anda</p>
         </div>
 
+        {/* Invitation Context Banner */}
+        {inviteToken && (
+          <div className="bg-green-50 border border-green-200 text-green-800 text-xs rounded-xl p-4 mb-4 dark:bg-green-950/30 dark:border-green-900/50 dark:text-green-400 leading-relaxed shadow-sm">
+            Silakan masuk ke akun Anda terlebih dahulu untuk menerima undangan pengurus.
+          </div>
+        )}
+
         {/* Google Sign-In */}
         <button
           type="button"
           onClick={handleGoogleSignIn}
           disabled={googleLoading}
-          className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 bg-white border hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-sm font-medium text-gray-700 transition-colors shadow-xs mb-4 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+          className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 bg-white border hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-sm font-medium text-gray-700 transition-colors shadow-xs mb-4 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:border-gray-800"
         >
           {googleLoading ? (
             <Loader2 size={18} className="animate-spin shrink-0" />
@@ -165,13 +187,28 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-gray-500 mt-6 dark:text-gray-400">
           Belum punya akun?{' '}
-          <Link href="/register" className="text-green-600 hover:text-green-700 font-medium">
+          <Link
+            href={inviteToken ? `/register?invite_token=${inviteToken}` : '/register'}
+            className="text-green-600 hover:text-green-700 font-medium"
+          >
             Daftar
           </Link>
         </p>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <Loader2 className="animate-spin text-green-600" size={32} />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }
