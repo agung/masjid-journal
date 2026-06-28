@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { eq, and, desc, sql, gt } from 'drizzle-orm'
 import crypto from 'crypto'
-import { db } from '@/lib/db'
+import { db, formatDbDate } from '@/lib/db'
 import {
   transaction,
   transactionMovement,
@@ -462,7 +462,7 @@ export async function deleteTransaction(
           .where(
             and(
               eq(transactionMovement.accountId, accountId),
-              gt(transactionMovement.createdAt, minCreatedAt)
+              sql`${transactionMovement.createdAt} > ${formatDbDate(minCreatedAt)}`
             )
           )
 
@@ -493,7 +493,7 @@ export async function deleteTransaction(
           .where(
             and(
               eq(transactionMovement.accountId, accountId),
-              gt(transactionMovement.createdAt, minCreatedAt)
+              sql`${transactionMovement.createdAt} > ${formatDbDate(minCreatedAt)}`
             )
           )
       }
@@ -725,7 +725,7 @@ export async function updateTransaction(
           .where(
             and(
               eq(transactionMovement.accountId, accId),
-              sql`${transactionMovement.createdAt} < ${timestamp}`
+              sql`${transactionMovement.createdAt} < ${formatDbDate(timestamp)}`
             )
           )
           .orderBy(desc(transactionMovement.createdAt))
@@ -857,7 +857,7 @@ export async function updateTransaction(
           .where(
             and(
               eq(transactionMovement.accountId, accountId),
-              gt(transactionMovement.createdAt, minCreatedAt)
+              sql`${transactionMovement.createdAt} > ${formatDbDate(minCreatedAt)}`
             )
           )
 
@@ -912,7 +912,7 @@ export async function updateTransaction(
           .where(
             and(
               eq(transactionMovement.accountId, accountId),
-              gt(transactionMovement.createdAt, minCreatedAt)
+              sql`${transactionMovement.createdAt} > ${formatDbDate(minCreatedAt)}`
             )
           )
       }

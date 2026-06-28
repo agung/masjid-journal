@@ -72,3 +72,13 @@ export const db = initializeDatabase() as any
 
 // Export a helper to get the current dialect
 export const getDialect = () => (isMysql ? 'mysql' : 'postgresql')
+
+/**
+ * Format a Date for use in Drizzle WHERE clauses.
+ * MySQL rejects ISO 8601 strings — convert to 'YYYY-MM-DD HH:MM:SS'.
+ * PostgreSQL accepts Date objects directly.
+ */
+export function formatDbDate(date: Date): string | Date {
+  if (!isMysql) return date
+  return date.toISOString().replace('T', ' ').slice(0, 19)
+}

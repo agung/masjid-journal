@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { eq, and, gt, sql } from 'drizzle-orm'
 import crypto from 'crypto'
-import { db } from '@/lib/db'
+import { db, formatDbDate } from '@/lib/db'
 import { invitation, member, organization, session as authSession } from '@/drizzle/schema'
 import { requireRole, requireAuth } from '@/lib/auth/guards'
 import { z } from 'zod'
@@ -60,7 +60,7 @@ export async function createInvitationAction(data: {
             eq(invitation.organizationId, orgId),
             eq(invitation.email, email),
             eq(invitation.status, 'pending'),
-            gt(invitation.expiresAt, new Date())
+            sql`${invitation.expiresAt} > ${formatDbDate(new Date())}`
           )
         )
         .limit(1)
