@@ -2,13 +2,13 @@
 
 import { eq, and, sql, gte, lte } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { transaction, transactionMovement, masjidAccount, category } from '@/drizzle/schema'
+import { transaction, transactionMovement, masjidAccount, category, type MasjidAccount } from '@/drizzle/schema'
 
 /**
  * Get total current balance per account kind for an organization.
  */
 export async function getAccountSummary(organizationId: string) {
-  const accounts = await db
+  const accounts: Array<Pick<MasjidAccount, 'id' | 'kind' | 'name' | 'isActive'> & { currentBalance: number | bigint }> = await db
     .select({
       id: masjidAccount.id,
       kind: masjidAccount.kind,
@@ -24,12 +24,12 @@ export async function getAccountSummary(organizationId: string) {
       )
     )
 
-  const cashHolders = accounts.filter((a: any) => a.kind === 'cash_holder')
-  const banks = accounts.filter((a: any) => a.kind === 'bank')
+  const cashHolders = accounts.filter((a) => a.kind === 'cash_holder')
+  const banks = accounts.filter((a) => a.kind === 'bank')
 
   // PostgreSQL bigint/numeric comes back as strings — cast to Number before summing.
-  const totalCash = cashHolders.reduce((sum: any, a: any) => sum + Number(a.currentBalance ?? 0), 0)
-  const totalBank = banks.reduce((sum: any, a: any) => sum + Number(a.currentBalance ?? 0), 0)
+  const totalCash = cashHolders.reduce((sum, a) => sum + Number(a.currentBalance ?? 0), 0)
+  const totalBank = banks.reduce((sum, a) => sum + Number(a.currentBalance ?? 0), 0)
 
   return {
     cashHolders,
@@ -92,7 +92,8 @@ export async function getMonthlyReport(
   const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
 
   // All transactions in range
-  const transactions = await db
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const transactions: any[] = await db
     .select({
       id: transaction.id,
       transactionNo: transaction.transactionNo,
@@ -136,12 +137,12 @@ export async function getMonthlyReport(
   const expenseByCategory = [...categoryMap.values()].filter((c) => c.type === 'expense')
 
   const totalIncome = transactions
-    .filter((t: any) => t.type === 'income')
-    .reduce((sum: any, t: any) => sum + Number(t.amount ?? 0), 0)
+    .filter((t) => t.type === 'income')
+    .reduce((sum, t) => sum + Number(t.amount ?? 0), 0)
 
   const totalExpense = transactions
-    .filter((t: any) => t.type === 'expense')
-    .reduce((sum: any, t: any) => sum + Number(t.amount ?? 0), 0)
+    .filter((t) => t.type === 'expense')
+    .reduce((sum, t) => sum + Number(t.amount ?? 0), 0)
 
   // Opening balance: total of all account balances at start of month
   // Approximate: currentBalance - netFlow

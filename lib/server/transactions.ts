@@ -407,6 +407,7 @@ export async function deleteTransaction(
     }
 
     // Begin transaction
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await db.transaction(async (trx: any) => {
       // Group old movements by accountId to compute net delta
       const deltas: Record<string, { delta: number; minCreatedAt: Date }> = {}
@@ -646,6 +647,7 @@ export async function updateTransaction(
     }
 
     // Assign roles to old movements
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const oldMovementsWithRoles = tx.movements.map((m: any) => {
       let role: 'source' | 'target'
       if (tx.type === 'income') role = 'target'
@@ -671,6 +673,7 @@ export async function updateTransaction(
     })
 
     // Begin database transaction
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await db.transaction(async (trx: any) => {
       const accountChanges: Record<string, { delta: number; minCreatedAt: Date }> = {}
       const addChange = (accountId: string, delta: number, createdAt: Date) => {
@@ -684,7 +687,9 @@ export async function updateTransaction(
         }
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const oldSourceM = oldMovementsWithRoles.find((m: any) => m.role === 'source')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const oldTargetM = oldMovementsWithRoles.find((m: any) => m.role === 'target')
 
       const newSourceM = newMovementsWithRoles.find((m) => m.role === 'source')

@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { eq, and, sql } from 'drizzle-orm'
 import crypto from 'crypto'
 import { db } from '@/lib/db'
-import { masjidAccount } from '@/drizzle/schema'
+import { masjidAccount, type MasjidAccount } from '@/drizzle/schema'
 import { requireRole } from '@/lib/auth/guards'
 import {
   createCashHolderSchema,
@@ -37,7 +37,7 @@ export async function getAccountBalance(accountId: string): Promise<number> {
  */
 export async function listAccounts(organizationId: string) {
   // Get latest balance_after per account using a lateral join approach.
-  const accounts = await db
+  const accounts: MasjidAccount[] = await db
     .select({
       id: masjidAccount.id,
       organizationId: masjidAccount.organizationId,
@@ -56,7 +56,7 @@ export async function listAccounts(organizationId: string) {
     .where(eq(masjidAccount.organizationId, organizationId))
     .orderBy(masjidAccount.kind, masjidAccount.name)
 
-  return accounts.map((account: any) => ({
+  return accounts.map((account) => ({
     ...account,
     currentBalance: Number(account.balance ?? 0),
   }))

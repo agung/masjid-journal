@@ -1,5 +1,7 @@
 import { drizzle as drizzlePg } from 'drizzle-orm/postgres-js'
 import { drizzle as drizzleMysql } from 'drizzle-orm/mysql2'
+import postgres from 'postgres'
+import mysql from 'mysql2/promise'
 import * as schemaPg from '@/drizzle/schema.pg'
 import * as schemaMysql from '@/drizzle/schema.mysql'
 
@@ -13,19 +15,21 @@ const isMysql = dbUrl.startsWith('mysql:')
 
 // Prevent multiple instances in development due to HMR
 const globalForDb = global as typeof globalThis & {
-  pgClient: any
-  mysqlPool: any
+  pgClient: ReturnType<typeof postgres> | undefined
+  mysqlPool: mysql.Pool | undefined
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dbInstance: any
 }
 
-function initializeDatabase() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function initializeDatabase(): any {
   if (globalForDb.dbInstance) return globalForDb.dbInstance
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let dbInstance: any
 
   if (isMysql) {
     // MySQL setup
-    const mysql = require('mysql2/promise')
     const pool = globalForDb.mysqlPool ?? mysql.createPool({
       uri: dbUrl,
       connectionLimit: 10,
@@ -40,7 +44,6 @@ function initializeDatabase() {
     dbInstance = drizzleMysql(pool, { schema: schemaMysql, mode: 'default' })
   } else {
     // PostgreSQL setup
-    const postgres = require('postgres')
     const client = globalForDb.pgClient ?? postgres(dbUrl, {
       max: 10,
       idle_timeout: 20,
@@ -62,8 +65,9 @@ function initializeDatabase() {
   return dbInstance
 }
 
-// Export as 'any' to avoid TypeScript union type issues
-// The actual type will be determined at runtime based on DATABASE_URL
+// db is typed as any to support both PostgreSQL and MySQL dialects at runtime.
+// The actual instance is correctly initialized based on DATABASE_URL.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const db = initializeDatabase() as any
 
 // Export a helper to get the current dialect

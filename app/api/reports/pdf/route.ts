@@ -105,7 +105,7 @@ export async function GET(req: NextRequest) {
       .from(organization)
       .where(eq(organization.id, activeOrgId))
       .limit(1)
-      .then((rows: any[]) => rows[0]),
+      .then((rows: unknown[]) => (rows as {name: string}[])[0]),
     getAccountSummary(activeOrgId),
     getMovementsForReport(activeOrgId, year, month),
   ])
@@ -134,8 +134,8 @@ export async function GET(req: NextRequest) {
     month,
     accountSummary,
     movements: movements
-      .filter((m: any) => m.transactionType !== 'transfer')
-      .map((m: any) => ({
+      .filter((m: typeof movements[number]) => m.transactionType !== 'transfer')
+      .map((m: typeof movements[number]) => ({
         ...m,
         amount: Number(m.amount ?? 0),
         balanceAfter: Number(m.balanceAfter ?? 0),

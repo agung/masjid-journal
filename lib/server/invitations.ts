@@ -229,6 +229,7 @@ export async function acceptInvitationAction(
       .where(and(eq(member.organizationId, invite.organizationId), eq(member.userId, userId)))
       .limit(1)
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await db.transaction(async (trx: any) => {
       if (!existingMember) {
         // Link user to organization
