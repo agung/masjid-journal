@@ -28,6 +28,7 @@ export function BottomNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={true}
                 className="flex flex-col items-center justify-center py-2 text-xs font-medium text-green-600"
               >
                 <div className="-mt-6 h-14 w-14 rounded-full bg-green-600 text-white flex items-center justify-center shadow-lg border-4 border-white dark:border-gray-900">
@@ -42,6 +43,7 @@ export function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={true}
               className={cn(
                 'flex flex-col items-center justify-center py-2.5 text-xs font-medium transition-colors',
                 active ? 'text-green-600' : 'text-gray-400 hover:text-gray-600'

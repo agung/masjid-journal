@@ -41,7 +41,7 @@ export function TopBar({ orgName }: { orgName?: string }) {
             </svg>
           </button>
         ) : (
-          <Link href="/dashboard" className="shrink-0">
+          <Link href="/dashboard" prefetch={true} className="shrink-0">
             <AppLogo size={32} layout="icon-only" />
           </Link>
         )}

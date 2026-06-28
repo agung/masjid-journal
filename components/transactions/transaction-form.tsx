@@ -223,16 +223,8 @@ export function TransactionForm({ accounts, categories, userRole, userId, transa
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Type badge + back button */}
+      {/* Type badge */}
       <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => { setStep(1); setError(null) }}
-          className="text-gray-400 hover:text-gray-600 text-xl leading-none p-2 -ml-2 min-h-[44px] min-w-[44px]"
-          aria-label="Kembali"
-        >
-          ←
-        </button>
         <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${
           selectedType.borderColor
         }`}>
