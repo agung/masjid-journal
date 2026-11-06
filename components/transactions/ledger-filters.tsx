@@ -12,6 +12,9 @@ import {
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 import { type DateRange } from 'react-day-picker'
 
+const ALL_ACCOUNTS_FILTER = '__all_accounts__'
+const ALL_TYPES_FILTER = '__all_types__'
+
 interface Account {
   id: string
   name: string
@@ -50,8 +53,8 @@ export function LedgerFilters({
   const router = useRouter()
 
   // Local state to instantly update the UI selection on client-side
-  const [selectedAccountId, setSelectedAccountId] = useState(currentAccountId ?? '')
-  const [selectedType, setSelectedType] = useState(currentType ?? '')
+  const [selectedAccountId, setSelectedAccountId] = useState(currentAccountId ?? ALL_ACCOUNTS_FILTER)
+  const [selectedType, setSelectedType] = useState(currentType ?? ALL_TYPES_FILTER)
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: parseLocalDate(startDate),
     to: parseLocalDate(endDate),
@@ -59,11 +62,11 @@ export function LedgerFilters({
 
   // Sync state with props when they change (e.g. initial render or URL change)
   useEffect(() => {
-    setSelectedAccountId(currentAccountId ?? '')
+    setSelectedAccountId(currentAccountId ?? ALL_ACCOUNTS_FILTER)
   }, [currentAccountId])
 
   useEffect(() => {
-    setSelectedType(currentType ?? '')
+    setSelectedType(currentType ?? ALL_TYPES_FILTER)
   }, [currentType])
 
   useEffect(() => {
@@ -112,7 +115,7 @@ export function LedgerFilters({
   }
 
   const TRANSACTION_TYPES = [
-    { value: '', label: 'Semua Tipe' },
+    { value: ALL_TYPES_FILTER, label: 'Semua Tipe' },
     { value: 'income', label: 'Pemasukan' },
     { value: 'expense', label: 'Pengeluaran' },
     { value: 'transfer', label: 'Transfer' },
@@ -138,14 +141,14 @@ export function LedgerFilters({
             value={selectedAccountId}
             onValueChange={(v) => {
               setSelectedAccountId(v)
-              navigate(buildUrl({ accountId: v || undefined }))
+              navigate(buildUrl({ accountId: v === ALL_ACCOUNTS_FILTER ? undefined : v }))
             }}
           >
             <SelectTrigger>
               <SelectValue placeholder="Semua Akun" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Semua Akun</SelectItem>
+              <SelectItem value={ALL_ACCOUNTS_FILTER}>Semua Akun</SelectItem>
               {accounts.map((a) => (
                 <SelectItem key={a.id} value={a.id}>
                   {a.kind === 'cash_holder' ? '💰' : '🏦'} {a.name}
@@ -160,7 +163,7 @@ export function LedgerFilters({
             value={selectedType}
             onValueChange={(v) => {
               setSelectedType(v)
-              navigate(buildUrl({ type: v || undefined }))
+              navigate(buildUrl({ type: v === ALL_TYPES_FILTER ? undefined : v }))
             }}
           >
             <SelectTrigger>
