@@ -36,7 +36,6 @@ export function InfiniteScrollList<T>({
     setPage(1)
     setHasMore(initialItems.length >= pageSize)
     setLoading(false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialItems, pageSize, ...dependencies])
 
   useEffect(() => {

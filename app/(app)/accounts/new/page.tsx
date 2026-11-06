@@ -1,6 +1,8 @@
 import { requireRole } from '@/lib/auth/guards'
 import { AccountForm } from '@/components/accounts/account-form'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewAccountPage() {
   await requireRole('admin')
 

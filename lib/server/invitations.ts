@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { eq, and, gt, sql } from 'drizzle-orm'
 import crypto from 'crypto'
 import { db, formatDbDate } from '@/lib/db'
-import { invitation, member, organization, session as authSession } from '@/drizzle/schema'
+import { invitation, member, organization, user } from '@/drizzle/schema'
 import { requireRole, requireAuth } from '@/lib/auth/guards'
 import { z } from 'zod'
 
@@ -229,33 +229,20 @@ export async function acceptInvitationAction(
       .where(and(eq(member.organizationId, invite.organizationId), eq(member.userId, userId)))
       .limit(1)
 
+    // Membership, invitation status and active organization are committed atomically.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await db.transaction(async (trx: any) => {
-      if (!existingMember) {
-        // Link user to organization
-        await trx.insert(member).values({
+    const statements: [any, ...any[]] = [db.update(invitation).set({ status: 'accepted' }).where(eq(invitation.id, token))]
+    if (!existingMember) {
+      statements.push(db.insert(member).values({
           id: crypto.randomUUID(),
           organizationId: invite.organizationId,
           userId,
           role: invite.role ?? 'treasurer',
-        })
-      }
+        }))
+    }
 
-      // Mark invitation as accepted
-      await trx
-        .update(invitation)
-        .set({ status: 'accepted' })
-        .where(eq(invitation.id, token))
-
-      // Update user's active session's organization
-      const sessionId = (session.session as unknown as { id?: string }).id
-      if (sessionId) {
-        await trx
-          .update(authSession)
-          .set({ activeOrganizationId: invite.organizationId, updatedAt: sql`CURRENT_TIMESTAMP` })
-          .where(eq(authSession.id, sessionId))
-      }
-    })
+    statements.push(db.update(user).set({ activeOrganizationId: invite.organizationId }).where(eq(user.id, userId)))
+    await db.batch(statements)
 
     revalidatePath('/dashboard')
     revalidatePath('/settings/members')

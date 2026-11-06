@@ -7,6 +7,8 @@ import type { MasjidAccount } from '@/drizzle/schema'
 
 type AccountWithBalance = MasjidAccount & { currentBalance: number }
 
+export const dynamic = 'force-dynamic'
+
 export default async function AccountsPage() {
   const ctx = await getActiveOrganizationContext()
   const activeOrgId = ctx.activeOrganizationId

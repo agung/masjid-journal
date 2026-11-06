@@ -4,6 +4,8 @@ import { listInvitationsAction } from '@/lib/server/invitations'
 import { redirect } from 'next/navigation'
 import { MemberManager } from '@/components/organization/member-manager'
 
+export const dynamic = 'force-dynamic'
+
 export default async function MembersPage() {
   const ctx = await getActiveOrganizationContext()
 

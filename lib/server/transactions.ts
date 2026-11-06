@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { eq, and, desc, sql, gt } from 'drizzle-orm'
+import { eq, and, desc, sql } from 'drizzle-orm'
 import crypto from 'crypto'
 import { db, formatDbDate } from '@/lib/db'
 import {
@@ -11,6 +11,7 @@ import {
   auditLog,
 } from '@/drizzle/schema'
 import { requireRole } from '@/lib/auth/guards'
+import { withLedgerLock } from '@/lib/ledger-coordinator'
 import {
   createTransactionSchema,
   type CreateTransactionInput,
@@ -95,7 +96,12 @@ async function validateAccounts(
 // CREATE TRANSACTION
 // ============================================================
 
-export async function createTransaction(
+export async function createTransaction(input: CreateTransactionInput) {
+  const session = await requireRole('treasurer')
+  return withLedgerLock(session.activeOrganizationId!, session.user.id, () => createTransactionUnlocked(input))
+}
+
+async function createTransactionUnlocked(
   input: CreateTransactionInput
 ): Promise<{ success: true; id: string } | { success: false; error: string }> {
   try {
@@ -227,8 +233,9 @@ export async function createTransaction(
       }
     }
 
-    // Persist transaction header + movements in one batch
-    await db.insert(transaction).values({
+    // D1 batch commits the complete ledger mutation atomically.
+    await db.batch([
+      db.insert(transaction).values({
       id: txId,
       organizationId: orgId,
       transactionNo: txNo,
@@ -238,24 +245,17 @@ export async function createTransaction(
       categoryId: 'categoryId' in data ? data.categoryId : null,
       description: data.description,
       notes: data.notes ?? null,
-      proofStoragePath: data.proofStoragePath ?? null,
-      proofPublicUrl: data.proofPublicUrl ?? null,
+      proofStoragePath: null,
+      proofPublicUrl: null,
       createdBy: session.user.id,
-      updatedAt: sql`CURRENT_TIMESTAMP`,
-    })
-
-    await db.insert(transactionMovement).values(resolvedMovements)
-
-    // Update balance on each affected account
-    for (const m of resolvedMovements) {
-      await db
+      updatedAt: sql`(unixepoch('subsec') * 1000)`,
+      }),
+      db.insert(transactionMovement).values(resolvedMovements),
+      ...resolvedMovements.map((m) => db
         .update(masjidAccount)
         .set({ balance: m.balanceAfter })
-        .where(eq(masjidAccount.id, m.accountId))
-    }
-
-    // Audit log
-    await db.insert(auditLog).values({
+        .where(eq(masjidAccount.id, m.accountId))),
+      db.insert(auditLog).values({
       id: crypto.randomUUID(),
       organizationId: orgId,
       actorUserId: session.user.id,
@@ -264,7 +264,8 @@ export async function createTransaction(
       entityId: txId,
       before: null,
       after: { transactionNo: txNo, type: data.type, amount: data.amount },
-    })
+      }),
+    ])
 
     revalidatePath('/transactions')
     revalidatePath('/dashboard')
@@ -309,6 +310,7 @@ export async function listTransactionMovements({
       signedAmount: transactionMovement.signedAmount,
       balanceBefore: transactionMovement.balanceBefore,
       balanceAfter: transactionMovement.balanceAfter,
+      createdAt: transactionMovement.createdAt,
       movementCreatedAt: transactionMovement.createdAt,
       // Account
       accountId: masjidAccount.id,
@@ -366,6 +368,7 @@ export async function getTransactionById(transactionId: string, organizationId: 
       signedAmount: transactionMovement.signedAmount,
       balanceBefore: transactionMovement.balanceBefore,
       balanceAfter: transactionMovement.balanceAfter,
+      createdAt: transactionMovement.createdAt,
       accountId: masjidAccount.id,
       accountName: masjidAccount.name,
       accountKind: masjidAccount.kind,
@@ -382,7 +385,12 @@ export async function getTransactionById(transactionId: string, organizationId: 
 // DELETE TRANSACTION
 // ============================================================
 
-export async function deleteTransaction(
+export async function deleteTransaction(transactionId: string) {
+  const session = await requireRole('admin')
+  return withLedgerLock(session.activeOrganizationId!, session.user.id, () => deleteTransactionUnlocked(transactionId))
+}
+
+async function deleteTransactionUnlocked(
   transactionId: string
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
@@ -406,118 +414,40 @@ export async function deleteTransaction(
       }
     }
 
-    // Begin transaction
+    const deltas: Record<string, { delta: number; minCreatedAt: Date }> = {}
+    for (const m of tx.movements) {
+      const current = deltas[m.accountId]
+      const delta = -m.signedAmount
+      deltas[m.accountId] = {
+        delta: (current?.delta ?? 0) + delta,
+        minCreatedAt: !current || m.createdAt < current.minCreatedAt ? m.createdAt : current.minCreatedAt,
+      }
+    }
+
+    // D1 batches accept heterogeneous select/update/delete statements.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await db.transaction(async (trx: any) => {
-      // Group old movements by accountId to compute net delta
-      const deltas: Record<string, { delta: number; minCreatedAt: Date }> = {}
-      for (const m of tx.movements) {
-        const delta = -m.signedAmount
-        // Query the actual movement created_at from the database
-        const [mov] = await trx
-          .select({ createdAt: transactionMovement.createdAt })
-          .from(transactionMovement)
-          .where(eq(transactionMovement.id, m.id))
-          .limit(1)
-        
-        const movCreatedAt = mov?.createdAt ?? tx.createdAt
-
-        if (deltas[m.accountId]) {
-          deltas[m.accountId].delta += delta
-          if (movCreatedAt < deltas[m.accountId].minCreatedAt) {
-            deltas[m.accountId].minCreatedAt = movCreatedAt
-          }
-        } else {
-          deltas[m.accountId] = { delta, minCreatedAt: movCreatedAt }
-        }
-      }
-
-      // Check balance constraints
-      for (const [accountId, { delta, minCreatedAt }] of Object.entries(deltas)) {
-        if (delta === 0) continue
-
-        const [acc] = await trx
-          .select({ name: masjidAccount.name, balance: masjidAccount.balance })
-          .from(masjidAccount)
-          .where(eq(masjidAccount.id, accountId))
-          .limit(1)
-
-        if (!acc) throw new Error(`Akun tidak ditemukan: ${accountId}`)
-
-        // Check if balance becomes negative
-        if (Number(acc.balance) + delta < 0) {
-          throw new Error(
-            `Saldo ${acc.name} tidak mencukupi (saldo saat ini: Rp ${acc.balance.toLocaleString('id-ID')}, perubahan: Rp ${delta.toLocaleString('id-ID')})`
-          )
-        }
-
-        // Check subsequent movements
-        const subsequent = await trx
-          .select({
-            id: transactionMovement.id,
-            balanceBefore: transactionMovement.balanceBefore,
-            balanceAfter: transactionMovement.balanceAfter,
-          })
-          .from(transactionMovement)
-          .where(
-            and(
-              eq(transactionMovement.accountId, accountId),
-              sql`${transactionMovement.createdAt} > ${formatDbDate(minCreatedAt)}`
-            )
-          )
-
-        for (const subM of subsequent) {
-          if (Number(subM.balanceBefore) + delta < 0 || Number(subM.balanceAfter) + delta < 0) {
-            throw new Error(
-              `Penghapusan ini akan menyebabkan saldo negatif pada riwayat transaksi berikutnya untuk akun ${acc.name}`
-            )
-          }
-        }
-      }
-
-      // Apply deltas and update subsequent movements
-      for (const [accountId, { delta, minCreatedAt }] of Object.entries(deltas)) {
-        // Update account balance
-        await trx
-          .update(masjidAccount)
-          .set({ balance: sql`${masjidAccount.balance} + ${delta}` })
-          .where(eq(masjidAccount.id, accountId))
-
-        // Update subsequent movements
-        await trx
-          .update(transactionMovement)
-          .set({
-            balanceBefore: sql`${transactionMovement.balanceBefore} + ${delta}`,
-            balanceAfter: sql`${transactionMovement.balanceAfter} + ${delta}`,
-          })
-          .where(
-            and(
-              eq(transactionMovement.accountId, accountId),
-              sql`${transactionMovement.createdAt} > ${formatDbDate(minCreatedAt)}`
-            )
-          )
-      }
-
-      // Delete transaction header (cascade will delete movements)
-      await trx.delete(transaction).where(eq(transaction.id, transactionId))
-
-      // Audit Log
-      await trx.insert(auditLog).values({
-        id: crypto.randomUUID(),
-        organizationId: orgId,
-        actorUserId: userId,
-        action: 'delete',
-        entityType: 'transaction',
-        entityId: transactionId,
-        before: {
-          transactionNo: tx.transactionNo,
-          type: tx.type,
-          amount: tx.amount,
-          description: tx.description,
-        },
-        after: null,
-      })
-    })
+    const statements: [any, ...any[]] = [db.select({ id: transaction.id }).from(transaction).where(eq(transaction.id, '__no-op__')).limit(1)]
+    for (const [accountId, { delta, minCreatedAt }] of Object.entries(deltas)) {
+      if (delta === 0) continue
+      const [acc] = await db.select({ name: masjidAccount.name, balance: masjidAccount.balance }).from(masjidAccount).where(eq(masjidAccount.id, accountId)).limit(1)
+      if (!acc) throw new Error(`Akun tidak ditemukan: ${accountId}`)
+      if (Number(acc.balance) + delta < 0) throw new Error(`Saldo ${acc.name} tidak mencukupi.`)
+      const subsequent = await db.select({ balanceBefore: transactionMovement.balanceBefore, balanceAfter: transactionMovement.balanceAfter }).from(transactionMovement).where(and(eq(transactionMovement.accountId, accountId), sql`${transactionMovement.createdAt} > ${formatDbDate(minCreatedAt)}`))
+      if (subsequent.some((m) => Number(m.balanceBefore) + delta < 0 || Number(m.balanceAfter) + delta < 0)) throw new Error(`Penghapusan ini akan menyebabkan saldo negatif pada riwayat transaksi berikutnya untuk akun ${acc.name}`)
+      statements.push(
+        db.update(masjidAccount).set({ balance: sql`${masjidAccount.balance} + ${delta}` }).where(eq(masjidAccount.id, accountId)),
+        db.update(transactionMovement).set({ balanceBefore: sql`${transactionMovement.balanceBefore} + ${delta}`, balanceAfter: sql`${transactionMovement.balanceAfter} + ${delta}` }).where(and(eq(transactionMovement.accountId, accountId), sql`${transactionMovement.createdAt} > ${formatDbDate(minCreatedAt)}`)),
+      )
+    }
+    statements.push(
+      db.delete(transaction).where(and(eq(transaction.id, transactionId), eq(transaction.organizationId, orgId))),
+      db.insert(auditLog).values({ id: crypto.randomUUID(), organizationId: orgId, actorUserId: userId, action: 'delete', entityType: 'transaction', entityId: transactionId, before: { transactionNo: tx.transactionNo, type: tx.type, amount: tx.amount, description: tx.description }, after: null }),
+    )
+    await db.batch(statements)
+    if (tx.proofStoragePath) {
+      const { deleteProofObject } = await import('@/lib/server/storage')
+      try { await deleteProofObject(tx.proofStoragePath) } catch (error) { console.error('[deleteTransaction] proof cleanup failed', error) }
+    }
 
     revalidatePath('/transactions')
     revalidatePath('/dashboard')
@@ -540,7 +470,12 @@ export async function deleteTransaction(
 // UPDATE TRANSACTION
 // ============================================================
 
-export async function updateTransaction(
+export async function updateTransaction(transactionId: string, input: CreateTransactionInput) {
+  const session = await requireRole('treasurer')
+  return withLedgerLock(session.activeOrganizationId!, session.user.id, () => updateTransactionUnlocked(transactionId, input))
+}
+
+async function updateTransactionUnlocked(
   transactionId: string,
   input: CreateTransactionInput
 ): Promise<{ success: true } | { success: false; error: string }> {
@@ -677,9 +612,7 @@ export async function updateTransaction(
       return { ...m, signedAmount, role }
     })
 
-    // Begin database transaction
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await db.transaction(async (trx: any) => {
+    {
       const accountChanges: Record<string, { delta: number; minCreatedAt: Date }> = {}
       const addChange = (accountId: string, delta: number, createdAt: Date) => {
         if (!accountChanges[accountId]) {
@@ -702,7 +635,7 @@ export async function updateTransaction(
 
       // Fetch the actual createdAt from database for existing movements
       const getMovCreatedAt = async (mId: string) => {
-        const [mov] = await trx
+        const [mov] = await db
           .select({ createdAt: transactionMovement.createdAt })
           .from(transactionMovement)
           .where(eq(transactionMovement.id, mId))
@@ -719,7 +652,7 @@ export async function updateTransaction(
 
       // Helper function to query balance immediately prior to a timestamp
       const getBalanceBefore = async (accId: string, timestamp: Date) => {
-        const [priorM] = await trx
+        const [priorM] = await db
           .select({ balanceAfter: transactionMovement.balanceAfter })
           .from(transactionMovement)
           .where(
@@ -833,7 +766,7 @@ export async function updateTransaction(
       for (const [accountId, { delta, minCreatedAt }] of Object.entries(accountChanges)) {
         if (delta === 0) continue
 
-        const [acc] = await trx
+        const [acc] = await db
           .select({ name: masjidAccount.name, balance: masjidAccount.balance })
           .from(masjidAccount)
           .where(eq(masjidAccount.id, accountId))
@@ -847,7 +780,7 @@ export async function updateTransaction(
           )
         }
 
-        const subsequent = await trx
+        const subsequent = await db
           .select({
             id: transactionMovement.id,
             balanceBefore: transactionMovement.balanceBefore,
@@ -870,15 +803,17 @@ export async function updateTransaction(
         }
       }
 
-      // Apply changes to database
+      // D1 batches make the ledger and audit changes atomic.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const statements: [any, ...any[]] = [db.select({ id: transaction.id }).from(transaction).where(eq(transaction.id, '__no-op__')).limit(1)]
       if (movementsToDelete.length > 0) {
         for (const mId of movementsToDelete) {
-          await trx.delete(transactionMovement).where(eq(transactionMovement.id, mId))
+          statements.push(db.delete(transactionMovement).where(eq(transactionMovement.id, mId)))
         }
       }
 
       for (const m of movementsToUpdate) {
-        await trx
+        statements.push(db
           .update(transactionMovement)
           .set({
             accountId: m.accountId,
@@ -888,22 +823,22 @@ export async function updateTransaction(
             balanceBefore: m.balanceBefore,
             balanceAfter: m.balanceAfter,
           })
-          .where(eq(transactionMovement.id, m.id))
+          .where(eq(transactionMovement.id, m.id)))
       }
 
       if (movementsToInsert.length > 0) {
-        await trx.insert(transactionMovement).values(movementsToInsert)
+        statements.push(db.insert(transactionMovement).values(movementsToInsert))
       }
 
       for (const [accountId, { delta, minCreatedAt }] of Object.entries(accountChanges)) {
         if (delta === 0) continue
 
-        await trx
+        statements.push(db
           .update(masjidAccount)
           .set({ balance: sql`${masjidAccount.balance} + ${delta}` })
-          .where(eq(masjidAccount.id, accountId))
+          .where(eq(masjidAccount.id, accountId)))
 
-        await trx
+        statements.push(db
           .update(transactionMovement)
           .set({
             balanceBefore: sql`${transactionMovement.balanceBefore} + ${delta}`,
@@ -914,10 +849,10 @@ export async function updateTransaction(
               eq(transactionMovement.accountId, accountId),
               sql`${transactionMovement.createdAt} > ${formatDbDate(minCreatedAt)}`
             )
-          )
+          ))
       }
 
-      await trx
+      statements.push(db
         .update(transaction)
         .set({
           transactionNo,
@@ -927,14 +862,14 @@ export async function updateTransaction(
           categoryId: 'categoryId' in data ? data.categoryId : null,
           description: data.description,
           notes: data.notes ?? null,
-          proofStoragePath: data.proofStoragePath ?? null,
-          proofPublicUrl: data.proofPublicUrl ?? null,
+          proofStoragePath: tx.proofStoragePath,
+          proofPublicUrl: null,
           updatedBy: userId,
-          updatedAt: sql`CURRENT_TIMESTAMP`,
+          updatedAt: sql`(unixepoch('subsec') * 1000)`,
         })
-        .where(eq(transaction.id, transactionId))
+        .where(and(eq(transaction.id, transactionId), eq(transaction.organizationId, orgId))))
 
-      await trx.insert(auditLog).values({
+      statements.push(db.insert(auditLog).values({
         id: crypto.randomUUID(),
         organizationId: orgId,
         actorUserId: userId,
@@ -953,8 +888,9 @@ export async function updateTransaction(
           amount: data.amount,
           description: data.description,
         },
-      })
-    })
+      }))
+      await db.batch(statements)
+    }
 
     revalidatePath('/transactions')
     revalidatePath('/dashboard')

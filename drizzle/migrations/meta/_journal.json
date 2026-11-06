@@ -1,12 +1,19 @@
 {
   "version": "7",
-  "dialect": "postgresql",
+  "dialect": "sqlite",
   "entries": [
     {
       "idx": 0,
-      "version": "7",
-      "when": 1782026915337,
-      "tag": "0000_groovy_archangel",
+      "version": "6",
+      "when": 1793951030153,
+      "tag": "0000_initial_d1",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793953371131,
+      "tag": "0001_tan_steel_serpent",
       "breakpoints": true
     }
   ]

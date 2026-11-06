@@ -5,9 +5,7 @@ import NextImage from 'next/image'
 import { Camera, Loader2 } from 'lucide-react'
 
 export interface ProofUploadResult {
-  fileId: string
-  webViewLink: string
-  webContentLink: string
+  file: File
 }
 
 interface ProofUploadProps {
@@ -78,25 +76,9 @@ export function ProofUpload({ onUploaded, onClear, initialPreview }: ProofUpload
       const compressed = await compressImage(file)
       const compressedFile = new File([compressed], 'bukti.webp', { type: 'image/webp' })
 
-      const fd = new FormData()
-      fd.append('file', compressedFile)
-
-      const res = await fetch('/api/upload-proof', {
-        method: 'POST',
-        body: fd,
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.error ?? 'Upload gagal')
-        setPreview(null)
-        return
-      }
-
-      onUploaded(data as ProofUploadResult)
+      onUploaded({ file: compressedFile })
     } catch {
-      setError('Upload gagal. Periksa koneksi internet.')
+      setError('Gagal memproses gambar. Silakan coba lagi.')
       setPreview(null)
     } finally {
       setUploading(false)

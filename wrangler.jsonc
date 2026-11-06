@@ -1,0 +1,40 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "masjid-journal",
+  "main": "worker.ts",
+  "compatibility_date": "2026-11-06",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "nodejs_compat_populate_process_env"
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "masjid-journal",
+      "database_id": "ea4c96b6-0d5f-4036-88c3-bd93adfb81a5",
+      "migrations_dir": "drizzle/migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "PROOF_BUCKET",
+      "bucket_name": "masjid-journal-proofs"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "LEDGER_COORDINATOR",
+        "class_name": "LedgerCoordinator"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "LedgerCoordinator"
+      ]
+    }
+  ]
+}

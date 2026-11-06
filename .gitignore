@@ -44,3 +44,8 @@ public/sw.js
 public/sw.js.map
 public/swe-worker-*.js
 public/swe-worker-*.js.map
+.vinext/
+.cloudflare/
+.wrangler/
+worker-configuration.d.ts
+public/sw.mjs

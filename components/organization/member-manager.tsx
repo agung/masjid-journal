@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, X, Eye, EyeOff, Trash2, Edit2, Copy, Check } from 'lucide-react'
-import { addMemberAction, updateMemberRoleAction, removeMemberAction } from '@/lib/server/organizations'
+import { Plus, X, Trash2, Edit2, Copy, Check } from 'lucide-react'
+import { updateMemberRoleAction, removeMemberAction } from '@/lib/server/organizations'
 import { createInvitationAction, cancelInvitationAction } from '@/lib/server/invitations'
 import type { Role } from '@/lib/auth/roles'
 import { Input } from '@/components/ui/input'
@@ -67,9 +67,7 @@ export function MemberManager({
   const [inviteMode, setInviteMode] = useState<'link' | 'manual'>('link')
   const [formName, setFormName] = useState('')
   const [formEmail, setFormEmail] = useState('')
-  const [formPassword, setFormPassword] = useState('')
   const [formRole, setFormRole] = useState<Role>('treasurer')
-  const [showPassword, setShowPassword] = useState(false)
 
   // Newly generated link display
   const [generatedLink, setGeneratedLink] = useState<string | null>(null)
@@ -98,9 +96,7 @@ export function MemberManager({
     setGeneratedLink(null)
     setFormName('')
     setFormEmail('')
-    setFormPassword('')
     setFormRole('treasurer')
-    setShowPassword(false)
     setIsConfirmingDelete(false)
     setIsSheetOpen(true)
   }
@@ -111,9 +107,7 @@ export function MemberManager({
     setEditingMember(m)
     setFormName(m.userName)
     setFormEmail(m.userEmail)
-    setFormPassword('')
     setFormRole(m.role as Role)
-    setShowPassword(false)
     setIsConfirmingDelete(false)
     setIsSheetOpen(true)
   }
@@ -146,46 +140,18 @@ export function MemberManager({
         )
         closeSheet()
         router.refresh()
-      } else if (inviteMode === 'link') {
-        // Create invitation link
-        const res = await createInvitationAction({
-          role: formRole,
-        })
-
-        if (!res.success) {
-          setError(res.error)
-          return
-        }
-
-        // Show generated link in success state inside sheet
-        const link = `${window.location.origin}/register?invite_token=${res.token}`
-        setGeneratedLink(link)
-        
-        // Refresh local invitations and server page
-        router.refresh()
-        // Wait briefly for server data to sync, then optimistically insert or let refresh handle it
-        setTimeout(() => {
-          router.refresh()
-        }, 100)
       } else {
-        // Add new member manually
-        const res = await addMemberAction({
-          name: formName,
-          email: formEmail,
-          password: formPassword,
+        const res = await createInvitationAction({
+          email: inviteMode === 'manual' ? formEmail : undefined,
           role: formRole,
         })
-
         if (!res.success) {
           setError(res.error)
           return
         }
-        
-        closeSheet()
+        setGeneratedLink(`${window.location.origin}/register?invite_token=${res.token}`)
         router.refresh()
-        setTimeout(() => {
-          router.refresh()
-        }, 100)
+        setTimeout(() => router.refresh(), 100)
       }
     } catch {
       setError('Terjadi kesalahan. Silakan coba lagi.')
@@ -506,7 +472,7 @@ export function MemberManager({
                       : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                   }`}
                 >
-                  Daftarkan Manual
+                  Undang dengan Email
                 </button>
               </div>
             )}
@@ -520,32 +486,14 @@ export function MemberManager({
                   <p>
                     Sistem akan membuat link pendaftaran unik untuk peran yang Anda pilih di bawah.
                   </p>
-                  <p>
-                    Calon pengurus dapat mendaftar dengan **email bebas** pilihan mereka sendiri, atau langsung menggunakan **Google SSO**.
-                  </p>
+                  <p>Pengurus akan membuat akun Clerk dengan email terverifikasi pilihan mereka.</p>
                   <p className="font-medium text-blue-700 dark:text-blue-300">
-                    Satu link hanya dapat digunakan oleh satu pengguna (1 link = 1 akun sukses).
+                    Link hanya dapat digunakan satu kali dan berlaku selama 7 hari.
                   </p>
                 </div>
               ) : (
                 /* Manual registration inputs */
                 <>
-                  {/* Name Input */}
-                  <div className="space-y-1.5">
-                    <label htmlFor="fullName" className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">
-                      Nama Lengkap
-                    </label>
-                    <Input
-                      id="fullName"
-                      type="text"
-                      value={formName}
-                      onChange={(e) => setFormName(e.target.value)}
-                      placeholder="Contoh: Ahmad Hidayat"
-                      required
-                      disabled={isSubmitting}
-                    />
-                  </div>
-
                   {/* Email Input */}
                   <div className="space-y-1.5">
                     <label htmlFor="emailAddress" className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">
@@ -562,33 +510,6 @@ export function MemberManager({
                     />
                   </div>
 
-                  {/* Password Input */}
-                  <div className="space-y-1.5">
-                    <label htmlFor="memberPass" className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">
-                      Password Login
-                    </label>
-                    <div className="relative">
-                      <Input
-                        id="memberPass"
-                        type={showPassword ? 'text' : 'password'}
-                        value={formPassword}
-                        onChange={(e) => setFormPassword(e.target.value)}
-                        placeholder="Minimal 8 karakter"
-                        required
-                        minLength={8}
-                        disabled={isSubmitting}
-                        className="pr-10"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-                        tabIndex={-1}
-                      >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                      </button>
-                    </div>
-                  </div>
                 </>
               )
             ) : (
@@ -638,7 +559,7 @@ export function MemberManager({
             <div className="flex flex-col gap-2 pt-4 border-t dark:border-gray-800">
               <button
                 type="submit"
-                disabled={isSubmitting || (!editingMember && inviteMode === 'manual' && (!formName || !formEmail || formPassword.length < 8))}
+                disabled={isSubmitting || (!editingMember && inviteMode === 'manual' && !formEmail)}
                 className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-semibold rounded-xl text-sm transition-colors shadow-sm flex items-center justify-center gap-1.5"
               >
                 {isSubmitting 
@@ -647,7 +568,7 @@ export function MemberManager({
                     ? 'Simpan Perubahan' 
                     : inviteMode === 'link' 
                       ? 'Buat Link Undangan' 
-                      : 'Simpan Anggota Baru'
+                      : 'Buat Undangan Email'
                 }
               </button>
 

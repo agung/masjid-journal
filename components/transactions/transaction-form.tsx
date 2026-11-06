@@ -38,11 +38,7 @@ export function TransactionForm({ accounts, categories, userRole, userId, transa
   const [type, setType] = useState<TransactionType | null>(transaction ? (transaction.type as TransactionType) : null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [proof, setProof] = useState<ProofUploadResult | null>(
-    transaction?.proofStoragePath
-      ? { fileId: transaction.proofStoragePath, webViewLink: transaction.proofPublicUrl ?? '', webContentLink: '' }
-      : null
-  )
+  const [proof, setProof] = useState<ProofUploadResult | null>(null)
   const [categoryId, setCategoryId] = useState(transaction?.categoryId ?? '')
   const [sourceAccountId, setSourceAccountId] = useState(
     transaction?.movements?.find((m) => m.direction === 'out')?.accountId ?? ''
@@ -112,8 +108,6 @@ export function TransactionForm({ accounts, categories, userRole, userId, transa
         description: get('description'),
         transactionDate: get('transactionDate'),
         notes: get('notes') || undefined,
-        proofStoragePath: proof?.fileId,
-        proofPublicUrl: proof?.webViewLink,
       } as const
 
       let finalSourceAccountId = sourceAccountId
@@ -151,6 +145,17 @@ export function TransactionForm({ accounts, categories, userRole, userId, transa
       if (!result.success) {
         setError(result.error)
         return
+      }
+
+      if (proof?.file) {
+        const fd = new FormData()
+        fd.append('file', proof.file)
+        fd.append('transactionId', transaction?.id ?? (('id' in result ? result.id : '') as string))
+        const upload = await fetch('/api/upload-proof', { method: 'POST', body: fd })
+        if (!upload.ok) {
+          const uploadResult = await upload.json().catch((): { error?: string } => ({})) as { error?: string }
+          setError(`Transaksi tersimpan, tetapi bukti gagal diunggah. ${uploadResult.error ?? 'Silakan edit transaksi untuk mencoba lagi.'}`)
+        }
       }
 
       if (transaction) {
@@ -455,7 +460,7 @@ export function TransactionForm({ accounts, categories, userRole, userId, transa
       <ProofUpload
         onUploaded={(result) => setProof(result)}
         onClear={() => setProof(null)}
-        initialPreview={transaction?.proofPublicUrl}
+        initialPreview={transaction?.proofStoragePath ? `/api/proofs/${encodeURIComponent(transaction.proofStoragePath)}` : null}
       />
 
       <button

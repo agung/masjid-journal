@@ -2,6 +2,8 @@ import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { updateOrganizationNameAction } from '@/lib/server/organizations'
 import { redirect } from 'next/navigation'
 
+export const dynamic = 'force-dynamic'
+
 export default async function OrganizationSettingsPage({
   searchParams,
 }: {

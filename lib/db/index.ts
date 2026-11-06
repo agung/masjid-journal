@@ -1,84 +1,21 @@
-import { drizzle as drizzlePg } from 'drizzle-orm/postgres-js'
-import { drizzle as drizzleMysql } from 'drizzle-orm/mysql2'
-import postgres from 'postgres'
-import mysql from 'mysql2/promise'
-import * as schemaPg from '@/drizzle/schema.pg'
-import * as schemaMysql from '@/drizzle/schema.mysql'
+import { drizzle } from 'drizzle-orm/d1'
+import * as schema from '@/drizzle/schema.sqlite'
+import { getRuntimeEnv } from '@/lib/env'
 
-const dbUrl = process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/masjid_journal'
-
-if (!process.env.DATABASE_URL && process.env.NODE_ENV === 'production') {
-  console.warn('DATABASE_URL is not set')
+// D1 bindings are request/runtime scoped. Do not construct a database client at
+// module initialization time or cache a binding between Worker invocations.
+export function getDb() {
+  return drizzle(getRuntimeEnv().DB, { schema })
 }
 
-const isMysql = dbUrl.startsWith('mysql:')
+// Existing server modules import `db`; this proxy resolves the D1 binding only
+// when a query builder method is accessed, keeping imports safe during builds.
+export const db = new Proxy({} as ReturnType<typeof getDb>, {
+  get(_target, property) {
+    const instance = getDb()
+    const value = Reflect.get(instance, property, instance)
+    return typeof value === 'function' ? value.bind(instance) : value
+  },
+})
 
-// Prevent multiple instances in development due to HMR
-const globalForDb = global as typeof globalThis & {
-  pgClient: ReturnType<typeof postgres> | undefined
-  mysqlPool: mysql.Pool | undefined
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  dbInstance: any
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function initializeDatabase(): any {
-  if (globalForDb.dbInstance) return globalForDb.dbInstance
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let dbInstance: any
-
-  if (isMysql) {
-    // MySQL setup
-    const pool = globalForDb.mysqlPool ?? mysql.createPool({
-      uri: dbUrl,
-      connectionLimit: 10,
-      waitForConnections: true,
-      queueLimit: 0,
-    })
-
-    if (process.env.NODE_ENV !== 'production') {
-      globalForDb.mysqlPool = pool
-    }
-
-    dbInstance = drizzleMysql(pool, { schema: schemaMysql, mode: 'default' })
-  } else {
-    // PostgreSQL setup
-    const client = globalForDb.pgClient ?? postgres(dbUrl, {
-      max: 10,
-      idle_timeout: 20,
-      connect_timeout: 10,
-      ssl: dbUrl.includes('supabase.com') ? 'require' : false,
-    })
-
-    if (process.env.NODE_ENV !== 'production') {
-      globalForDb.pgClient = client
-    }
-
-    dbInstance = drizzlePg(client, { schema: schemaPg })
-  }
-
-  if (process.env.NODE_ENV !== 'production') {
-    globalForDb.dbInstance = dbInstance
-  }
-
-  return dbInstance
-}
-
-// db is typed as any to support both PostgreSQL and MySQL dialects at runtime.
-// The actual instance is correctly initialized based on DATABASE_URL.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const db = initializeDatabase() as any
-
-// Export a helper to get the current dialect
-export const getDialect = () => (isMysql ? 'mysql' : 'postgresql')
-
-/**
- * Format a Date for use in Drizzle WHERE clauses.
- * MySQL rejects ISO 8601 strings — convert to 'YYYY-MM-DD HH:MM:SS'.
- * PostgreSQL accepts Date objects directly.
- */
-export function formatDbDate(date: Date): string | Date {
-  if (!isMysql) return date
-  return date.toISOString().replace('T', ' ').slice(0, 19)
-}
+export function formatDbDate(date: Date): Date { return date }

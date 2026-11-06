@@ -9,6 +9,8 @@ interface AcceptInvitePageProps {
   searchParams: Promise<{ invite_token?: string }>
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function AcceptInvitePage({ searchParams }: AcceptInvitePageProps) {
   const { invite_token: token } = await searchParams
 
@@ -43,7 +45,7 @@ export default async function AcceptInvitePage({ searchParams }: AcceptInvitePag
     )
   }
 
-  // 3. Verify email matches logged-in user
+  // 3. Verify the invitation matches the verified Clerk email
   const loggedInEmail = session.user.email
   const invitedEmail = inviteRes.email
 

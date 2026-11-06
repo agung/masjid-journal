@@ -12,6 +12,8 @@ function parseLocalDate(dateStr: string): Date {
   return new Date(year, month - 1, day)
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function TransactionsPage({
   searchParams,
 }: {

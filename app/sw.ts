@@ -1,33 +1,19 @@
-import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist'
-import { Serwist, NetworkFirst, StaleWhileRevalidate } from 'serwist'
+import { clientsClaim } from 'workbox-core'
+import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching'
+import { registerRoute } from 'workbox-routing'
+import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies'
 
-// This declares the value of `injectionPoint` to TypeScript.
-declare global {
-  interface ServiceWorkerGlobalScope extends SerwistGlobalConfig {
-    __SW_MANIFEST: (PrecacheEntry | string)[] | undefined
-  }
+declare const self: {
+  __WB_MANIFEST: Array<{ url: string; revision?: string }>
+  addEventListener(type: 'message', listener: (event: MessageEvent) => void): void
+  skipWaiting(): Promise<void>
 }
 
-declare const self: ServiceWorkerGlobalScope
-
-const serwist = new Serwist({
-  precacheEntries: self.__SW_MANIFEST,
-  skipWaiting: true,
-  clientsClaim: true,
-  navigationPreload: true,
-  runtimeCaching: [
-    {
-      matcher: ({ request }) => request.destination === 'document',
-      handler: new NetworkFirst(),
-    },
-    {
-      matcher: ({ request }) =>
-        request.destination === 'style' ||
-        request.destination === 'script' ||
-        request.destination === 'image',
-      handler: new StaleWhileRevalidate(),
-    },
-  ],
+clientsClaim()
+precacheAndRoute(self.__WB_MANIFEST)
+cleanupOutdatedCaches()
+registerRoute(({ request }) => request.mode === 'navigate', new NetworkFirst())
+registerRoute(({ request }) => ['style', 'script', 'image'].includes(request.destination), new StaleWhileRevalidate())
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting()
 })
-
-serwist.addEventListeners()

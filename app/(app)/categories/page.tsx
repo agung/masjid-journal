@@ -3,6 +3,8 @@ import { listCategories } from '@/lib/server/categories'
 import { CategoryManager } from '@/components/categories/category-manager'
 import { PERMISSIONS } from '@/lib/auth/roles'
 
+export const dynamic = 'force-dynamic'
+
 export default async function CategoriesPage() {
   const ctx = await getActiveOrganizationContext()
   const orgId = ctx.activeOrganizationId
