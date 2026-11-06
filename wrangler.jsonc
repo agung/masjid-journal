@@ -7,6 +7,15 @@
     "nodejs_compat",
     "nodejs_compat_populate_process_env"
   ],
+  "vars": {
+    "NEXT_PUBLIC_APP_URL": "https://masjidku.nugs.web.id"
+  },
+  "routes": [
+    {
+      "pattern": "masjidku.nugs.web.id",
+      "custom_domain": true
+    }
+  ],
   "d1_databases": [
     {
       "binding": "DB",
