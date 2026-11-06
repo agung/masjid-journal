@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { AppLogo } from '@/components/ui/app-logo'
+import { UserButton } from '@clerk/react'
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -52,6 +53,7 @@ export function TopBar({ orgName }: { orgName?: string }) {
             <p className="text-xs text-gray-500 truncate -mt-0.5 dark:text-gray-400">{orgName}</p>
           )}
         </div>
+        <UserButton />
       </div>
     </header>
   )

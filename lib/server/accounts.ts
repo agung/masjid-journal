@@ -51,6 +51,8 @@ export async function listAccounts(organizationId: string) {
       balance: masjidAccount.balance,
       isActive: masjidAccount.isActive,
       createdAt: masjidAccount.createdAt,
+      updatedAt: masjidAccount.updatedAt,
+      createdBy: masjidAccount.createdBy,
     })
     .from(masjidAccount)
     .where(eq(masjidAccount.organizationId, organizationId))
@@ -88,7 +90,7 @@ export async function createCashHolder(
       balance,
       isActive: true,
       createdBy: session.user.id,
-      updatedAt: sql`CURRENT_TIMESTAMP`,
+      updatedAt: sql`(unixepoch('subsec') * 1000)`,
     })
 
     revalidatePath('/accounts')
@@ -123,7 +125,7 @@ export async function createBankAccount(
       balance,
       isActive: true,
       createdBy: session.user.id,
-      updatedAt: sql`CURRENT_TIMESTAMP`,
+      updatedAt: sql`(unixepoch('subsec') * 1000)`,
     })
 
     revalidatePath('/accounts')
@@ -159,7 +161,7 @@ export async function updateAccount(
 
     await db
       .update(masjidAccount)
-      .set({ ...validated.data, updatedAt: sql`CURRENT_TIMESTAMP` })
+      .set({ ...validated.data, updatedAt: sql`(unixepoch('subsec') * 1000)` })
       .where(eq(masjidAccount.id, accountId))
 
     revalidatePath('/accounts')
@@ -191,7 +193,7 @@ export async function toggleAccountActive(
 
     await db
       .update(masjidAccount)
-      .set({ isActive, updatedAt: sql`CURRENT_TIMESTAMP` })
+      .set({ isActive, updatedAt: sql`(unixepoch('subsec') * 1000)` })
       .where(and(eq(masjidAccount.id, accountId), eq(masjidAccount.organizationId, orgId)))
 
     revalidatePath('/accounts')

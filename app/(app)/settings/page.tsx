@@ -1,8 +1,10 @@
 import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import Link from 'next/link'
-import { ChevronRight, Users, Building2, Tag, Wallet, UserCircle, HardDrive, SunMoon } from 'lucide-react'
+import { ChevronRight, Users, Building2, Tag, Wallet, UserCircle, SunMoon } from 'lucide-react'
 import { LogoutButton } from '@/components/auth/logout-button'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+
+export const dynamic = 'force-dynamic'
 
 export default async function SettingsPage() {
   const ctx = await getActiveOrganizationContext()
@@ -48,7 +50,6 @@ export default async function SettingsPage() {
         )}
 
         <SettingsSection title="Sistem">
-          <SettingsItem href="/settings/drive" icon={HardDrive} label="Penyimpanan Bukti" />
           <div className="flex items-center justify-between px-4 py-3.5 border-b last:border-b-0">
             <div className="flex items-center gap-3">
               <SunMoon size={18} className="text-gray-500 dark:text-gray-400" />

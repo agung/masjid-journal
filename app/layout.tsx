@@ -3,6 +3,8 @@ import { Poppins, Reem_Kufi } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { SplashScreen } from '@/components/ui/splash-screen'
+import { ClerkProvider } from '@/components/providers/clerk-provider'
+import { env } from 'cloudflare:workers'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -55,10 +57,12 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${poppins.variable} ${reemKufi.variable}`} suppressHydrationWarning>
       <body className="font-sans antialiased">
-        <ThemeProvider>
+        <ClerkProvider publishableKey={env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
+          <ThemeProvider>
           <SplashScreen />
           {children}
-        </ThemeProvider>
+          </ThemeProvider>
+        </ClerkProvider>
       </body>
     </html>
   )

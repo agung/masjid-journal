@@ -4,6 +4,8 @@ import { listCategories } from '@/lib/server/categories'
 import { TransactionForm } from '@/components/transactions/transaction-form'
 import type { MasjidAccount, Category } from '@/drizzle/schema'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewTransactionPage() {
   const session = await requireRole('treasurer')
   const orgId = session.activeOrganizationId!

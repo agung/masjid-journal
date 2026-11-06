@@ -8,6 +8,8 @@ import { Plus } from 'lucide-react'
 import { AppLogo } from '@/components/ui/app-logo'
 import { CreateOrganizationForm } from '@/components/organization/create-organization-form'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const ctx = await getActiveOrganizationContext()
 

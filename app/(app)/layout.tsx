@@ -19,3 +19,4 @@ export default async function AppLayout({
     </div>
   )
 }
+export const dynamic = 'force-dynamic'

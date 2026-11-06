@@ -2,18 +2,19 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { signOut } from '@/lib/auth-client'
+import { useClerk } from '@clerk/react'
 import { LogOut, Loader2 } from 'lucide-react'
 
 export function LogoutButton() {
   const router = useRouter()
+  const { signOut } = useClerk()
   const [loading, setLoading] = useState(false)
 
   async function handleLogout() {
     if (loading) return
     setLoading(true)
     try {
-      await signOut()
+      await signOut({ redirectUrl: '/sign-in' })
       router.push('/login')
       router.refresh()
     } catch {

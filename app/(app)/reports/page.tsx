@@ -2,6 +2,8 @@ import { getActiveOrganizationContext } from '@/lib/auth/guards'
 import { getMonthlyReport } from '@/lib/server/reports'
 import { ReportContainer } from '@/components/reports/report-container'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ReportsPage({
   searchParams,
 }: {
