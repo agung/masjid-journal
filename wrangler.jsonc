@@ -11,7 +11,7 @@
     {
       "binding": "DB",
       "database_name": "masjid-journal",
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_id": "ea4c96b6-0d5f-4036-88c3-bd93adfb81a5",
       "migrations_dir": "drizzle/migrations"
     }
   ],
@@ -33,8 +33,7 @@
     {
       "tag": "v1",
       "new_sqlite_classes": [
-        "LedgerCoordinator",
-        "CacheMetadata"
+        "LedgerCoordinator"
       ]
     }
   ]

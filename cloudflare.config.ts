@@ -18,7 +18,7 @@ export default defineConfig({
     env: {
       ...responseStore.env,
       ASSETS: bindings.assets(),
-      DB: bindings.d1({ name: 'masjid-journal', id: 'REPLACE_WITH_D1_DATABASE_ID' }),
+      DB: bindings.d1({ name: 'masjid-journal', id: 'ea4c96b6-0d5f-4036-88c3-bd93adfb81a5' }),
       PROOF_BUCKET: bindings.r2({ name: 'masjid-journal-proofs' }),
       LEDGER_COORDINATOR: bindings.durableObject({ worker: 'masjid-journal', exportName: 'LedgerCoordinator' }),
     },
