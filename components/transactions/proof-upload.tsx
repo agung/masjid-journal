@@ -49,7 +49,7 @@ async function compressImage(file: File): Promise<Blob> {
 
   const url = URL.createObjectURL(source)
   try {
-    const img = new Image()
+    const img = document.createElement('img')
     img.src = url
     await img.decode()
     const maxDimension = 2048
