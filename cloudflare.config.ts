@@ -9,6 +9,8 @@ export default defineConfig({
     entrypoint: 'worker.ts',
     compatibilityDate: '2026-11-06',
     compatibilityFlags: ['nodejs_compat'],
+    workersDev: true,
+    previewUrls: true,
     domains: ['masjidku.nugs.web.id'],
     observability: {
       issues: { enabled: true },
