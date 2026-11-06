@@ -324,6 +324,7 @@ export async function listTransactionMovements({
       description: transaction.description,
       notes: transaction.notes,
       proofPublicUrl: transaction.proofPublicUrl,
+      proofStoragePath: transaction.proofStoragePath,
       categoryId: transaction.categoryId,
       createdBy: transaction.createdBy,
     })

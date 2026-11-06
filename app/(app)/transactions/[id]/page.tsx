@@ -5,7 +5,6 @@ import { formatRupiah, formatDate } from '@/lib/formatters'
 import { TRANSACTION_TYPE_CONFIG } from '@/lib/transaction-icons'
 import { notFound } from 'next/navigation'
 import { Wallet, Landmark, Pencil, Clock } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { hasMinRole } from '@/lib/auth/roles'
 import { DeleteTransactionButton } from '@/components/transactions/delete-transaction-button'
@@ -50,6 +49,9 @@ export default async function TransactionDetailPage({ params }: Props) {
   const freshProofUrl =
     (await getProofSignedUrl(tx.proofStoragePath)) ??
     embeddableProofUrl(tx.proofPublicUrl)
+  const proofExtension = (tx.proofStoragePath ?? freshProofUrl ?? '').split(/[?#]/)[0].split('.').pop()?.toLowerCase() ?? ''
+  const proofIsPdf = proofExtension === 'pdf'
+  const proofIsDocument = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'rtf'].includes(proofExtension)
 
   const userRole = ctx.role
   const isWithin1Hour = (Date.now() - tx.createdAt.getTime()) < 60 * 60 * 1000
@@ -159,25 +161,29 @@ export default async function TransactionDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Proof image */}
+      {/* Transaction proof */}
       {freshProofUrl && (
         <div className="mb-4">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 dark:text-gray-400">Bukti Transaksi</h2>
-          <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border bg-gray-50 dark:bg-gray-900">
-            <Image
-              src={freshProofUrl}
-              alt="Bukti transaksi"
-              fill
-              className="object-contain"
-            />
-          </div>
+          {proofIsPdf ? (
+            <iframe src={freshProofUrl} title="Bukti transaksi PDF" className="w-full h-[min(70vh,640px)] rounded-xl border bg-white" />
+          ) : proofIsDocument ? (
+            <div className="flex items-center gap-3 rounded-xl border p-4 bg-gray-50 dark:bg-gray-900">
+              <span className="text-green-600 text-sm font-bold uppercase">{proofExtension}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">Dokumen bukti transaksi</span>
+            </div>
+          ) : (
+            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border bg-gray-50 dark:bg-gray-900">
+              <img src={freshProofUrl} alt="Bukti transaksi" className="absolute inset-0 w-full h-full object-contain" />
+            </div>
+          )}
           <a
             href={freshProofUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-2 text-xs text-green-600 hover:underline"
           >
-            Buka gambar penuh ↗
+            {proofIsDocument ? 'Unduh dokumen' : proofIsPdf ? 'Buka PDF penuh ↗' : 'Buka gambar penuh ↗'}
           </a>
         </div>
       )}
