@@ -9,6 +9,10 @@ export default defineConfig({
     entrypoint: 'worker.ts',
     compatibilityDate: '2026-11-06',
     compatibilityFlags: ['nodejs_compat'],
+    domains: ['masjidku.nugs.web.id'],
+    observability: {
+      issues: { enabled: true },
+    },
     assets: {
       htmlHandling: 'none',
       notFoundHandling: 'none',
@@ -17,6 +21,9 @@ export default defineConfig({
     ...responseStore,
     env: {
       ...responseStore.env,
+      NEXT_PUBLIC_APP_URL: { type: 'text', value: 'https://masjidku.nugs.web.id' },
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: bindings.secret(),
+      CLERK_SECRET_KEY: bindings.secret(),
       ASSETS: bindings.assets(),
       DB: bindings.d1({ name: 'masjid-journal', id: 'ea4c96b6-0d5f-4036-88c3-bd93adfb81a5' }),
       PROOF_BUCKET: bindings.r2({ name: 'masjid-journal-proofs' }),
