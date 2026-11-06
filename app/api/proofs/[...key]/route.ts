@@ -17,5 +17,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   if (!membership) return new Response('Forbidden', { status: 403 })
   const object = await env.PROOF_BUCKET.get(key)
   if (!object) return new Response('Not found', { status: 404 })
-  return new Response(object.body, { headers: { 'Content-Type': object.httpMetadata?.contentType ?? 'application/octet-stream', 'Cache-Control': 'private, no-store', 'ETag': object.httpEtag } })
+  const contentType = object.httpMetadata?.contentType ?? 'application/octet-stream'
+  const extension = key.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin'
+  const disposition = contentType.startsWith('image/') || contentType === 'application/pdf' ? 'inline' : 'attachment'
+  return new Response(object.body, { headers: {
+    'Content-Type': contentType,
+    'Content-Disposition': `${disposition}; filename="bukti.${extension}"`,
+    'X-Content-Type-Options': 'nosniff',
+    'Cache-Control': 'private, no-store',
+    'ETag': object.httpEtag,
+  } })
 }
