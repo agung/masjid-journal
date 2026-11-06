@@ -18,8 +18,10 @@ export default async function ReportsPage({
 
   const { month, year } = await searchParams
   const now = new Date()
-  const pYear = year ? parseInt(year as string, 10) : now.getFullYear()
-  const pMonth = month ? parseInt(month as string, 10) : now.getMonth() + 1
+  const currentYear = now.getFullYear()
+  const currentMonth = now.getMonth() + 1
+  const pYear = year ? parseInt(year as string, 10) : currentYear
+  const pMonth = month ? parseInt(month as string, 10) : currentMonth
 
   const report = await getMonthlyReport(orgId, pYear, pMonth)
 
@@ -35,6 +37,8 @@ export default async function ReportsPage({
         report={report}
         pYear={pYear}
         pMonth={pMonth}
+        currentYear={currentYear}
+        currentMonth={currentMonth}
         monthLabel={monthLabel}
       />
     </div>

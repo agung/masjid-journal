@@ -34,6 +34,8 @@ interface ReportContainerProps {
   report: MonthlyReport
   pYear: number
   pMonth: number
+  currentYear: number
+  currentMonth: number
   monthLabel: string
 }
 
@@ -42,6 +44,8 @@ export function ReportContainer({
   report,
   pYear,
   pMonth,
+  currentYear,
+  currentMonth,
   monthLabel,
 }: ReportContainerProps) {
   const router = useRouter()
@@ -75,9 +79,9 @@ export function ReportContainer({
     })
   }
 
-  // Pre-calculate month tabs relative to selectedYear/selectedMonth
+  // Keep month navigation anchored to the current calendar month.
   const tabs = [-2, -1, 0].map((offset) => {
-    const d = new Date(pYear, pMonth - 1 + offset)
+    const d = new Date(currentYear, currentMonth - 1 + offset)
     const y = d.getFullYear()
     const m = d.getMonth() + 1
     const label = d.toLocaleString('id-ID', { month: 'short', year: 'numeric' })
