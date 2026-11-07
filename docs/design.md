@@ -31,6 +31,8 @@ Layout aplikasi memakai top bar, lebar konten yang nyaman di perangkat mobile, d
 - Nominal memakai format Rupiah dan tidak boleh mengandalkan warna saja untuk menunjukkan arah.
 - Card ledger menampilkan tanggal, nomor transaksi, tipe, akun, nominal, saldo sebelum, dan saldo sesudah.
 - Bukti foto memakai `object-contain` agar seluruh dokumen terlihat. PDF memakai viewer; dokumen lain memakai card file dan aksi unduh.
+- Avatar di top bar hanya menampilkan foto pengguna tanpa popover. Pengaturan akun memakai card dan tab Profil/Keamanan aplikasi; panel komposabel Clerk mempertahankan pengelolaan avatar, email, akun sosial, password, passkey, MFA, dan sesi. Field, menu popover, card keamanan, checkbox kotak, dan tombol Clerk mengikuti warna, radius, border, dan focus style proyek.
+- Halaman login dan register memakai satu layout mobile-first satu kolom pada semua ukuran layar, dengan logo horizontal di atas wrapper Clerk tanpa shadow, radius `rounded-xl`, dan border yang melingkupi form, tautan pergantian akun, serta footer Clerk. Light dan dark mode mengikuti warna permukaan aplikasi. Field Clerk mengikuti ukuran, padding, warna, radius, dan focus ring komponen `Input`; tombol utama dan tombol provider menjaga kontras teks dan border di kedua tema. Form mempertahankan provider sosial, validasi, verifikasi, pergantian akun, dan pemulihan password; teks Clerk menggunakan lokalisasi Indonesia.
 - Loading halaman memakai skeleton. Mutation menonaktifkan aksi dan menampilkan status proses.
 - Empty state menjelaskan keadaan dan memberi aksi berikutnya bila relevan.
 

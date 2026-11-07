@@ -47,5 +47,6 @@ public/swe-worker-*.js.map
 .vinext/
 .cloudflare/
 .wrangler/
+.superdesign/tmp/
 worker-configuration.d.ts
 public/sw.mjs
