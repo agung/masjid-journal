@@ -19,7 +19,7 @@ flowchart LR
 | Komponen | Tanggung jawab |
 | --- | --- |
 | Next.js/vinext | Routing, rendering, Server Actions, dan route API |
-| Clerk | Sign-in, sign-up, OAuth, sesi, dan identitas eksternal |
+| Clerk | Sign-in, sign-up, OAuth, pemulihan password, verifikasi, sesi, dan identitas eksternal |
 | D1 | User internal, organisasi, anggota, akun, kategori, transaksi, movement, dan audit log |
 | R2 `masjid-journal-proofs` | Bukti transaksi privat |
 | Durable Object `LedgerCoordinator` | Mengurutkan mutation ledger per organisasi |
@@ -27,7 +27,9 @@ flowchart LR
 
 ## Model identitas dan organisasi
 
-Clerk menjadi sumber autentikasi. Setelah token valid, aplikasi mencari user D1 melalui `clerk_id`; jika belum terhubung, email Clerk yang terverifikasi dipakai untuk menghubungkan user lama. ID user D1 tetap menjadi identitas internal agar membership dan data hasil migrasi tetap utuh.
+Clerk menjadi sumber autentikasi, termasuk pemulihan password dan verifikasi melalui komponen Clerk berlokalisasi Indonesia. Halaman auth memberi appearance sesuai token UI proyek tanpa mengganti interaksi Clerk. Setelah token valid, aplikasi mencari user D1 melalui `clerk_id`; jika belum terhubung, email Clerk yang terverifikasi dipakai untuk menghubungkan user lama. ID user D1 tetap menjadi identitas internal agar membership dan data hasil migrasi tetap utuh.
+
+Avatar header memakai `UserAvatar` saja. Halaman pengaturan akun memakai panel komposabel Clerk di dalam tab dan card aplikasi. Appearance Clerk disesuaikan dengan token visual proyek. Panel akun tetap menyediakan pengelolaan profil, avatar, alamat email, dan akun sosial; panel keamanan menangani password, passkey, autentikasi dua faktor, dan sesi melalui Clerk.
 
 Setiap data bisnis membawa `organization_id`. Akses server harus memverifikasi membership aktif dan role sebelum membaca atau mengubah data. Hierarki role adalah `viewer < treasurer < admin < owner`.
 

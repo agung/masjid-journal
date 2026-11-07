@@ -18,6 +18,8 @@ npm run dev
 
 Vinext menjalankan aplikasi di runtime yang menyerupai Cloudflare Worker. Jangan mengganti akses binding dengan koneksi database Node biasa.
 
+Vite Cloudflare plugin memakai `.wrangler/state` agar D1 lokal yang dipakai `npm run dev` sama dengan target `npm run db:migrate:local`. Jika lokasi persistensi ini diubah di `vite.config.ts`, jalankan migrasi Wrangler dengan lokasi yang sama.
+
 ## Environment lokal
 
 Buat `.env.local` yang tidak di-commit:

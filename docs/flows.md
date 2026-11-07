@@ -2,12 +2,15 @@
 
 ## Autentikasi dan bootstrap user
 
-1. Pengguna sign-in atau sign-up melalui Clerk.
-2. Worker memvalidasi sesi Clerk dan authorized party.
-3. Aplikasi mencari user D1 berdasarkan Clerk ID.
-4. Jika belum ada, aplikasi mencoba menghubungkan user berdasarkan email terverifikasi; jika tidak ditemukan, user internal baru dibuat.
-5. Organisasi aktif dibaca dari user. Jika kosong, membership pertama menjadi fallback.
-6. Pengguna tanpa organisasi dapat membuat organisasi atau menerima undangan.
+1. Pengguna masuk atau mendaftar melalui halaman Clerk berbahasa Indonesia. Login menyediakan provider sosial, email/password, dan tautan pemulihan password dari Clerk.
+2. Jika lupa password, Clerk memverifikasi email dan kode pemulihan, lalu mengizinkan pengguna membuat password baru sebelum kembali ke login.
+3. Setelah autentikasi berhasil, Worker memvalidasi sesi Clerk dan authorized party.
+4. Aplikasi mencari user D1 berdasarkan Clerk ID.
+5. Jika belum ada, aplikasi mencoba menghubungkan user berdasarkan email terverifikasi; jika tidak ditemukan, user internal baru dibuat.
+6. Organisasi aktif dibaca dari user. Jika kosong, membership pertama menjadi fallback.
+7. Pengguna tanpa organisasi dapat membuat organisasi atau menerima undangan.
+
+Parameter undangan dipertahankan saat pengguna berpindah antara login dan register. Setelah login/register, redirect kembali menuju penerimaan undangan.
 
 ## Organisasi dan akses
 
@@ -58,6 +61,10 @@ Dashboard merangkum saldo dan aktivitas terbaru. Halaman laporan menghitung ring
 3. Penerima sign-in memakai email Clerk yang telah terverifikasi.
 4. Halaman penerimaan memastikan email cocok dengan undangan.
 5. Membership, status undangan, dan organisasi aktif diperbarui secara atomik.
+
+## Profil dan keamanan akun
+
+Top bar menampilkan avatar pengguna tanpa menu popover. Halaman `Pengaturan > Profil & Password` menyediakan dua tab dengan panel komposabel Clerk yang tampil di dalam card aplikasi. Tab Profil mempertahankan fitur Clerk untuk mengedit data, foto profil, alamat email termasuk penambahan dan verifikasi, serta akun sosial yang terhubung. Tab Keamanan mempertahankan fitur pengelolaan password, passkey, autentikasi dua faktor, dan sesi. Tampilan field dan tombol Clerk mengikuti appearance yang disesuaikan dengan tema aplikasi; operasional akun tetap dijalankan Clerk.
 
 ## Penghapusan
 

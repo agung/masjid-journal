@@ -7,7 +7,10 @@ import { responseStoreAdapter } from '@vinext/cloudflare/cache/response-store-ad
 export default defineConfig({
   plugins: [
     vinext({ cache: responseStoreAdapter({ mode: 'self-contained' }) }),
-    cloudflare({ viteEnvironment: { name: 'rsc', childEnvironments: ['ssr'] } }),
+    cloudflare({
+      persistState: { path: '.wrangler/state' },
+      viteEnvironment: { name: 'rsc', childEnvironments: ['ssr'] },
+    }),
     VitePWA({
       strategies: 'injectManifest',
       outDir: 'public',

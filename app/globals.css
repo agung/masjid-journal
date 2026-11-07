@@ -75,6 +75,272 @@
   }
 }
 
+@layer components {
+  .clerk-auth .cl-cardBox {
+    width: 100% !important;
+    margin-inline: auto !important;
+    border-radius: 0.75rem !important;
+    border: 1px solid hsl(var(--border)) !important;
+    background-color: #fff !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  .clerk-auth .cl-card {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .dark .clerk-auth .cl-cardBox {
+    border-color: hsl(var(--border)) !important;
+    background-color: #1c1c1c !important;
+  }
+
+  .dark .clerk-auth .cl-card {
+    background-color: transparent !important;
+  }
+
+  .clerk-auth .cl-socialButtonsBlockButton {
+    border: 1px solid #d1d5db !important;
+    background-color: #fff !important;
+    color: #374151 !important;
+    box-shadow: none !important;
+  }
+
+  .clerk-auth .cl-socialButtonsBlockButtonText {
+    color: inherit !important;
+  }
+
+  .clerk-auth .cl-formButtonPrimary {
+    background-color: #249361 !important;
+    color: #fff !important;
+    box-shadow: none !important;
+  }
+
+  .clerk-auth .cl-formButtonPrimary:hover {
+    background-color: #1b724a !important;
+  }
+
+  .dark .clerk-auth .cl-socialButtonsBlockButton {
+    border-color: #374151 !important;
+    background-color: #1f2937 !important;
+    color: #f3f4f6 !important;
+  }
+
+  .dark .clerk-auth .cl-socialButtonsBlockButton:hover {
+    background-color: #374151 !important;
+  }
+
+  .dark .clerk-auth .cl-formButtonPrimary {
+    background-color: #249361 !important;
+    color: #fff !important;
+  }
+
+  .dark .clerk-auth .cl-formButtonPrimary:hover {
+    background-color: #1b724a !important;
+  }
+
+  .clerk-auth .cl-formFieldInput:not([type="checkbox"]):not([type="radio"]) {
+    box-sizing: border-box !important;
+    height: 2.75rem !important;
+    min-height: 2.75rem !important;
+    padding: 0.625rem 0.75rem !important;
+    border: 1px solid hsl(var(--border)) !important;
+    border-radius: 0.75rem !important;
+    background-color: #fff !important;
+    color: #111827 !important;
+    font-family: inherit !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+    box-shadow: none !important;
+    transition: box-shadow 150ms, border-color 150ms !important;
+  }
+
+  .clerk-auth .cl-formFieldInput:not([type="checkbox"]):not([type="radio"])::placeholder {
+    color: #9ca3af !important;
+  }
+
+  .clerk-auth .cl-formFieldInput:not([type="checkbox"]):not([type="radio"]):focus {
+    border-color: transparent !important;
+    outline: 2px solid transparent !important;
+    outline-offset: 0;
+    box-shadow: 0 0 0 2px #3ecf8e !important;
+  }
+
+  .clerk-auth .cl-formFieldInput:-webkit-autofill,
+  .clerk-auth .cl-formFieldInput:-webkit-autofill:hover,
+  .clerk-auth .cl-formFieldInput:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+    -webkit-text-fill-color: #111827 !important;
+  }
+
+  .dark .clerk-auth .cl-formFieldInput:not([type="checkbox"]):not([type="radio"]) {
+    border-color: #1f2937 !important;
+    background-color: #111827 !important;
+    color: #f3f4f6 !important;
+  }
+
+  .dark .clerk-auth .cl-formFieldInput:-webkit-autofill,
+  .dark .clerk-auth .cl-formFieldInput:-webkit-autofill:hover,
+  .dark .clerk-auth .cl-formFieldInput:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #111827 inset !important;
+    -webkit-text-fill-color: #f3f4f6 !important;
+  }
+
+  .dark .clerk-auth .cl-formFieldInput:not([type="checkbox"]):not([type="radio"])::placeholder {
+    color: #6b7280 !important;
+  }
+
+  .clerk-profile .cl-actionCard {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.75rem !important;
+    background-color: #fff !important;
+    color: #111827 !important;
+    box-shadow: none !important;
+  }
+
+  .clerk-profile .cl-checkbox {
+    box-sizing: border-box !important;
+    width: 1rem !important;
+    min-width: 1rem !important;
+    height: 1rem !important;
+    min-height: 1rem !important;
+    padding: 0 !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    border: 1px solid #9ca3af !important;
+    border-radius: 0.25rem !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+  }
+
+  .clerk-profile .cl-checkbox:checked {
+    border-color: #249361 !important;
+    background-color: #249361 !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 8.5 3 3L13 4.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: 0.75rem !important;
+  }
+
+  .clerk-profile .cl-checkbox::before,
+  .clerk-profile .cl-checkbox::after {
+    content: none !important;
+    display: none !important;
+    background: none !important;
+    mask: none !important;
+    -webkit-mask: none !important;
+  }
+
+  .clerk-profile .cl-checkbox:focus-visible {
+    outline: 2px solid #249361 !important;
+    outline-offset: 2px !important;
+  }
+
+  .clerk-profile .cl-menuList {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.75rem !important;
+    background-color: #fff !important;
+    color: #111827 !important;
+    padding: 0.25rem !important;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+  }
+
+  .clerk-profile .cl-menuItem {
+    min-height: 2.75rem !important;
+    border-radius: 0.5rem !important;
+    padding: 0.5rem 0.75rem !important;
+    color: #374151 !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+  }
+
+  .clerk-profile .cl-menuItem:hover,
+  .clerk-profile .cl-menuItem:focus-visible {
+    background-color: #f3f4f6 !important;
+    color: #1b724a !important;
+  }
+
+  .clerk-profile .cl-formFieldInput:not([type="checkbox"]):not([type="radio"]) {
+    box-sizing: border-box !important;
+    height: 2.75rem !important;
+    min-height: 2.75rem !important;
+    padding: 0.625rem 0.75rem !important;
+    border: 1px solid hsl(var(--input)) !important;
+    border-radius: 0.75rem !important;
+    background-color: #fff !important;
+    color: #111827 !important;
+    font-family: inherit !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+    box-shadow: none !important;
+    transition: box-shadow 150ms, border-color 150ms !important;
+  }
+
+  .clerk-profile .cl-formFieldInput:not([type="checkbox"]):not([type="radio"])::placeholder {
+    color: #9ca3af !important;
+  }
+
+  .clerk-profile .cl-formFieldInput:not([type="checkbox"]):not([type="radio"]):focus {
+    border-color: transparent !important;
+    outline: 2px solid transparent !important;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px #249361 !important;
+  }
+
+  .clerk-profile .cl-formFieldInput:not([type="checkbox"]):not([type="radio"]):disabled {
+    background-color: #f3f4f6 !important;
+    color: #9ca3af !important;
+  }
+
+  .dark .clerk-profile .cl-formFieldInput:not([type="checkbox"]):not([type="radio"]) {
+    border-color: #1f2937 !important;
+    background-color: #111827 !important;
+    color: #f3f4f6 !important;
+  }
+
+  .dark .clerk-profile .cl-formFieldInput:not([type="checkbox"]):not([type="radio"])::placeholder {
+    color: #6b7280 !important;
+  }
+
+  .dark .clerk-profile .cl-formFieldInput:not([type="checkbox"]):not([type="radio"]):disabled {
+    background-color: #1f2937 !important;
+    color: #6b7280 !important;
+  }
+
+  .dark .clerk-profile .cl-menuList {
+    border-color: #1f2937 !important;
+    background-color: #111827 !important;
+    color: #f3f4f6 !important;
+  }
+
+  .dark .clerk-profile .cl-menuItem {
+    color: #d1d5db !important;
+  }
+
+  .dark .clerk-profile .cl-menuItem:hover,
+  .dark .clerk-profile .cl-menuItem:focus-visible {
+    background-color: #1f2937 !important;
+    color: #56db9f !important;
+  }
+
+  .dark .clerk-profile .cl-actionCard {
+    border-color: #1f2937 !important;
+    background-color: #111827 !important;
+    color: #f3f4f6 !important;
+  }
+
+  .dark .clerk-profile .cl-checkbox:not(:checked) {
+    border-color: #6b7280 !important;
+    background-color: #111827 !important;
+  }
+
+}
+
 .pb-safe {
   padding-bottom: calc(4rem + env(safe-area-inset-bottom));
 }
