@@ -35,7 +35,7 @@ Admin dan treasurer dibatasi pada akun pemegang kas miliknya ketika aturan trans
 5. Lock dilepas dalam blok `finally`.
 6. Jika ada bukti, file diunggah setelah transaksi mempunyai ID dan `proof_storage_path` diperbarui.
 
-Edit transaksi hanya tersedia selama satu jam setelah dibuat untuk role minimal treasurer. Penghapusan selama jendela yang sama memerlukan minimal admin. Saat diedit, movement lama dibalik dan movement baru diterapkan secara atomik.
+Edit transaksi tersedia selama satu jam setelah dibuat untuk role minimal treasurer, sedangkan penghapusan dalam jendela yang sama memerlukan minimal admin. Owner dapat mengedit atau menghapus transaksi setelah jendela satu jam untuk mengoreksi entri historis. Pengecualian waktu ini tetap melewati `LedgerCoordinator`: perubahan saldo akun dan seluruh movement sesudah transaksi direkonsiliasi dalam batch atomik.
 
 ## Upload dan akses bukti
 

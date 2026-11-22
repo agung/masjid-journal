@@ -7,9 +7,9 @@ These instructions apply to every Codex session in this repository.
 1. Read this file, `README.md`, and `docs/README.md` before changing anything.
 2. Read the documentation linked from `docs/README.md` that applies to the task.
 3. Run `git status --short --branch` and preserve all existing user changes.
-4. Run `git fetch origin --prune` to inspect the latest remote state.
-5. For new work, start from the latest `origin/main` on a `codex/<topic>` branch. Never edit or commit directly on `main`.
-6. When continuing an existing branch, compare it with `origin/main` first. Do not rebase, reset, discard, or overwrite existing work without explicit user approval.
+4. Start each new session on the local `main` branch, then run `git fetch origin --prune` and fast-forward `main` to `origin/main` when safe. If the working tree has changes or `main` cannot be updated without overwriting work, preserve the changes and resolve the situation before switching branches.
+5. For new code work, create a new branch from the latest `main`. Branch names must start with a type prefix such as `feat/`, `fix/`, `docs/`, or `refactor/`, followed by a concise description. Never edit or commit directly on `main`.
+6. Continue an existing task branch only when the user explicitly asks to continue it or the task context clearly requires it. Compare it with the latest `origin/main` first. Do not rebase, reset, discard, or overwrite existing work without explicit user approval.
 
 ## Change rules
 
@@ -21,6 +21,7 @@ These instructions apply to every Codex session in this repository.
 - Keep secrets out of source control, logs, examples, and documentation. Production secrets belong in Cloudflare Worker secrets or GitHub environment secrets.
 - Keep Cloudflare and vinext dependency versions pinned unless the task explicitly upgrades them.
 - Do not push, merge, deploy, alter production data, or send external messages unless the user explicitly asks.
+- Do not create commits automatically. After implementation and review, ask whether the user wants the changes committed and pushed. Commit or push only after the user explicitly confirms the requested action.
 
 ## Documentation contract
 
@@ -32,7 +33,7 @@ These instructions apply to every Codex session in this repository.
 
 ## Verification and handoff
 
-- At minimum, run `git diff --check` and inspect `git diff` before committing.
+- At minimum, run `git diff --check` and inspect `git diff` before handoff and before any user-approved commit.
 - Run the relevant lint, typecheck, test, or build commands when requested or when preparing a PR; report any check that was not run.
-- Use focused commits with clear messages. Before handoff, report the branch, commit state, files changed, checks run, and remaining risks.
+- After implementation, leave changes uncommitted until the user explicitly confirms whether to commit and push. Use focused commits with clear messages when approved. Before handoff, report the branch, commit state, files changed, checks run, and remaining risks.
 
