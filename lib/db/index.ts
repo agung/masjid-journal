@@ -17,5 +17,3 @@ export const db = new Proxy({} as ReturnType<typeof getDb>, {
     return typeof value === 'function' ? value.bind(instance) : value
   },
 })
-
-export function formatDbDate(date: Date): Date { return date }

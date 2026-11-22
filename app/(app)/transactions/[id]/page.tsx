@@ -6,7 +6,7 @@ import { TRANSACTION_TYPE_CONFIG } from '@/lib/transaction-icons'
 import { notFound } from 'next/navigation'
 import { Wallet, Landmark, Pencil, Clock } from 'lucide-react'
 import Link from 'next/link'
-import { hasMinRole } from '@/lib/auth/roles'
+import { hasMinRole, isTransactionChangeWindowOpen } from '@/lib/auth/roles'
 import { DeleteTransactionButton } from '@/components/transactions/delete-transaction-button'
 
 /**
@@ -55,14 +55,17 @@ export default async function TransactionDetailPage({ params }: Props) {
 
   const userRole = ctx.role
   const isWithin1Hour = (Date.now() - tx.createdAt.getTime()) < 60 * 60 * 1000
-  const canEdit = userRole && hasMinRole(userRole, 'treasurer') && isWithin1Hour
-  const canDelete = userRole && hasMinRole(userRole, 'admin') && isWithin1Hour
+  const isChangeWindowOpen = userRole
+    ? isTransactionChangeWindowOpen(userRole, tx.createdAt)
+    : false
+  const canEdit = userRole && hasMinRole(userRole, 'treasurer') && isChangeWindowOpen
+  const canDelete = userRole && hasMinRole(userRole, 'admin') && isChangeWindowOpen
 
   return (
     <div className="p-4 max-w-md mx-auto pb-24">
 
       {/* Lock warning */}
-      {!isWithin1Hour && (
+      {!isWithin1Hour && !isChangeWindowOpen && (
         <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-2xl p-4 mb-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-200">
           <Clock className="text-amber-500 shrink-0 mt-0.5" size={18} />
           <div>
@@ -75,7 +78,7 @@ export default async function TransactionDetailPage({ params }: Props) {
       )}
 
       {/* Edit & Delete actions */}
-      {isWithin1Hour && (canEdit || canDelete) && (
+      {(canEdit || canDelete) && (
         <div className="flex gap-2 mb-4">
           {canEdit && (
             <Link

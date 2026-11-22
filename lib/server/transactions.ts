@@ -1,9 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { eq, and, desc, sql } from 'drizzle-orm'
+import { eq, and, desc, gt, lt, sql } from 'drizzle-orm'
 import crypto from 'crypto'
-import { db, formatDbDate } from '@/lib/db'
+import { db } from '@/lib/db'
 import {
   transaction,
   transactionMovement,
@@ -11,6 +11,7 @@ import {
   auditLog,
 } from '@/drizzle/schema'
 import { requireRole } from '@/lib/auth/guards'
+import { isTransactionChangeWindowOpen } from '@/lib/auth/roles'
 import { withLedgerLock } from '@/lib/ledger-coordinator'
 import {
   createTransactionSchema,
@@ -397,6 +398,7 @@ async function deleteTransactionUnlocked(
   try {
     const session = await requireRole('admin')
     const orgId = session.activeOrganizationId!
+    const userRole = session.activeOrganizationRole!
     const userId = session.user.id
 
     // Fetch existing transaction
@@ -405,10 +407,8 @@ async function deleteTransactionUnlocked(
       return { success: false, error: 'Transaksi tidak ditemukan.' }
     }
 
-    // Verify 1 hour window
-    const now = new Date()
-    const diffInMs = now.getTime() - tx.createdAt.getTime()
-    if (diffInMs > 60 * 60 * 1000) {
+    // Owners may correct historical entries; all other roles keep the one-hour window.
+    if (!isTransactionChangeWindowOpen(userRole, tx.createdAt)) {
       return {
         success: false,
         error: 'Transaksi tidak dapat dihapus karena sudah lebih dari 1 jam sejak dibuat.',
@@ -433,11 +433,11 @@ async function deleteTransactionUnlocked(
       const [acc] = await db.select({ name: masjidAccount.name, balance: masjidAccount.balance }).from(masjidAccount).where(eq(masjidAccount.id, accountId)).limit(1)
       if (!acc) throw new Error(`Akun tidak ditemukan: ${accountId}`)
       if (Number(acc.balance) + delta < 0) throw new Error(`Saldo ${acc.name} tidak mencukupi.`)
-      const subsequent = await db.select({ balanceBefore: transactionMovement.balanceBefore, balanceAfter: transactionMovement.balanceAfter }).from(transactionMovement).where(and(eq(transactionMovement.accountId, accountId), sql`${transactionMovement.createdAt} > ${formatDbDate(minCreatedAt)}`))
+      const subsequent = await db.select({ balanceBefore: transactionMovement.balanceBefore, balanceAfter: transactionMovement.balanceAfter }).from(transactionMovement).where(and(eq(transactionMovement.accountId, accountId), gt(transactionMovement.createdAt, minCreatedAt)))
       if (subsequent.some((m) => Number(m.balanceBefore) + delta < 0 || Number(m.balanceAfter) + delta < 0)) throw new Error(`Penghapusan ini akan menyebabkan saldo negatif pada riwayat transaksi berikutnya untuk akun ${acc.name}`)
       statements.push(
         db.update(masjidAccount).set({ balance: sql`${masjidAccount.balance} + ${delta}` }).where(eq(masjidAccount.id, accountId)),
-        db.update(transactionMovement).set({ balanceBefore: sql`${transactionMovement.balanceBefore} + ${delta}`, balanceAfter: sql`${transactionMovement.balanceAfter} + ${delta}` }).where(and(eq(transactionMovement.accountId, accountId), sql`${transactionMovement.createdAt} > ${formatDbDate(minCreatedAt)}`)),
+        db.update(transactionMovement).set({ balanceBefore: sql`${transactionMovement.balanceBefore} + ${delta}`, balanceAfter: sql`${transactionMovement.balanceAfter} + ${delta}` }).where(and(eq(transactionMovement.accountId, accountId), gt(transactionMovement.createdAt, minCreatedAt))),
       )
     }
     statements.push(
@@ -531,10 +531,8 @@ async function updateTransactionUnlocked(
       return { success: false, error: 'Transaksi tidak ditemukan.' }
     }
 
-    // Verify 1 hour window
-    const now = new Date()
-    const diffInMs = now.getTime() - tx.createdAt.getTime()
-    if (diffInMs > 60 * 60 * 1000) {
+    // Owners may correct historical entries; all other roles keep the one-hour window.
+    if (!isTransactionChangeWindowOpen(userRole, tx.createdAt)) {
       return {
         success: false,
         error: 'Transaksi tidak dapat diubah karena sudah lebih dari 1 jam sejak dibuat.',
@@ -659,7 +657,7 @@ async function updateTransactionUnlocked(
           .where(
             and(
               eq(transactionMovement.accountId, accId),
-              sql`${transactionMovement.createdAt} < ${formatDbDate(timestamp)}`
+              lt(transactionMovement.createdAt, timestamp)
             )
           )
           .orderBy(desc(transactionMovement.createdAt))
@@ -791,7 +789,7 @@ async function updateTransactionUnlocked(
           .where(
             and(
               eq(transactionMovement.accountId, accountId),
-              sql`${transactionMovement.createdAt} > ${formatDbDate(minCreatedAt)}`
+              gt(transactionMovement.createdAt, minCreatedAt)
             )
           )
 
@@ -848,7 +846,7 @@ async function updateTransactionUnlocked(
           .where(
             and(
               eq(transactionMovement.accountId, accountId),
-              sql`${transactionMovement.createdAt} > ${formatDbDate(minCreatedAt)}`
+              gt(transactionMovement.createdAt, minCreatedAt)
             )
           ))
       }

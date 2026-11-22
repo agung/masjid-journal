@@ -3,6 +3,7 @@ import { getTransactionById } from '@/lib/server/transactions'
 import { listAccounts } from '@/lib/server/accounts'
 import { listCategories } from '@/lib/server/categories'
 import { TransactionForm } from '@/components/transactions/transaction-form'
+import { isTransactionChangeWindowOpen } from '@/lib/auth/roles'
 import { notFound, redirect } from 'next/navigation'
 import type { Category, MasjidAccount } from '@/drizzle/schema'
 
@@ -24,9 +25,8 @@ export default async function EditTransactionPage({ params }: Props) {
   const tx = await getTransactionById(id, orgId)
   if (!tx) notFound()
 
-  // Enforce 1 hour limit
-  const isWithin1Hour = (Date.now() - tx.createdAt.getTime()) < 60 * 60 * 1000
-  if (!isWithin1Hour) {
+  // Owners may correct historical entries; all other roles keep the one-hour window.
+  if (!userRole || !isTransactionChangeWindowOpen(userRole, tx.createdAt)) {
     redirect(`/transactions/${id}`)
   }
 

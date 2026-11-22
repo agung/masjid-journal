@@ -1,9 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { eq, and, gt, sql } from 'drizzle-orm'
+import { eq, and, gt } from 'drizzle-orm'
 import crypto from 'crypto'
-import { db, formatDbDate } from '@/lib/db'
+import { db } from '@/lib/db'
 import { invitation, member, organization, user } from '@/drizzle/schema'
 import { requireRole, requireAuth } from '@/lib/auth/guards'
 import { z } from 'zod'
@@ -60,7 +60,7 @@ export async function createInvitationAction(data: {
             eq(invitation.organizationId, orgId),
             eq(invitation.email, email),
             eq(invitation.status, 'pending'),
-            sql`${invitation.expiresAt} > ${formatDbDate(new Date())}`
+            gt(invitation.expiresAt, new Date())
           )
         )
         .limit(1)
